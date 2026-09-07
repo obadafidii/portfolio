@@ -5,14 +5,15 @@ import { useEffect, useId, useRef, useState } from 'react';
 interface ShareBarProps {
     title: string;
     summary: string;
-    url: string;
+    path: string;
 }
 
 const optionClass =
     'share-modal__option cursor-pointer rounded-[4px] border px-3 py-2.5 text-left text-[12px] no-underline transition-colors';
 
-export const ShareBar = ({ title, summary, url }: ShareBarProps) => {
+export const ShareBar = ({ title, summary, path }: ShareBarProps) => {
     const [open, setOpen] = useState(false);
+    const [url, setUrl] = useState(path);
     const [status, setStatus] = useState('');
     const triggerRef = useRef<HTMLButtonElement>(null);
     const closeRef = useRef<HTMLButtonElement>(null);
@@ -100,6 +101,7 @@ export const ShareBar = ({ title, summary, url }: ShareBarProps) => {
                 type="button"
                 className="share-bar__trigger"
                 onClick={() => {
+                    setUrl(new URL(path, window.location.origin).href);
                     setStatus('');
                     setOpen(true);
                 }}

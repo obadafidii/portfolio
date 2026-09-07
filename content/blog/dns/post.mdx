@@ -17,7 +17,7 @@ import { ResolutionWalk } from '@/components/ui/blog/dns/ResolutionWalk';
 
 # Domain Name System
 
-In October 2025, a chunk of AWS went down because DNS records were deleted. Not a datacentre fire, not a bad deploy — a name stopped resolving and the services that depended on it had no way to find each other. That outage is why I stopped treating DNS as infrastructure someone else operates and wrote [a resolver in Go](https://github.com/tdadadavid/go-dns) to find out what it actually does.
+In October 2025, a chunk of AWS went down because DNS records were deleted. Not a datacentre fire, not a bad deploy — a name stopped resolving and the services that depended on it had no way to find each other. That outage is why I stopped treating DNS as infrastructure someone else operates and wrote [a resolver in Go](https://github.com/obadafidii/go-dns) to find out what it actually does.
 
 What follows is the protocol as I understand it now: the wire format, the walk from root to answer, the parts that are older than they look, and where the sharp edges are.
 

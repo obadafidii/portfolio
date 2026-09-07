@@ -316,7 +316,7 @@ export const ManPageContent = ({ resume }: { resume: Resume }) => {
                         style={{ borderColor: 'var(--paper-line)' }}
                     >
                         <RunningLine
-                            left={info.url.replace('https://www.', '')}
+                            left={new URL(info.url).hostname}
                             middle={updated}
                             right={title}
                         />

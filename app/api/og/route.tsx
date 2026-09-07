@@ -1,5 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
+import info from '@/misc/info';
 
 export const runtime = 'nodejs';
 
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
                 }}
             >
                 <div style={{ display: 'flex', color: '#577fbc', fontSize: 24, marginBottom: 32 }}>
-                    obadafidi.tech / writing
+                    {new URL(info.url).hostname} / writing
                 </div>
 
                 <div

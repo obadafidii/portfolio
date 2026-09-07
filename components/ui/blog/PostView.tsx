@@ -11,7 +11,6 @@ import { UnpublishedNotice } from './UnpublishedNotice';
 import { PostContent } from './PostContent.generated';
 import { PostNavigation } from './PostNavigation';
 import { blogStatusLabel, getBlogMetadata, getReadableBlogs, isReadable } from '@/lib/blogs';
-import info from '@/misc/info';
 import '@/app/code.css';
 
 export function PostView({ postKey }: { postKey: string }) {
@@ -48,7 +47,7 @@ export function PostView({ postKey }: { postKey: string }) {
                     <span style={{ color: 'var(--term-green)' }}>
                         [{blogStatusLabel(blog.status)}]
                     </span>
-                    <ShareBar title={blog.title} summary={blog.summary} url={`${info.url}/blog/${postKey}`} />
+                    <ShareBar title={blog.title} summary={blog.summary} path={`/blog/${postKey}`} />
                     <span className="ink-faint ml-auto hidden text-[11px] sm:inline">{blog.tags.join(' · ')}</span>
                 </header>
 

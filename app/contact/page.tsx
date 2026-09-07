@@ -9,8 +9,8 @@ import { CommandLine, Prompt } from '@/components/ui/shell/CommandLine';
 const CHANNELS = [
     { flag: '--email', label: info.email, href: `mailto:${info.email}` },
     { flag: '--linkedin', label: 'in/obadafidi', href: info.socials.linkedin },
-    { flag: '--github', label: 'tdadadavid', href: info.github },
-    { flag: '--x', label: '@dtrue_king', href: info.socials.twitter },
+    { flag: '--github', label: new URL(info.github).pathname.slice(1), href: info.github },
+    { flag: '--x', label: `@${new URL(info.socials.twitter).pathname.slice(1)}`, href: info.socials.twitter },
     { flag: '--resume', label: 'man david', href: '/resume', internal: true },
     { flag: '--pdf', label: 'resume.pdf', href: '/resume.pdf' },
 ];
