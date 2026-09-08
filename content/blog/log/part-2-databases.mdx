@@ -2,7 +2,11 @@ export const post = {
     "title": "Understanding Log: Databases",
     "summary": "How databases use logs to record changes and recover their state.",
     "publishedOn": "2026-09-03T00:00:00.000Z",
-    "status": "draft",
+    "status": "in-progress",
+    "coverImage": {
+        "src": "/image/log-in-several-systems.png",
+        "alt": "Handwritten map connecting logs to databases, version control, and distributed systems"
+    },
     "part": 2,
     "tags": [
         "logs",
@@ -11,3 +15,17 @@ export const post = {
 };
 
 # Understanding Log: Databases
+
+In the last [post](./part-1-introduction.mdx) we went through what a log is from a high-level perspective. Now we are going
+to go deeper into the nitty-gritty of things with our focus on databases. In this section we are going to answer some questions
+
+1. Why is there a Log in Database?
+2. What problem is the Log solving?
+3. What is `fysnc()` and why is it the pain-point? (ie. _journey from database to disk_)
+4. How do we resolve `fsync()` problem?
+5. Structure of a Database Log
+    * Headers
+    * checksum
+    * keys/values
+6. Database Replication and Database Logs 🤷‍♂️
+7. Research / Trending areas in database logs.

@@ -82,7 +82,7 @@ export const blogMetadata: Record<string, BlogMetadata> = {
             "logs",
             "databases"
         ],
-        "status": "draft",
+        "status": "in-progress",
         "series": "log",
         "part": 2
     },
