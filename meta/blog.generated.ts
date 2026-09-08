@@ -156,21 +156,6 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         ],
         "status": "draft"
     },
-    "wal": {
-        "title": "Write-Ahead Logs",
-        "summary": "How databases keep the promise that an acknowledged write survives a power cut — record layout, fsync, group commit, segment rotation and replay, built up in Go.",
-        "publishedOn": "2026-07-30T09:00:00.000Z",
-        "year": "2026",
-        "slug": "wal",
-        "tags": [
-            "wal",
-            "go",
-            "db",
-            "storage",
-            "distributed-systems"
-        ],
-        "status": "in-progress"
-    }
 };
 
 export const blogSeries: Record<string, BlogSeries> = {
