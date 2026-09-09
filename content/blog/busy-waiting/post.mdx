@@ -20,25 +20,27 @@ import { WakeSet } from '@/components/ui/blog/busy-waiting/WakeSet';
 
 # Busy-Waiting: When Doing Nothing Uses Everything
 
-I met busy-waiting as a warning in a concurrency problem: **do not busy-wait**. I understood the words, but not the mechanism. How can a thread be doing nothing and still waste a CPU core?
+I met busy-waiting as a warning in a concurrency problem: **do not busy-wait**.
+I understood the words, but not the mechanism. How can a thread be doing nothing
+and still waste a CPU core?
 
-The answer changed how I think about waiting. A thread can repeatedly ask whether something has changed, or it can stop running and ask the scheduler to wake it when change is possible. Both approaches wait. Only one of them keeps sending the CPU a bill.
+The answer changed how I think about waiting. A thread can repeatedly ask
+whether something has changed, or it can stop running and ask the scheduler to
+wake it when change is possible. Both approaches wait. Only one of them keeps
+sending the CPU a bill.
 
-<img
-    src="/image/busy-waiting-cover.webp"
-    alt="Network cables connected to rows of servers in a data centre"
-    width="1800"
-    height="1010"
-    caption="The infrastructure behind a wait. Photo by Taylor Vick on Unsplash."
-/>
+<img src="/image/busy-waiting-cover.webp" alt="Network cables connected to rows of servers in a data centre" width="1800" height="1010" caption="The infrastructure behind a wait. Photo by Taylor Vick on Unsplash." />
 
-Photo: [Taylor Vick](https://unsplash.com/@tvick) · [view the original on Unsplash](https://unsplash.com/photos/cable-network-M5tzZtFCOfs) · free to use under the [Unsplash License](https://unsplash.com/license)
+Photo: [Taylor Vick](https://unsplash.com/@tvick) ·
+[view the original on Unsplash](https://unsplash.com/photos/cable-network-M5tzZtFCOfs)
+· free to use under the [Unsplash License](https://unsplash.com/license)
 
 ---
 
 ## Two ways for a thread to wait
 
-Suppose a worker cannot continue until `ready` becomes true. The most direct implementation is a loop:
+Suppose a worker cannot continue until `ready` becomes true. The most direct
+implementation is a loop:
 
 ```go title="busy_wait.go"
 for !ready.Load() {
@@ -48,13 +50,17 @@ for !ready.Load() {
 doWork()
 ```
 
-That loop is busy-waiting, also called spinning. The thread stays runnable and repeatedly loads the same state. If it is scheduled on a core, it can consume nearly all of that core while making no useful progress.
+That loop is busy-waiting, also called spinning. The thread stays runnable and
+repeatedly loads the same state. If it is scheduled on a core, it can consume
+nearly all of that core while making no useful progress.
 
-The important question is not simply “does this code contain a loop?” It is: **what happens to the thread when progress is impossible?**
+The important question is not simply “does this code contain a loop?” It is:
+**what happens to the thread when progress is impossible?**
 
 <PollingLab />
 
-A busy-wait keeps the thread active. A blocking wait parks it: the operating system can run something else until the thread has a reason to try again.
+A busy-wait keeps the thread active. A blocking wait parks it: the operating
+system can run something else until the thread has a reason to try again.
 
 ## A subtle Go trap
 
@@ -69,7 +75,8 @@ case <-conditionTwo:
 }
 ```
 
-This is **not** busy-waiting. With no `default` case, Go blocks the goroutine until one of the channel operations can proceed.
+This is **not** busy-waiting. With no `default` case, Go blocks the goroutine
+until one of the channel operations can proceed.
 
 The busy version looks like this:
 
@@ -85,16 +92,21 @@ for {
 }
 ```
 
-The `default` makes the `select` non-blocking. Wrapped in a tight loop, it continuously polls. That distinction is tiny in code and enormous at runtime.
+The `default` makes the `select` non-blocking. Wrapped in a tight loop, it
+continuously polls. That distinction is tiny in code and enormous at runtime.
 
 ## Why not just use a mutex?
 
 A mutex and a condition variable solve different parts of the problem.
 
 - A **mutex** protects an invariant while shared state is inspected or changed.
-- A **condition variable** lets a thread sleep until that shared state may satisfy a predicate.
+- A **condition variable** lets a thread sleep until that shared state may
+  satisfy a predicate.
 
-The condition variable is attached to a mutex because “check the state” and “go to sleep” must behave like one atomic transition. Otherwise, another thread could change the state and send a signal in the gap, leaving the waiter asleep forever. This is the classic lost-wakeup bug.
+The condition variable is attached to a mutex because “check the state” and “go
+to sleep” must behave like one atomic transition. Otherwise, another thread
+could change the state and send a signal in the gap, leaving the waiter asleep
+forever. This is the classic lost-wakeup bug.
 
 The waiting pattern is always a loop:
 
@@ -109,16 +121,21 @@ use_shared_resource();
 pthread_mutex_unlock(&mutex);
 ```
 
-`pthread_cond_wait` atomically releases the mutex and parks the thread. Before it returns, it reacquires the mutex. The predicate still belongs in a `while` loop because a wakeup is permission to **check again**, not proof that the condition is still true.
+`pthread_cond_wait` atomically releases the mutex and parks the thread. Before
+it returns, it reacquires the mutex. The predicate still belongs in a `while`
+loop because a wakeup is permission to **check again**, not proof that the
+condition is still true.
 
 ## Signal and broadcast
 
-The thread that changes shared state normally holds the same mutex, updates the predicate, and then signals the condition variable.
+The thread that changes shared state normally holds the same mutex, updates the
+predicate, and then signals the condition variable.
 
 - `signal` wakes at least one waiting thread.
 - `broadcast` wakes every waiting thread.
 
-Waking does not hand over the mutex. It makes the waiter runnable; the awakened thread must still reacquire the mutex and re-check the predicate.
+Waking does not hand over the mutex. It makes the waiter runnable; the awakened
+thread must still reacquire the mutex and re-check the predicate.
 
 <WakeSet />
 
@@ -168,28 +185,42 @@ func (q *Queue) Push(item Item) {
 }
 ```
 
-`Wait` unlocks `q.mu`, suspends the goroutine, and locks `q.mu` again before returning. That lets producers call `Push` while consumers sleep instead of forcing either side to poll.
+`Wait` unlocks `q.mu`, suspends the goroutine, and locks `q.mu` again before
+returning. That lets producers call `Push` while consumers sleep instead of
+forcing either side to poll.
 
 ## Condition variables or channels?
 
-Go usually makes channels the clearer default. A channel combines notification with ownership transfer or a value moving between goroutines. It is a natural fit for jobs, results, streams, cancellation, and pipelines.
+Go usually makes channels the clearer default. A channel combines notification
+with ownership transfer or a value moving between goroutines. It is a natural
+fit for jobs, results, streams, cancellation, and pipelines.
 
-A condition variable becomes useful when the thing being communicated is not a message but a **predicate over shared state**:
+A condition variable becomes useful when the thing being communicated is not a
+message but a **predicate over shared state**:
 
 - many goroutines wait for the same state transition;
 - a broadcast must wake all current waiters;
 - the shared state is already protected by a mutex;
 - no value needs to be sent or received.
 
-The useful rule is not “condition variables are better than channels” or the reverse. It is: **choose the primitive that matches what is being coordinated**.
+The useful rule is not “condition variables are better than channels” or the
+reverse. It is: **choose the primitive that matches what is being coordinated**.
 
 ## Is spinning always wrong?
 
-No. Busy-waiting can make sense when the expected wait is shorter than the cost of putting a thread to sleep and waking it again. Low-level runtimes, kernels, and lock implementations sometimes spin briefly before blocking. On a multicore machine, a spinlock can be reasonable when another core is expected to release the lock almost immediately.
+No. Busy-waiting can make sense when the expected wait is shorter than the cost
+of putting a thread to sleep and waking it again. Low-level runtimes, kernels,
+and lock implementations sometimes spin briefly before blocking. On a multicore
+machine, a spinlock can be reasonable when another core is expected to release
+the lock almost immediately.
 
-That is a narrow optimization with strict assumptions. In application code, an unbounded spin loop is usually a warning sign: it wastes energy, steals CPU time from useful work, and behaves worse as contention grows.
+That is a narrow optimization with strict assumptions. In application code, an
+unbounded spin loop is usually a warning sign: it wastes energy, steals CPU time
+from useful work, and behaves worse as contention grows.
 
-My default is now simple: if a wait may last, **park the work and arrange a wakeup**. Spin only when measurement shows that the wait is truly tiny and the trade-off is intentional.
+My default is now simple: if a wait may last,
+**park the work and arrange a wakeup**. Spin only when measurement shows that
+the wait is truly tiny and the trade-off is intentional.
 
 ---
 

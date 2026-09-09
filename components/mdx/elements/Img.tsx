@@ -9,20 +9,23 @@ interface ImageProps extends HTMLAttributes<HTMLImageElement> {
     height?: string | number;
     /** Overrides the caption. Defaults to the alt text. */
     caption?: string;
+    /** Optional display width for illustrations that should sit within the text measure. */
+    maxWidth?: number;
 }
 
-const Img = ({ src, alt, width, height, className, caption }: ImageProps) => {
+const Img = ({ src, alt, width, height, className, caption, maxWidth }: ImageProps) => {
     const resolvedWidth = typeof width === 'number' ? width : Number(width) || 1280;
     const resolvedHeight = typeof height === 'number' ? height : Number(height) || 720;
     const label = caption ?? alt;
 
     return (
-        <figure className="mdx-image-frame">
+        <figure className="mdx-image-frame" style={{ maxWidth }}>
             <Image
                 src={src}
                 alt={alt}
                 width={resolvedWidth}
                 height={resolvedHeight}
+                sizes={maxWidth ? `(max-width: ${maxWidth}px) 100vw, ${maxWidth}px` : undefined}
                 className={cn(
                     'h-auto w-full rounded-[4px] border',
                     className,

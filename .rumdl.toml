@@ -1,0 +1,11 @@
+[global]
+line-length = 80
+
+[per-file-flavor]
+"**/*.mdx" = "mdx"
+
+[MD013]
+line-length = 80
+reflow = true
+code-blocks = false
+tables = false

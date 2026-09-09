@@ -2,10 +2,10 @@ export const post = {
     "title": "Understanding Log: Databases",
     "summary": "How databases use logs to record changes and recover their state.",
     "publishedOn": "2026-09-03T00:00:00.000Z",
-    "status": "in-progress",
+    "status": "done",
     "coverImage": {
-        "src": "/image/log-in-several-systems.png",
-        "alt": "Handwritten map connecting logs to databases, version control, and distributed systems"
+        "src": "/image/journey-of-a-write.jpeg",
+        "alt": "Handwritten diagram tracing a write request from a client to the database"
     },
     "part": 2,
     "tags": [
@@ -14,18 +14,398 @@ export const post = {
     ]
 };
 
+import { WalDiskWrite, WalRecovery, PhysicalReplication, LogicalReplication } from '@/components/ui/blog/log/DatabaseVisuals';
+import ArticleImage from '@/components/mdx/elements/Img';
+
 # Understanding Log: Databases
 
-In the last [post](./part-1-introduction.mdx) we went through what a log is from a high-level perspective. Now we are going
-to go deeper into the nitty-gritty of things with our focus on databases. In this section we are going to answer some questions
+In the last [post](./part-1-introduction) we went through what a log is from a
+high-level perspective. Now we are going to go deeper into the nitty-gritty of
+things with our focus on databases. In this section we are going to answer some
+questions
 
-1. Why is there a Log in Database?
-2. What problem is the Log solving?
-3. What is `fysnc()` and why is it the pain-point? (ie. _journey from database to disk_)
-4. How do we resolve `fsync()` problem?
-5. Structure of a Database Log
-    * Headers
-    * checksum
-    * keys/values
-6. Database Replication and Database Logs 🤷‍♂️
-7. Research / Trending areas in database logs.
+## The journey of a write
+
+When is the journey like for a "write" into a database? When a client sends a
+write be it an update, insert or deletion (basically any state-altering
+command), what happens to this process. In this part we are going to go deeper
+in to the responsibilities and purpose of a Log in database.
+
+<ArticleImage src="/image/journey-of-a-write.jpeg" alt="An image describing the
+flow of a write request from a client to the database"
+    width={1600}
+    height={985}
+    maxWidth={560}
+caption="An image describing the flow of a write request from a client to the
+database drawn by David Dada" />
+
+In previous years when a client writes to the database, the database immediately
+writes it to disk
+([SSTables](https://www.igvita.com/2012/02/06/sstable-and-log-structured-storage-leveldb/))
+which made data very reliable and durable. This flow came with a cost on
+performance, because writing to a disk (SSDs or spinning disks) is very costly.
+How should this be mitigated? How do we achieve `strong` durability and
+performance?
+
+<ArticleImage src="/image/database-to-disk.jpeg" alt="An image describing the
+flow of a write request from a client to the database to disk"
+    width={1600}
+    height={985}
+    maxWidth={560}
+caption="An image describing writing directly from database to disk" />
+
+The answer was to build an in-memory structure
+([Memtable](https://en.wikipedia.org/wiki/Skip_list) part of [LSM Tree]) where
+all incoming writes will be applied to then _after a while_ or _when this
+in-memory structure is fiiled up_ we _"flush"_ to the disk
+([SSTables](https://www.igvita.com/2012/02/06/sstable-and-log-structured-storage-leveldb/)).
+
+<ArticleImage src="/image/memtables-to-disk.jpeg" alt="An image describing the
+flow of a write request from a client to the database to disk"
+        width={1600}
+        height={985}
+        maxWidth={560}
+    caption="An image describing writing to database memtables then to disk"
+/>
+
+This solution improved the performance of writes in a write-heavy workload as
+the client will just need to write to memory (which is extremely faster than
+writing to disks) and the database can asynchronously flush these buffered
+writes to disk. Now, we can say we have both `performance` and `strong`
+durability right? No! we don't.
+
+Consider a scenario where there is power loss in a data center or any human
+error, and we have several writes (transactions) Memtable and have not been
+flushed to disk, several questions arises
+
+1. the writes from the client where they "stored"(commited) before the power
+   loss?
+2. Can we recover those transactions in-process when the crash happened?
+
+If a database cannot boldly answer **Yes** to these questions, then that
+database is not _RELIABLE_
+
+## Database Reliability: How 🤷‍♂️?
+
+To achieve reliability in a database we need to figure out a way to store or
+keep client's writes beyond any failure. This is where the Log comes in.
+
+The Log in a database serves as a _bookkeeper_ of every state-altering
+transaction. The beautiful concept to this in a database is that, **we write
+every state-altering transaction to the log before making changes to any
+data-structure in the database**. This is where the Log in database gets it
+name; Write-_Ahead_-Log, any command/transaction that alters state must be first
+committed to the WAL before
+
+1. Informing the client that the write was successful (committed)
+2. Making any change to the database structures (memtable)
+
+WAL in databases are `append-only`; meaning entries (writes) are only added at
+the end of the log and only when they're _committed_ then can the database say
+the write is guaranteed to weather any storm of failure or crash.
+
+But another thought rises immediately. Is the WAL magically durable or reliable?
+How does it survive crash or failures? It will be great for me to create a
+mental model for you to clarify some terms commonly used around this topic.
+
+1. **Append**: When we say we append to a WAL most times, we are speaking about
+   writing to the internal buffer of the log (like a queue or ordered array).
+   This particular operation happens _in-memory_.
+
+2. **Committed**: This has to do with `flushing` the WAL (in the
+   `kernerl-dirty-pages`) to the disk making it permanently durable. The
+   [`fysnc POSIX API`](https://man7.org/linux/man-pages/man2/fsync.2.html)
+is used to synchronize the internal changes of the WAL to disk.
+
+Hurray! This is really awesome, right? If we have any write to our database, we
+store it in the WAL then call the `fysnc()` method on the file, on-success we
+notify the client that the write has been committed no need to worry come any
+failure or crash the information will be there, then we make any change to any
+structured concerned. But should we celebrate now?
+
+<WalDiskWrite />
+
+## Fsync? Its Strength & Pitfalls
+
+<ArticleImage
+    src="/image/fsync-description.png"
+    alt="An image describing the fsync API"
+    width={1000}
+    height={186}
+    maxWidth={1000}
+    caption="Description of the fsync API"
+/>
+
+The [`fysnc`](https://man7.org/linux/man-pages/man2/fsync.2.html) api is the nut
+that ties both the WAL and the disk together giving us the ability to ensure
+`performance` and `reliability` of our database. When we write data to our WAL,
+the kernel internal pages is marked `dirty`. The operating system by itself
+periodically (configured by
+[`dirty_expire_centiseconds`](https://lkml.indiana.edu/hypermail/linux/kernel/1309.1/01585.html))
+flushes these dirty pages to disk, but we don't want to rely on the OS, so we
+call `fysnc` manually. This comes with a bottleneck, flushing to disk via
+`fsync` is a costly operation, and considering a write-heavy workload of over 1
+million w/s this won't be achievable due the fact that `fsync` is really costly.
+So we are back to the first problem of performance, writing to the disk via
+`fsync` is costly, are we not just going in cycles? No!
+
+To solve this, a standard solution has been adopted over the
+years;`Group Commit` this solution is used by several mainstreams like
+[Postgres's `commit_delay`](https://www.postgresql.org/docs/current/runtime-config-wal.html#GUC-COMMIT-DELAY)
+and
+[Mysql](https://dev.mysql.com/worklog/task/?id=5223)
+
+## What is Group Commit?
+
+Group commit is a standard solution where writes are written to a buffer first
+before being flushed to the disk (_batched_). There is a mental model I want us
+concerning `Group Commit`'s, how do we configure the batching of commits
+
+1. Time-based: this method involves configuring a timer trigger flushing to disk
+   e.g. 1 ms. Most times it is configured based on the write-frequency of the
+   workload. In postgres it is configured using
+   [`commit_delay`](https://www.postgresql.org/docs/current/runtime-config-wal.html#GUC-COMMIT-DELAY).
+2. Size-based: this mode involves flushing to disk when the WAL's buffer (queue)
+   is full. The buffer can be configured to 8 kb for example allowing for
+   quicker flushes. Checkout
+   [Postgres `commit_sibling`](https://www.postgresql.org/docs/current/runtime-config-wal.html#GUC-COMMIT-SIBLINGS)
+
+Most databases employ both modes to handle `Group commit`.
+
+```go title="wal-psuedocode"
+     //pseudocode of fsync
+     fn write(key, value string) (err error) {
+		 walBuffer.write(key, value) // append to buffer
+
+		 // then synchronize when full or time configured as elapsed
+		 if walBuffer.isFull() or time.Since(wal.PeriodicSyncMs) > 0 {
+			 walBuffer.Flush() //flush to os kernel
+			 walBuffer.Sync() // flush dirty pages from kernel to disk
+		 }
+
+		 memtable.append(key, value)
+
+		 if memtable.isFull() {
+			 go syncMemtableToDisk(memtable) // done in the background
+		 }
+     }
+```
+
+This solution, as many in software engineering, is a tradeoff of _reliability_
+for _performance_. Reliability is not lost but just high tendency based on the
+configuration and the needs of the workload.
+
+So the WAL using _group commit_ is able to bridge the gap between
+`performant memtables` and `durable sstables`. Our writes journey has come to
+the beautiful end that we all want. We've learnt about how the Log in databases
+(_WAL_) help to achieve durability in scenarios of failures or crashes. What are
+the internal mechanics of the WAL entries that makes us able to achieve this?
+
+## The WAL: its entries
+
+There are different shapes the WAL's entry can take in several databases, but
+there are common parts that appear in each of these implementations; we are
+going to be looking at them and the role they play in this section.
+
+1. **Operation**: an entry into a Log must contain the operation the client just
+   performed. These operations are `state-altering` changes for example
+   `PUT name = David` alters the state of
+_name_ in the database and this must be recorded before applying the change to
+the `memtable`.
+
+2. **Log Number**: each entry in a given a `monotonically` increasing number
+   (sometimes `timestamps`) and it this property of the entry is used to
+   establish order when replaying events.
+It can also be used to eventual consistency in distributed systems, but more on
+this when we get to distributed systems.
+
+3. **Key and value**: In most entries the key and value length is stored in the
+   header of the WAL, before storing the actual key and value. This helps during
+   recovery and helps the reading stream to
+know how many bytes to read as the key and value.
+
+4. **Checksum value**: This is a crucial part of a WAL entry. Checksum is an
+   error-detection algorithm used to verify the validity of information, where a
+   slight change in the content of the information will result in
+a different checksum. This guards against scenarios of
+_`partial or corrupted writes`_. The algorithms commonly used are
+[`CRC32`](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) or
+[`xxhash`](https://xxhash.com/). I need to elaborate on this, imagine while the
+WAL was writing to the disk there is power outage and some bytes have been
+written to the disk, this scenario is what we called `Partial Write` it means
+the state was not successfully committed and the way know about this is by
+re-computing the checksum of the data read from disk and comparing it to what
+was written into disk. The function of checksum is seen while `Replaying`
+entries during _recovery_. To understand this more, let's look at WAL Recovery
+
+```go title="entry.go"
+    package  entry
+    
+    import "sync/atomic"
+
+    type Operation string
+
+    const (
+			Del Operation = "delete"
+			Put Operation = "put"
+    )
+
+    type Entry struct {
+     Op Operation
+		 logSequenceNum atomic.Int64
+		 keyLen int
+		 valueLen int
+		 key []byte
+		 value []byte
+    }
+```
+
+## The WAL: Recovery/Replaying
+
+When a database crashes or experiences a failure and the states are stored
+(written to disk), how do we now build the database to the last valid state
+stored on the disk by the WAL? This process is called _Recovery_. We read from
+the WAL directory picking the
+`active WAL segments and unflushed segments of the WAL` and build the internal
+state of the database using these entries. The algorithm for recovery is quite
+simple.
+
+1. Read from the WAL directory and pick the active WAL segment (the log file
+   currently written to) and unflushed segments (older segments not yet flushed
+   to disks)
+2. Perform a validation check on each entry. If we get an entry that is
+   corrupted, we truncate that entry and all entries after this; this process
+   helps to guard the state of the database
+against corruption.
+3. For each valid entry construct the `memtables` and when the `memtables` are
+   full flush them to disk (SSTables).
+
+<WalRecovery />
+
+Which this we can be able to construct our database state before a crash.
+Question 🙋‍♂️, let's paint a scenario where we have our WAL to be 100 gb do you
+think recovery will be performant? No! Then how do we
+
+1. Store the WAL on the server
+2. optimize for performant recovery?
+
+## The WAL: Size and Storage
+
+The Log cannot continue to grow forever, in a write-heavy workload having
+millions of write per second think of the size of the log at the end of the day;
+it will be too voluminous, now think of it after a month. Recovering database
+state from this kind of huge file will be too cumbersome for any system, the way
+we avoid the log file growing beyond proportion is _segmentation_. This process
+involves creating chunks or segments of log files in the Log directory, instead
+of one huge log file, we have several chunks (for instance, 8 kb) that can
+quickly fill up and allow for flushing.
+
+Once a chunk or segment of the WAL has been written to disk, we don't need to
+still keep them. WAL Truncation is what happens where old-flushed segments of
+WAL are deleted to free up space for the WAL process itself. The process of
+marking a segment old is _checkpointing_. Checkpointing forces a write to the
+disk and marks every entry before the write as old allow space recovery of the
+databse for other operations.
+
+## Database WAL beyond crash recovery: Replication
+
+In a distributed system where we have multiple nodes/instances of databases
+(like a leader-follower). Since the log serves as an authoritative source for
+anything state change in the database, if we want the same state of the current
+database in another database then all we need to do is
+_take the WAL and give it to the other database to replay it_ and it will be
+consistent with the origin database. This process is simply replication, where
+we are updating the state of other replicas/nodes with the state of the origin
+database (leader/master) using the WAL
+
+In databases, we can achieve this _replication_ using two strategies
+
+1. Physical Replication
+2. Logical Replication
+
+### Physical Replication
+
+This involves streaming the `raw bytes` contents of the WAL to the replicas,
+these bytes are written to the disk of the replicas. This is rapid both on the
+leader and replicas (follower's) end. This strategy is employed when you want
+[_exact disaster recovery_](https://www.cockroachlabs.com/blog/232-physical-cluster-replication/)
+or you want an instant fail over. To achieve this, the leader-followers must
+have the same _machine architecture_, _database version_ and most importantly
+_same shape of database tables_.
+
+<PhysicalReplication />
+
+### Logical Replication
+
+This does not stream the raw-bytes instead it streams the
+operations/commands/transactions (logical operations) that caused the change in
+state. It is more flexible than the physical, it a with a different table shape
+from the leader to subscribe to changes. This is used when changes recorded in
+WAL are to be streamed to different data systems e.g., Kafka, ingestion
+pipelines etc. This is the building block of
+[Change-Data-Capture](https://en.wikipedia.org/wiki/Change_data_capture)
+
+<LogicalReplication />
+
+## The WAL: its bottleneck
+
+There are 3 major bottlenecks a WAL goes through
+
+1. **Write Amplication**: This is a scenario where a single write results in
+   multiple writes, considering the case when there is burst in write-load. This
+   can reduce the lifespan of the underlying hardware. lets take count of
+   everywhere a write takes place
+
+   * client to WAL buffer -> not costly
+
+   * WAL buffer to disk -> costly
+
+   * WAL to memtables -> not costly
+
+   * memtables to sstable -> costly (but happens asynchronously in most designs)
+
+For every write we have at least 2 costly write operations, this leads to
+[I/O Amplification](https://en.wikipedia.org/wiki/Write_amplification). Ways
+this can be handled
+
+* write changes in batch (`group commit`),
+* compress the WAL binary before flushing to disk; this comes with a cost on CPU
+  during compression.
+  [Rock's db compression design](https://github.com/facebook/rocksdb/wiki/WAL-Compression)
+
+2. **Slow Flushing**: since WAL lives in memory, during flushing to disk if it
+   is not fast enough, WAL can consume memory space and lead to `OOM` error
+   (out-of-memory), this is why most databases
+give tunable variables (like knobs) to control how often flushing happens.
+
+3. **Full disk**: in the scenario where we don't have space on disk what
+   happens? An ACID compliant database would crash instead of accepting another
+   write that it cannot gauranteee.
+
+## Conclusion
+
+Woah! we went through journey alongside the client's write understanding every
+scenario it faces to make sure it is `permanently stored` in a `performant`
+manner. We can see now how WAL is really the pillar holding together big-data
+workloads that we use in our daily operations. A simple concept/structure
+powering data systems used by billion-dollar organizations. I hope through this
+discuss we were able to understand the Log from the perspective of Database. If
+you want to go further you can check research areas like building _WAL on S3_.
+See what
+[Arpit Bhayani](https://arpitbhayani.me/notes/how-s3-enables-stateless-write-ahead-logs-despite-latency-trade-offs/)
+has to say about it. Another thing I will like to add is checking out the
+internal design of [Tigerbettle](https://www.youtube.com/watch?v=_jfOk4L7CiY).
+They implemented an innovation called _double WAL_, its something you're going
+to enjoy so check it out. Thank you for sticking so far.
+
+> If you love deep-dives or research areas like this consider joining
+> [Designing Ultra Large Scale Systems Study Group](https://space-rf-org.github.io/dulss-study-group/)
+
+## Resources
+
+1. [Memtables and SSTables](https://www.mauriciopoppe.com/notes/computer-science/data-structures/memtable-sstable/)
+2. [Build a Database by Adam Comer](https://adambcomer.com/blog/simple-database/sstable/)
+3. [WAL for LSM storage engine](https://blog.lbenicio.dev/post/2025/02/04/write-ahead-logging-under-the-hood-designing-a-durable-wal-for-an-lsm-tree-storage-engine/)
+4. [WAL Durability](https://shirokoff.ca/blog/write-ahead-log-durability)
+5. [Building a LSM storage engine](https://khushal.net/blog/building-lsm-trees-storage-engine/)
+6. [WAL on S3 by Neon](https://neon.com/blog/wal-s3-lakebase-storage-for-the-era-of-agents?via=obadafidi.me)

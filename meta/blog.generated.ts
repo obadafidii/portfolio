@@ -82,7 +82,11 @@ export const blogMetadata: Record<string, BlogMetadata> = {
             "logs",
             "databases"
         ],
-        "status": "in-progress",
+        "status": "done",
+        "coverImage": {
+            "src": "/image/journey-of-a-write.jpeg",
+            "alt": "Handwritten diagram tracing a write request from a client to the database"
+        },
         "series": "log",
         "part": 2
     },
@@ -155,7 +159,7 @@ export const blogMetadata: Record<string, BlogMetadata> = {
             "memory"
         ],
         "status": "draft"
-    },
+    }
 };
 
 export const blogSeries: Record<string, BlogSeries> = {
@@ -180,6 +184,6 @@ export const blogSeries: Record<string, BlogSeries> = {
             "log/part-5-consensus-algorithms"
         ],
         "partCount": 5,
-        "publishedParts": 1
+        "publishedParts": 2
     }
 };

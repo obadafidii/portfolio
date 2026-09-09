@@ -17,15 +17,24 @@ import { ResolutionWalk } from '@/components/ui/blog/dns/ResolutionWalk';
 
 # Domain Name System
 
-In October 2025, a chunk of AWS went down because DNS records were deleted. Not a datacentre fire, not a bad deploy — a name stopped resolving and the services that depended on it had no way to find each other. That outage is why I stopped treating DNS as infrastructure someone else operates and wrote [a resolver in Go](https://github.com/obadafidii/go-dns) to find out what it actually does.
+In October 2025, a chunk of AWS went down because DNS records were deleted. Not
+a datacentre fire, not a bad deploy — a name stopped resolving and the services
+that depended on it had no way to find each other. That outage is why I stopped
+treating DNS as infrastructure someone else operates and wrote
+[a resolver in Go](https://github.com/obadafidii/go-dns) to find out what it
+actually does.
 
-What follows is the protocol as I understand it now: the wire format, the walk from root to answer, the parts that are older than they look, and where the sharp edges are.
+What follows is the protocol as I understand it now: the wire format, the walk
+from root to answer, the parts that are older than they look, and where the
+sharp edges are.
 
 ---
 
 ## What is actually on the wire
 
-A DNS message is a header followed by four sections. The same layout serves both queries and responses — a response is literally the query echoed back with the answer sections filled in and one bit flipped.
+A DNS message is a header followed by four sections. The same layout serves both
+queries and responses — a response is literally the query echoed back with the
+answer sections filled in and one bit flipped.
 
 ```plaintext title="RFC 1035 §4.1"
 +---------------------+
@@ -86,11 +95,13 @@ func ParseHeader(buf []byte) (Header, error) {
 }
 ```
 
-That `Flags` word is where most of the protocol's control logic lives, packed into sixteen bits.
+That `Flags` word is where most of the protocol's control logic lives, packed
+into sixteen bits.
 
 <HeaderLayout />
 
-Packing and unpacking it is bit-twiddling, and worth writing out once so you never think about it again:
+Packing and unpacking it is bit-twiddling, and worth writing out once so you
+never think about it again:
 
 ```go title="dns/flags.go"
 type Flags struct {
@@ -143,7 +154,9 @@ func UnpackFlags(v uint16) Flags {
 
 ## Names are not strings
 
-This is the first thing that surprised me. `www.example.com` never appears on the wire as text. It is encoded as a sequence of length-prefixed labels, terminated by a zero byte:
+This is the first thing that surprised me. `www.example.com` never appears on
+the wire as text. It is encoded as a sequence of length-prefixed labels,
+terminated by a zero byte:
 
 ```plaintext title="wire encoding of www.example.com"
 03 77 77 77   05 65 78 61 6d 70 6c 65   03 63 6f 6d   00
@@ -179,11 +192,17 @@ func EncodeName(name string) ([]byte, error) {
 }
 ```
 
-The 63-byte label limit is why that length byte only needs six bits. The top two bits were left spare — and then used for something clever that becomes a security problem if you implement it naively.
+The 63-byte label limit is why that length byte only needs six bits. The top two
+bits were left spare — and then used for something clever that becomes a
+security problem if you implement it naively.
 
 ### Name compression, and the infinite loop
 
-A response repeats domain names constantly. Ask for `www.example.com` and the answer, authority and additional sections all mention `example.com` again. To save space in a 512-byte budget, RFC 1035 lets a name be replaced by a **pointer**: two bytes whose top bits are `11`, with the remaining 14 bits giving an offset from the start of the message.
+A response repeats domain names constantly. Ask for `www.example.com` and the
+answer, authority and additional sections all mention `example.com` again. To
+save space in a 512-byte budget, RFC 1035 lets a name be replaced by a
+**pointer**: two bytes whose top bits are `11`, with the remaining 14 bits
+giving an offset from the start of the message.
 
 ```plaintext
 0xC0 0x0C  →  11000000 00001100
@@ -191,7 +210,9 @@ A response repeats domain names constantly. Ask for `www.example.com` and the an
                 111111 00001100   offset 12 — the start of the question section
 ```
 
-The naive parser follows pointers recursively. A hostile server sends a pointer to itself and your resolver spins forever. Every real implementation has to bound this:
+The naive parser follows pointers recursively. A hostile server sends a pointer
+to itself and your resolver spins forever. Every real implementation has to
+bound this:
 
 ```go title="dns/name.go — decoding" showLineNumbers
 // DecodeName reads a name at offset, following compression pointers.
@@ -263,7 +284,10 @@ func DecodeName(msg []byte, offset int) (string, int, error) {
 }
 ```
 
-Two details worth keeping. **Pointers must point backwards** — enforcing that alone makes loops impossible, because each jump strictly decreases the offset. And the function returns two offsets, because after following a pointer you must resume reading from where the pointer *was*, not from where it led.
+Two details worth keeping. **Pointers must point backwards** — enforcing that
+alone makes loops impossible, because each jump strictly decreases the offset.
+And the function returns two offsets, because after following a pointer you must
+resume reading from where the pointer *was*, not from where it led.
 
 ---
 
@@ -290,13 +314,18 @@ func (q Question) Marshal() ([]byte, error) {
 }
 ```
 
-The `Class` field is a fossil. It exists so DNS could serve non-internet networks — CHAOS and Hesiod were real options in 1987. You will only ever send `1`, except for the one party trick: `dig @ns1.example.com CH TXT version.bind` asks a nameserver what software it runs.
+The `Class` field is a fossil. It exists so DNS could serve non-internet
+networks — CHAOS and Hesiod were real options in 1987. You will only ever send
+`1`, except for the one party trick: `dig @ns1.example.com CH TXT version.bind`
+asks a nameserver what software it runs.
 
 ---
 
 ## Resource records
 
-Every answer, authority and additional entry is a resource record with the same shape: name, type, class, TTL, then a length-prefixed blob whose meaning depends on the type.
+Every answer, authority and additional entry is a resource record with the same
+shape: name, type, class, TTL, then a length-prefixed blob whose meaning depends
+on the type.
 
 ```go title="dns/record.go" showLineNumbers
 type RecordType uint16
@@ -349,7 +378,9 @@ func ParseRecord(msg []byte, offset int) (Record, int, error) {
 }
 ```
 
-Note the TTL is a `uint32` of **seconds**, and it is advisory in the sense that nothing enforces it — but it is the only mechanism DNS has for propagating a change. Set a 24-hour TTL and a mistake stays live for a day.
+Note the TTL is a `uint32` of **seconds**, and it is advisory in the sense that
+nothing enforces it — but it is the only mechanism DNS has for propagating a
+change. Set a 24-hour TTL and a mistake stays live for a day.
 
 ### The types worth knowing
 
@@ -372,7 +403,8 @@ Note the TTL is a `uint32` of **seconds**, and it is advisory in the sense that 
 
 #### 1. Address records
 
-A and AAAA are the ones people mean when they say "DNS". The RDATA is the raw address, nothing more:
+A and AAAA are the ones people mean when they say "DNS". The RDATA is the raw
+address, nothing more:
 
 ```go title="dns/rdata.go"
 func (r Record) IP() (net.IP, error) {
@@ -411,7 +443,9 @@ dig google.com -t AAAA  # ipv6
 
 #### 2. CNAME
 
-An alias. If you own `example.com` and also serve `docs.example.com` and `drive.example.com`, a CNAME points them at the canonical name rather than repeating the address.
+An alias. If you own `example.com` and also serve `docs.example.com` and
+`drive.example.com`, a CNAME points them at the canonical name rather than
+repeating the address.
 
 <table border="1">
   <thead>
@@ -425,9 +459,14 @@ An alias. If you own `example.com` and also serve `docs.example.com` and `drive.
   </tbody>
 </table>
 
-Two rules that bite people. **A CNAME cannot coexist with other records at the same name**, which is why you cannot put one at the zone apex (`example.com` itself needs SOA and NS records). And **CNAMEs cost an extra round trip** unless the server helpfully includes the target's A record in the same response.
+Two rules that bite people.
+**A CNAME cannot coexist with other records at the same name**, which is why you
+cannot put one at the zone apex (`example.com` itself needs SOA and NS records).
+And **CNAMEs cost an extra round trip** unless the server helpfully includes the
+target's A record in the same response.
 
-Chasing them is the resolver's job, and the chain needs a bound like everything else here:
+Chasing them is the resolver's job, and the chain needs a bound like everything
+else here:
 
 ```go title="dns/resolve.go"
 func (r *Resolver) followCNAMEs(msg *Message, want RecordType) ([]Record, error) {
@@ -466,7 +505,8 @@ func (r *Resolver) followCNAMEs(msg *Message, want RecordType) ([]Record, error)
 
 #### 3. MX
 
-MX records say which servers accept mail for a domain, ordered by a preference number where lower wins.
+MX records say which servers accept mail for a domain, ordered by a preference
+number where lower wins.
 
 ```go title="dns/rdata.go"
 type MX struct {
@@ -490,7 +530,10 @@ func (r Record) MX(msg []byte, dataOffset int) (MX, error) {
 }
 ```
 
-That `dataOffset+2` is the trap. RDATA containing a name can use compression pointers into the rest of the message, so you cannot parse it from the `Data` slice alone — you need the full message and an absolute offset. I lost an evening to this.
+That `dataOffset+2` is the trap. RDATA containing a name can use compression
+pointers into the rest of the message, so you cannot parse it from the `Data`
+slice alone — you need the full message and an absolute offset. I lost an
+evening to this.
 
 Here is what actually happens when mail moves between two domains:
 
@@ -502,29 +545,34 @@ sequenceDiagram
     participant Yahoo as Yahoo Mail Server
     participant Tolulope as tolulope@yahoo.com
 
-    Note over Obadafidi,GMail: MX resolution and mail delivery
+Note over Obadafidi,GMail: MX resolution and mail delivery
 
-    Obadafidi->>GMail: (1) sends email to tolulope@yahoo.com
-    GMail->>DNS: (2) MX? yahoo.com
-    DNS-->>GMail: (3) MX 1 mta.yahoodns.net
-    GMail->>DNS: (3b) A? mta.yahoodns.net
-    GMail->>Yahoo: (4) SMTP delivery
-    Yahoo->>DNS: (5) TXT? for SPF/DKIM/DMARC checks
-    DNS-->>Yahoo: authentication policy
-    Yahoo->>Tolulope: (6) delivers to the mailbox
+Obadafidi->>GMail: (1) sends email to tolulope@yahoo.com
+GMail->>DNS: (2) MX? yahoo.com
+DNS-->>GMail: (3) MX 1 mta.yahoodns.net
+GMail->>DNS: (3b) A? mta.yahoodns.net
+GMail->>Yahoo: (4) SMTP delivery
+Yahoo->>DNS: (5) TXT? for SPF/DKIM/DMARC checks
+DNS-->>Yahoo: authentication policy
+Yahoo->>Tolulope: (6) delivers to the mailbox
+
 `} />
 
-Step 5 is the one people forget: the receiving server does its own DNS lookups to decide whether the sender was allowed to send. SPF, DKIM and DMARC are all TXT records. Email authentication is DNS wearing a hat.
+Step 5 is the one people forget: the receiving server does its own DNS lookups
+to decide whether the sender was allowed to send. SPF, DKIM and DMARC are all
+TXT records. Email authentication is DNS wearing a hat.
 
 ---
 
 ## Resolution: walking the tree
 
-None of the above says how a resolver finds `ns1.example.com` in the first place. The answer is that it starts at the root and follows referrals down.
+None of the above says how a resolver finds `ns1.example.com` in the first
+place. The answer is that it starts at the root and follows referrals down.
 
 <ResolutionWalk />
 
-The thirteen root server addresses are the only thing a resolver knows a priori — they are compiled in, or read from a hints file:
+The thirteen root server addresses are the only thing a resolver knows a priori
+— they are compiled in, or read from a hints file:
 
 ```go title="dns/roots.go"
 var rootServers = []string{
@@ -536,7 +584,10 @@ var rootServers = []string{
 }
 ```
 
-There are thirteen because thirteen `NS` records plus their glue was the most that fit in a 512-byte UDP response. A protocol limit from 1987 is why the number is not fourteen. Anycast means each of those addresses is actually hundreds of physical servers worldwide.
+There are thirteen because thirteen `NS` records plus their glue was the most
+that fit in a 512-byte UDP response. A protocol limit from 1987 is why the
+number is not fourteen. Anycast means each of those addresses is actually
+hundreds of physical servers worldwide.
 
 The walk itself:
 
@@ -593,13 +644,19 @@ func (r *Resolver) Resolve(name string, qtype RecordType) (*Message, error) {
 }
 ```
 
-The comment about glue is worth dwelling on. If `example.com`'s nameserver is `ns1.example.com`, then to look up `example.com` you need `ns1.example.com`, and to look up `ns1.example.com` you need... `example.com`. The parent zone breaks the cycle by including the address directly in the additional section. That is what glue records are for, and it is why registrars ask for nameserver IPs and not just names.
+The comment about glue is worth dwelling on. If `example.com`'s nameserver is
+`ns1.example.com`, then to look up `example.com` you need `ns1.example.com`, and
+to look up `ns1.example.com` you need... `example.com`. The parent zone breaks
+the cycle by including the address directly in the additional section. That is
+what glue records are for, and it is why registrars ask for nameserver IPs and
+not just names.
 
 ---
 
 ## The 512-byte problem
 
-DNS was specified over UDP with a 512-byte payload limit. That was generous in 1987 and is not now — DNSSEC signatures alone can blow past it.
+DNS was specified over UDP with a 512-byte payload limit. That was generous in
+1987 and is not now — DNSSEC signatures alone can blow past it.
 
 There are two escape hatches, and a resolver needs both:
 
@@ -665,7 +722,8 @@ Anyone who told you "DNS is UDP" was giving you the first half of a sentence.
 
 ## Caching, and why TTLs are a liability
 
-Without caching, every page load would walk from the root. With it, the vast majority of queries never leave the resolver.
+Without caching, every page load would walk from the root. With it, the vast
+majority of queries never leave the resolver.
 
 ```go title="dns/cache.go" showLineNumbers
 type entry struct {
@@ -715,9 +773,16 @@ func (c *Cache) Put(name string, qtype RecordType, msg *Message) {
 }
 ```
 
-The operational consequence is the thing to internalise: **TTL is how long your mistakes last**. Before any migration, drop TTLs to 60 seconds a day ahead, do the change, then put them back. Doing this is the difference between a five-minute cutover and the 24-hour one I did for a domain migration once, watching stale records expire at their own pace.
+The operational consequence is the thing to internalise:
+**TTL is how long your mistakes last**. Before any migration, drop TTLs to 60
+seconds a day ahead, do the change, then put them back. Doing this is the
+difference between a five-minute cutover and the 24-hour one I did for a domain
+migration once, watching stale records expire at their own pace.
 
-And it cuts the other way. Deleting a record does not remove it from the world — it removes it from the authoritative source, and every resolver holding a copy keeps serving it until its TTL runs out. Which is roughly the shape of the AWS incident that sent me down this path.
+And it cuts the other way. Deleting a record does not remove it from the world —
+it removes it from the authoritative source, and every resolver holding a copy
+keeps serving it until its TTL runs out. Which is roughly the shape of the AWS
+incident that sent me down this path.
 
 ---
 
@@ -739,7 +804,8 @@ And the same for google.com:
 
 ### 2. Domains that do not exist
 
-An NXDOMAIN response, distinguished from a failure — the name does not exist, as opposed to the server being unable to tell you:
+An NXDOMAIN response, distinguished from a failure — the name does not exist, as
+opposed to the server being unable to tell you:
 
 <br/>
 <img src="/image/lookup_fake_domain.png" alt="resolver output for an invalid domain"/>
@@ -749,23 +815,39 @@ An NXDOMAIN response, distinguished from a failure — the name does not exist, 
 
 ## What building it taught me
 
-The protocol is small. The header is twelve bytes, there are maybe ten record types worth implementing, and the resolution algorithm fits on a page. What is not small is the accumulated weight of decisions made when 512 bytes was a lot of memory: compression pointers that need loop guards, a class field that only ever holds one value, thirteen root servers because fourteen would not fit.
+The protocol is small. The header is twelve bytes, there are maybe ten record
+types worth implementing, and the resolution algorithm fits on a page. What is
+not small is the accumulated weight of decisions made when 512 bytes was a lot
+of memory: compression pointers that need loop guards, a class field that only
+ever holds one value, thirteen root servers because fourteen would not fit.
 
-The security properties follow from the same history. There is no authentication in what I wrote above — any packet with a matching ID and port is accepted, which is the entire basis of cache poisoning. DNSSEC bolts signatures on afterwards, and DNS-over-HTTPS gives up on fixing the protocol and wraps it in one that already has TLS.
+The security properties follow from the same history. There is no authentication
+in what I wrote above — any packet with a matching ID and port is accepted,
+which is the entire basis of cache poisoning. DNSSEC bolts signatures on
+afterwards, and DNS-over-HTTPS gives up on fixing the protocol and wraps it in
+one that already has TLS.
 
-Mostly, though, I stopped thinking of DNS as a lookup table. It is a distributed, cached, eventually-consistent database with no transactions and a propagation delay you configure yourself. Treated as a lookup table it will surprise you, usually at the worst moment.
+Mostly, though, I stopped thinking of DNS as a lookup table. It is a
+distributed, cached, eventually-consistent database with no transactions and a
+propagation delay you configure yourself. Treated as a lookup table it will
+surprise you, usually at the worst moment.
 
 ### Future improvements
 
 * DNSSEC validation — chase the chain of trust from the root's DS records
-* Serve-stale (RFC 8767): return expired entries when the authoritative server is unreachable, rather than failing
+* Serve-stale (RFC 8767): return expired entries when the authoritative server
+  is unreachable, rather than failing
 * A proper zone file parser, so it can be authoritative and not just a resolver
 * Query pipelining over the TCP path
-* 0x20 encoding — randomise the case of the query name and require it echoed back, which adds entropy against spoofing at zero protocol cost
+* 0x20 encoding — randomise the case of the query name and require it echoed
+  back, which adds entropy against spoofing at zero protocol cost
 
 ### Further reading
 
-* [RFC 1035](https://www.rfc-editor.org/rfc/rfc1035) — the original spec, and unusually readable for an RFC
-* [RFC 6891](https://www.rfc-editor.org/rfc/rfc6891) — EDNS0, which is how anything modern fits on the wire
-* [Julia Evans: How DNS works](https://jvns.ca/blog/2022/11/01/how-updating-dns-works/) — the clearest explanation of propagation I have found
+* [RFC 1035](https://www.rfc-editor.org/rfc/rfc1035) — the original spec, and
+  unusually readable for an RFC
+* [RFC 6891](https://www.rfc-editor.org/rfc/rfc6891) — EDNS0, which is how
+  anything modern fits on the wire
+* [Julia Evans: How DNS works](https://jvns.ca/blog/2022/11/01/how-updating-dns-works/)
+  — the clearest explanation of propagation I have found
 * [DNS Flag Day 2020](https://dnsflagday.net/2020/) — why 1232 and not 4096
