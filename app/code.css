@@ -113,6 +113,8 @@
     scrollbar-width: thin;
     scrollbar-color: var(--code-border) transparent;
     tab-size: 4;
+    text-align: left;
+    hyphens: none;
 }
 
 .mdx-code-block pre::-webkit-scrollbar {

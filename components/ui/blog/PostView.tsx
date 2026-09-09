@@ -40,7 +40,7 @@ export function PostView({ postKey }: { postKey: string }) {
                 <Link href="/blog" style={{ color: 'var(--term-blue)' }}>q · back to ~/writing</Link>
             </>
         }>
-            <article>
+            <article className="blog-article">
                 <header className="pager-head">
                     <span className="ink-faint">{new Date(blog.publishedOn).toISOString().slice(0, 10)}</span>
                     <span style={{ color: 'var(--paper-bright)' }}>{blog.title}</span>

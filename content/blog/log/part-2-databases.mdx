@@ -35,7 +35,6 @@ in to the responsibilities and purpose of a Log in database.
 flow of a write request from a client to the database"
     width={1600}
     height={985}
-    maxWidth={560}
 caption="An image describing the flow of a write request from a client to the
 database drawn by David Dada" />
 
@@ -51,7 +50,6 @@ performance?
 flow of a write request from a client to the database to disk"
     width={1600}
     height={985}
-    maxWidth={560}
 caption="An image describing writing directly from database to disk" />
 
 The answer was to build an in-memory structure
@@ -64,7 +62,6 @@ in-memory structure is fiiled up_ we _"flush"_ to the disk
 flow of a write request from a client to the database to disk"
         width={1600}
         height={985}
-        maxWidth={560}
     caption="An image describing writing to database memtables then to disk"
 />
 
@@ -172,23 +169,24 @@ concerning `Group Commit`'s, how do we configure the batching of commits
 
 Most databases employ both modes to handle `Group commit`.
 
-```go title="wal-psuedocode"
-     //pseudocode of fsync
-     fn write(key, value string) (err error) {
-		 walBuffer.write(key, value) // append to buffer
+```go title="wal-pseudocode"
+//pseudocode of fsync
+func write(key, value string) (err error) {
+	walBuffer.write(key, value) // append to buffer
 
-		 // then synchronize when full or time configured as elapsed
-		 if walBuffer.isFull() or time.Since(wal.PeriodicSyncMs) > 0 {
-			 walBuffer.Flush() //flush to os kernel
-			 walBuffer.Sync() // flush dirty pages from kernel to disk
-		 }
+	// then synchronize when full or time configured as elapsed
+	if walBuffer.isFull() || time.Since(wal.lastSync) >= wal.PeriodicSyncMs {
+		walBuffer.Flush() //flush to os kernel
+		walBuffer.Sync()  // flush dirty pages from kernel to disk
+	}
 
-		 memtable.append(key, value)
+	memtable.append(key, value)
 
-		 if memtable.isFull() {
-			 go syncMemtableToDisk(memtable) // done in the background
-		 }
-     }
+	if memtable.isFull() {
+		go syncMemtableToDisk(memtable) // done in the background
+	}
+	return nil
+}
 ```
 
 This solution, as many in software engineering, is a tradeoff of _reliability_
@@ -239,25 +237,25 @@ was written into disk. The function of checksum is seen while `Replaying`
 entries during _recovery_. To understand this more, let's look at WAL Recovery
 
 ```go title="entry.go"
-    package  entry
-    
-    import "sync/atomic"
+package entry
 
-    type Operation string
+import "sync/atomic"
 
-    const (
-			Del Operation = "delete"
-			Put Operation = "put"
-    )
+type Operation string
 
-    type Entry struct {
-     Op Operation
-		 logSequenceNum atomic.Int64
-		 keyLen int
-		 valueLen int
-		 key []byte
-		 value []byte
-    }
+const (
+	Del Operation = "delete"
+	Put Operation = "put"
+)
+
+type Entry struct {
+	Op             Operation
+	logSequenceNum atomic.Int64
+	keyLen         int
+	valueLen       int
+	key            []byte
+	value          []byte
+}
 ```
 
 ## The WAL: Recovery/Replaying
