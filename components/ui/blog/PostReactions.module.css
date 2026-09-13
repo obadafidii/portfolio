@@ -1,0 +1,38 @@
+.reactions {
+    width: 100%;
+    margin-block: 2.5rem 1rem;
+    padding-block: 1.25rem;
+    border-block: 1px solid var(--paper-line-strong);
+    font-family: var(--font-mono), monospace;
+    text-align: left;
+}
+
+.label { display: block; font-size: 14px; margin-bottom: 0.75rem; }
+.buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--paper-line-strong);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--paper-bright);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+.button:hover:not(:disabled), .button[aria-pressed='true'] {
+    border-color: var(--term-green);
+    color: var(--term-green);
+}
+.button:focus-visible, .status button:focus-visible {
+    outline: 2px solid var(--term-blue);
+    outline-offset: 3px;
+}
+.button:disabled { opacity: 0.55; cursor: default; }
+.count { min-width: 1ch; font-variant-numeric: tabular-nums; }
+.status { margin-top: 0.75rem; font-size: 12px; line-height: 1.6; color: var(--paper-muted); }
+.status button { margin-left: 0.5rem; color: var(--term-blue); text-decoration: underline; cursor: pointer; min-height: 44px; }

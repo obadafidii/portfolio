@@ -14,7 +14,8 @@
     "format": "npx prettier . --write",
     "resume:sync": "node scripts/sync-resume.mjs",
     "blog:sync": "node scripts/sync-blogs.mjs",
-    "test:blog": "node --test scripts/blog-content.test.mjs"
+    "test:blog": "node --test scripts/blog-content.test.mjs",
+    "test:reactions": "node --test scripts/reactions.test.mjs"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.0",

@@ -90,7 +90,7 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         "series": "log",
         "part": 2
     },
-    "log/part-3-version-control": {
+    "log/part-5-version-control": {
         "title": "Understanding Log: Version Control",
         "summary": "How version control records and navigates the history of changes.",
         "publishedOn": "2026-09-03T00:00:00.000Z",
@@ -102,9 +102,9 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         ],
         "status": "draft",
         "series": "log",
-        "part": 3
+        "part": 5
     },
-    "log/part-4-distributed-systems": {
+    "log/part-3-distributed-systems": {
         "title": "Understanding Log: Distributed Systems",
         "summary": "How logs help distributed systems replicate and coordinate changes.",
         "publishedOn": "2026-09-03T00:00:00.000Z",
@@ -116,9 +116,9 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         ],
         "status": "draft",
         "series": "log",
-        "part": 4
+        "part": 3
     },
-    "log/part-5-consensus-algorithms": {
+    "log/part-4-consensus-algorithms": {
         "title": "Understanding Log: Consensus",
         "summary": "Distributed Logs: view-stamped replication",
         "publishedOn": "2026-09-03T00:00:00.000Z",
@@ -130,7 +130,7 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         ],
         "status": "draft",
         "series": "log",
-        "part": 5
+        "part": 4
     },
     "raft": {
         "title": "Raft",
@@ -179,9 +179,9 @@ export const blogSeries: Record<string, BlogSeries> = {
         "parts": [
             "log/part-1-introduction",
             "log/part-2-databases",
-            "log/part-3-version-control",
-            "log/part-4-distributed-systems",
-            "log/part-5-consensus-algorithms"
+            "log/part-3-distributed-systems",
+            "log/part-4-consensus-algorithms",
+            "log/part-5-version-control"
         ],
         "partCount": 5,
         "publishedParts": 2

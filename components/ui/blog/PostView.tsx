@@ -10,6 +10,7 @@ import { TableOfContents } from './TableOfContents';
 import { UnpublishedNotice } from './UnpublishedNotice';
 import { PostContent } from './PostContent.generated';
 import { PostNavigation } from './PostNavigation';
+import { PostReactions } from './PostReactions';
 import { blogStatusLabel, getBlogMetadata, getReadableBlogs, isReadable } from '@/lib/blogs';
 import '@/app/code.css';
 
@@ -55,6 +56,7 @@ export function PostView({ postKey }: { postKey: string }) {
                 <div className="blog-post-layout">
                     <div ref={contentRef} className="pager-body pager-prose">
                         <PostContent postKey={postKey} />
+                        <PostReactions key={postKey} postKey={postKey} />
                     </div>
                     <TableOfContents contentRef={contentRef} />
                 </div>
