@@ -160,7 +160,7 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         ],
         "status": "draft"
   },
-  "mojo-compiler": {
+  "mojo-walkthrough": {
       "title": "Jottings around my study of the Mojo compiler",
       "summary": "mojo-compiler",
       "publishedOn": "2026-09-03T00:00:00.000Z",
