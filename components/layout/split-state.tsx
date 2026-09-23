@@ -17,6 +17,7 @@ export const PANE_ROUTES = [
     { href: '/', label: '~ / home', navLabel: '/home' },
     { href: '/works', label: '~/works', navLabel: '/works' },
     { href: '/blog', label: '~/writing', navLabel: '/blog' },
+    { href: '/open-source', label: '~/open-source', navLabel: '/oss' },
     { href: '/resume', label: '~/resume', navLabel: '/resume' },
     { href: '/contact', label: '~/contact', navLabel: '/contact' },
     ...getAllBlogs().map(post => ({
@@ -26,7 +27,7 @@ export const PANE_ROUTES = [
     })),
 ] as const;
 
-export const PANE_NAV_ROUTES = PANE_ROUTES.slice(0, 5);
+export const PANE_NAV_ROUTES = PANE_ROUTES.slice(0, 6);
 
 interface SplitWorkspaceValue {
     splitOpen: boolean;

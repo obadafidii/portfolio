@@ -1,5 +1,39 @@
 ## David Dada's Website
 
+### GitHub comments
+
+Published blog posts render a Giscus comment thread after the reaction buttons.
+Each discussion uses a stable `blog:<slug>` key, so it also works when a post is
+opened inside a split pane. The widget follows the site's light or dark theme.
+
+Giscus is connected to the repository's `General` discussion category. The
+public repository and category identifiers live in
+`components/ui/blog/GitHubComments.tsx`; environment variables can override the
+category values if the discussion category changes. Allowed production and
+localhost origins are restricted in `giscus.json`. The custom light and dark
+stylesheets in `public/giscus-*.css` match the terminal palette. Giscus loads
+them from the site's own origin, so theme changes follow the site toggle. The
+blog's existing Like/Love buttons and GitHub discussion reactions are separate
+totals. On HTTP localhost, the widget uses Giscus's built-in themes because an
+HTTPS iframe cannot fetch a custom stylesheet over HTTP.
+
+### Open source archive
+
+`/open-source` loads public pull requests authored by `obadafidii` from GitHub,
+groups them by year and month, and excludes repositories owned by that account.
+The GitHub response is cached for one hour. Set `GITHUB_TOKEN` on the server for
+a higher API rate limit; the token is never sent to the browser.
+
+The verified entries in `content/contributions.ts` remain visible if GitHub is
+unavailable. Add an entry to `contributionNotes` using the exact PR URL to write
+the “what changed” and “why it matters” explanation. Optional `learned` and
+`article` fields add a personal note and a link to a longer blog post. PRs
+without editorial notes show their public GitHub description when available.
+
+On the archive, `/` focuses search, Up/Down moves through focused PR rows,
+Enter opens a PR, and Escape clears search. The same controls work by click or
+tap.
+
 ### Writing a blog
 
 Writing lives in `content/blog`. The site discovers articles and series

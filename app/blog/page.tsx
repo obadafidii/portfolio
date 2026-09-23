@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { motion } from 'framer-motion';
 
 import { TerminalWindow } from '@/components/layout/TerminalWindow';
@@ -67,6 +67,7 @@ const Row = ({ post }: { post: BlogMetadata }) => {
     return (
         <Link
             href={`/blog/${post.slug}`}
+            data-blog-row
             className="term-row group"
             title={readable ? undefined : `${status.label} — not published yet`}
         >
@@ -79,6 +80,28 @@ const BlogsPage = () => {
     const posts = useMemo(() => getAllBlogs(), []);
     const [query, setQuery] = useState('');
     const [tag, setTag] = useState<string | null>(null);
+    const searchRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        const onKeyDown = (event: globalThis.KeyboardEvent) => {
+            const target = event.target as HTMLElement;
+            if (event.key === '/' && !target.matches('input,textarea,select,[contenteditable="true"]') && !event.metaKey && !event.ctrlKey) {
+                event.preventDefault();
+                searchRef.current?.focus();
+            }
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, []);
+
+    const onRowsKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+        if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+        const rows = [...event.currentTarget.querySelectorAll<HTMLAnchorElement>('[data-blog-row]')];
+        const index = rows.indexOf(document.activeElement as HTMLAnchorElement);
+        if (index < 0) return;
+        event.preventDefault();
+        rows[Math.min(rows.length - 1, Math.max(0, index + (event.key === 'ArrowDown' ? 1 : -1)))]?.focus();
+    };
 
     const tags = useMemo(() => {
         const counts: Record<string, number> = {};
@@ -137,16 +160,25 @@ const BlogsPage = () => {
                 <label className="mt-3 flex items-baseline gap-2">
                     <span className="ink-faint shrink-0">grep</span>
                     <input
+                        ref={searchRef}
                         type="search"
                         value={query}
                         onChange={event => setQuery(event.target.value)}
+                        onKeyDown={event => {
+                            if (event.key === 'Escape') {
+                                setQuery('');
+                                searchRef.current?.blur();
+                            }
+                        }}
                         placeholder="search titles, summaries, tags"
                         aria-label="Search posts"
                         className="term-cmd min-w-0 flex-1 bg-transparent outline-none placeholder:text-[var(--paper-faint)]"
                     />
                 </label>
 
-                <div className="mt-6 space-y-6">
+                <p className="ink-faint mt-2 text-[11px]">/ search · ↑↓ move through posts · Enter read · Esc clear search</p>
+
+                <div className="mt-6 space-y-6" onKeyDown={onRowsKeyDown}>
                     {byYear.map(([year, entries]) => (
                         <section key={year}>
                             <p className="ink-faint mb-1 text-[11px]"># {year}</p>

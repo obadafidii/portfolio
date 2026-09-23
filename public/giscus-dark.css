@@ -1,0 +1,125 @@
+@import url('https://giscus.app/themes/transparent_dark.css');
+
+main {
+    color-scheme: dark;
+    --terminal-panel: #10141b;
+    --terminal-raised: #161b23;
+    --terminal-inset: #0a0d12;
+    --terminal-line: #2b333f;
+    --terminal-ink: #d5dde8;
+    --terminal-muted: #7b8798;
+    --terminal-blue: #79c0ff;
+    --terminal-green: #56d364;
+
+    --color-fg-default: var(--terminal-ink);
+    --color-fg-muted: var(--terminal-muted);
+    --color-fg-subtle: #5a6472;
+    --color-canvas-default: transparent;
+    --color-canvas-subtle: var(--terminal-panel);
+    --color-canvas-inset: var(--terminal-inset);
+    --color-canvas-overlay: var(--terminal-raised);
+    --color-border-default: var(--terminal-line);
+    --color-border-muted: #1e242e;
+    --color-accent-fg: var(--terminal-blue);
+    --color-accent-emphasis: #428bd0;
+    --color-accent-subtle: #79c0ff1a;
+    --color-success-fg: var(--terminal-green);
+    --color-btn-text: var(--terminal-ink);
+    --color-btn-bg: var(--terminal-raised);
+    --color-btn-border: var(--terminal-line);
+    --color-btn-hover-bg: #202833;
+    --color-btn-hover-border: var(--terminal-blue);
+    --color-btn-active-bg: #26303c;
+    --color-btn-active-border: var(--terminal-blue);
+    --color-btn-selected-bg: #26303c;
+    --color-btn-primary-text: #0a0d12;
+    --color-btn-primary-bg: var(--terminal-green);
+    --color-btn-primary-border: var(--terminal-green);
+    --color-btn-primary-hover-bg: #70e17c;
+    --color-btn-primary-hover-border: #70e17c;
+    --color-btn-primary-disabled-bg: #56d36480;
+    --color-btn-primary-disabled-text: #0a0d12;
+    --color-primer-shadow-inset: none;
+}
+
+html,
+body,
+main {
+    background: transparent !important;
+}
+
+main .gsc-main,
+main button,
+main textarea,
+main .btn {
+    font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-feature-settings: 'liga' 0;
+}
+
+main .gsc-main {
+    color: var(--terminal-ink);
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+main .gsc-header {
+    border-bottom: 1px solid var(--terminal-line);
+    padding-bottom: 0.65rem;
+    margin-bottom: 0.9rem;
+}
+
+main .gsc-comments-count {
+    color: var(--terminal-muted);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+main .gsc-comment-box,
+main .gsc-comment {
+    overflow: hidden;
+    border: 1px solid var(--terminal-line);
+    border-radius: 5px;
+    background: var(--terminal-panel);
+    box-shadow: none;
+}
+
+main .gsc-comment-box-tabs,
+main .gsc-comment-box-bottom {
+    background: var(--terminal-raised);
+    border-color: var(--terminal-line);
+}
+
+main .gsc-comment-box-tabs button,
+main .btn {
+    border-radius: 4px;
+}
+
+main .gsc-comment-box-textarea,
+main .gsc-comment-box-textarea-extras {
+    background: var(--terminal-inset);
+    color: var(--terminal-ink);
+    border-color: var(--terminal-line);
+}
+
+main .gsc-comment-box-textarea:focus-visible,
+main button:focus-visible,
+main a:focus-visible {
+    outline: 2px solid var(--terminal-blue);
+    outline-offset: 2px;
+}
+
+main .btn-primary {
+    background: var(--terminal-green);
+    border-color: var(--terminal-green);
+    color: var(--terminal-inset);
+    font-weight: 500;
+}
+
+main .btn-primary:hover {
+    background: #70e17c;
+    border-color: #70e17c;
+}
+
+main a:not(.btn) {
+    color: var(--terminal-blue);
+}

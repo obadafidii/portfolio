@@ -18,6 +18,12 @@ await generateBlogContent(projectRoot);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    async headers() {
+        return ['dark', 'light'].map((theme) => ({
+            source: `/giscus-${theme}.css`,
+            headers: [{ key: 'Access-Control-Allow-Origin', value: '*' }],
+        }));
+    },
     outputFileTracingIncludes: {
         '/api/blog-image/*': ['./public/image/**/*'],
     },

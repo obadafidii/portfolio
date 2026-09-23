@@ -20,6 +20,7 @@ export type CommandResult = ReactNode | null;
 export const ROUTES = [
     { name: 'works', href: '/works', cwd: '~/works', note: 'systems built and shipped' },
     { name: 'blog', href: '/blog', cwd: '~/writing', note: 'notes on how things work' },
+    { name: 'open-source', href: '/open-source', cwd: '~/open-source', note: 'contributions and the stories behind them' },
     { name: 'resume', href: '/resume', cwd: '~/resume', note: 'the man page' },
     { name: 'contact', href: '/contact', cwd: '~/contact', note: 'say hello' },
 ];
@@ -78,6 +79,7 @@ export const setResumeSections = (sections: string[]) => {
 /** Everything the shell can complete or resolve, per directory. */
 export const entriesFor = (cwd: Cwd): string[] => {
     if (cwd === '~/works') return [...info.works.map(work => work.file), '--tags'];
+    if (cwd === '~/open-source') return ['archive', 'github'];
     if (cwd === '~/writing') {
         return [...getAllBlogs().map(post => postFile(post.slug)), ...Object.keys(POST_FILTERS)];
     }
@@ -104,7 +106,7 @@ const HELP_ROWS: { name: string; args?: string; help: string }[] = [
         args: '--done|--draft|--wip|--all',
         help: 'in ~/writing, filter posts by status',
     },
-    { name: 'cd', args: '<dir>', help: 'works, blog, resume, contact, .. or ~' },
+    { name: 'cd', args: '<dir>', help: 'works, blog, open-source, resume, contact, .. or ~' },
     { name: 'cat', args: '<name>', help: 'read an entry here' },
     { name: 'man', args: 'david', help: 'the resume, as a manual page' },
     { name: 'open', args: '<name>', help: 'open a project, post or profile' },
@@ -438,6 +440,7 @@ export const runCommand = (raw: string, ctx: ShellContext): CommandResult | 'CLE
             }
 
             if (cwd === '~/works') return <WorksListing />;
+            if (cwd === '~/open-source') return <Hint>use the year and month selectors above to browse contributions</Hint>;
             if (cwd === '~/resume') return <ResumeListing />;
             return <RouteListing />;
         }
@@ -550,6 +553,12 @@ export const runCommand = (raw: string, ctx: ShellContext): CommandResult | 'CLE
 
         case 'open': {
             if (!arg) return <Err>open: missing operand</Err>;
+
+            const route = ROUTES.find(item => item.name === arg);
+            if (route) {
+                ctx.navigate(route.href);
+                return <div className="ink-muted mt-1">→ {route.href}</div>;
+            }
 
             const post = findPost(arg);
             if (post) {

@@ -90,26 +90,12 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         "series": "log",
         "part": 2
     },
-    "log/part-5-version-control": {
-        "title": "Understanding Log: Version Control",
-        "summary": "How version control records and navigates the history of changes.",
-        "publishedOn": "2026-09-03T00:00:00.000Z",
-        "year": "2026",
-        "slug": "log/part-3-version-control",
-        "tags": [
-            "logs",
-            "version-control"
-        ],
-        "status": "draft",
-        "series": "log",
-        "part": 5
-    },
     "log/part-3-distributed-systems": {
         "title": "Understanding Log: Distributed Systems",
         "summary": "How logs help distributed systems replicate and coordinate changes.",
         "publishedOn": "2026-09-03T00:00:00.000Z",
         "year": "2026",
-        "slug": "log/part-4-distributed-systems",
+        "slug": "log/part-3-distributed-systems",
         "tags": [
             "logs",
             "distributed-systems"
@@ -123,7 +109,7 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         "summary": "Distributed Logs: view-stamped replication",
         "publishedOn": "2026-09-03T00:00:00.000Z",
         "year": "2026",
-        "slug": "log/part-5-consensus-algorithms",
+        "slug": "log/part-4-consensus-algorithms",
         "tags": [
             "logs",
             "distributed-systems"
@@ -131,6 +117,37 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         "status": "draft",
         "series": "log",
         "part": 4
+    },
+    "log/part-5-version-control": {
+        "title": "Understanding Log: Version Control",
+        "summary": "How version control records and navigates the history of changes.",
+        "publishedOn": "2026-09-03T00:00:00.000Z",
+        "year": "2026",
+        "slug": "log/part-5-version-control",
+        "tags": [
+            "logs",
+            "version-control"
+        ],
+        "status": "draft",
+        "series": "log",
+        "part": 5
+    },
+    "mojo-walkthrough": {
+        "title": "Jottings around my study of the Mojo compiler",
+        "summary": "Understanding heterogeneous computing through the Mojo compiler.",
+        "publishedOn": "2026-09-03T00:00:00.000Z",
+        "year": "2026",
+        "slug": "mojo-walkthrough",
+        "tags": [
+            "compiler",
+            "mojo",
+            "heterogeneous-computing"
+        ],
+        "status": "draft",
+        "coverImage": {
+            "src": "/image/log-in-several-systems.png",
+            "alt": "heterogeneous computing through Mojo"
+        }
     },
     "raft": {
         "title": "Raft",
@@ -159,19 +176,7 @@ export const blogMetadata: Record<string, BlogMetadata> = {
             "memory"
         ],
         "status": "draft"
-  },
-  "mojo-walkthrough": {
-      "title": "Jottings around my study of the Mojo compiler",
-      "summary": "mojo-compiler",
-      "publishedOn": "2026-09-03T00:00:00.000Z",
-      "year": "2026",
-      "slug": "mojo-compiler",
-      "tags": [
-          "mojo",
-          "heterogeneous-computing",
-      ],
-      "status": "draft"
-  }
+    }
 };
 
 export const blogSeries: Record<string, BlogSeries> = {

@@ -156,7 +156,7 @@ export const CommandLine = ({ cwd, children, autoFocus = false }: CommandLinePro
             className="min-h-full"
             role="presentation"
             onClick={event => {
-                if (!(event.target as HTMLElement).closest('a,button')) {
+                if (!(event.target as HTMLElement).closest('a,button,input,textarea,select,[contenteditable="true"]')) {
                     inputRef.current?.focus();
                 }
             }}

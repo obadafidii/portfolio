@@ -11,6 +11,7 @@ import { UnpublishedNotice } from './UnpublishedNotice';
 import { PostContent } from './PostContent.generated';
 import { PostNavigation } from './PostNavigation';
 import { PostReactions } from './PostReactions';
+import { GitHubComments } from './GitHubComments';
 import { blogStatusLabel, getBlogMetadata, getReadableBlogs, isReadable } from '@/lib/blogs';
 import '@/app/code.css';
 
@@ -57,6 +58,7 @@ export function PostView({ postKey }: { postKey: string }) {
                     <div ref={contentRef} className="pager-body pager-prose">
                         <PostContent postKey={postKey} />
                         <PostReactions key={postKey} postKey={postKey} />
+                        <GitHubComments key={`comments-${postKey}`} postKey={postKey} />
                     </div>
                     <TableOfContents contentRef={contentRef} />
                 </div>

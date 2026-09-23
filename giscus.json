@@ -1,0 +1,11 @@
+{
+    "origins": [
+        "https://obadafidi.me",
+        "https://www.obadafidi.me",
+        "https://obadafidi.tech",
+        "https://www.obadafidi.tech",
+        "https://portfolio-lilac-beta-ymwsf0o9se.vercel.app"
+    ],
+    "originsRegex": ["http://localhost:[0-9]+"],
+    "defaultCommentOrder": "oldest"
+}

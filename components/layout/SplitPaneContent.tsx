@@ -14,6 +14,7 @@ const PaneLoading = () => <p className="ink-faint">loading pane…</p>;
 
 const Home = dynamic(() => import('@/app/page'), { loading: PaneLoading });
 const Blog = dynamic(() => import('@/app/blog/page'), { loading: PaneLoading });
+const OpenSource = dynamic(() => import('@/app/open-source/page'), { loading: PaneLoading });
 const Contact = dynamic(() => import('@/app/contact/page'), { loading: PaneLoading });
 const Works = dynamic(() => import('@/app/works/page'), { loading: PaneLoading });
 
@@ -66,6 +67,7 @@ const resolveContent = (path: string) => {
     if (path === '/') return <Home />;
     if (path === '/works') return <Works />;
     if (path === '/blog') return <Blog />;
+    if (path === '/open-source') return <OpenSource />;
     if (path === '/resume') return <ResumePane />;
     if (path === '/contact') return <Contact />;
     const postKey = getPostKey(path);

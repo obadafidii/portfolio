@@ -1,0 +1,56 @@
+.comments {
+    width: 100%;
+    margin-block: 0 1rem;
+    padding-top: 1.25rem;
+    font-family: var(--font-mono), monospace;
+}
+
+.header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.header h2 {
+    margin: 0;
+    color: var(--paper-bright);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.header h2::before {
+    content: '> ';
+    color: var(--term-green);
+}
+
+.header p,
+.header > span {
+    color: var(--paper-faint);
+    font-size: 11px;
+}
+
+.header p {
+    margin-top: 0.25rem;
+    font-family: var(--font-sans);
+}
+
+.header > span {
+    flex: 0 0 auto;
+}
+
+.embed {
+    min-height: 180px;
+}
+
+.embed :global(.giscus),
+.embed :global(.giscus-frame) {
+    width: 100%;
+}
+
+@media (max-width: 520px) {
+    .header > span {
+        display: none;
+    }
+}

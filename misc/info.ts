@@ -12,6 +12,7 @@ const info = {
         { title: 'home', href: '/' },
         { title: 'works', href: '/works' },
         { title: 'blog', href: '/blog' },
+        { title: 'open-source', href: '/open-source' },
         { title: 'resume', href: '/resume' },
         { title: 'contact', href: '/contact' },
     ],
