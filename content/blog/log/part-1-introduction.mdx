@@ -5,7 +5,7 @@ export const post = {
     "status": "done",
     "part": 1,
     "coverImage": {
-        "src": "/image/log-in-several-systems.png",
+        "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/log-in-several-systems.png",
         "alt": "Handwritten map connecting logs to databases, version control, and distributed systems"
     },
     "tags": [
@@ -22,10 +22,11 @@ import {
     NumberedAppend,
     SegmentRotation,
 } from '@/components/ui/blog/log/LogVisuals';
+import ArticleImage from '@/components/mdx/elements/Img';
 
 # Understanding Log - Part 1
 
-<img src="/image/log-in-several-systems.png" alt="Handwritten map connecting logs to databases, version control, and distributed systems" width="1280" height="835" caption="The note that started this series: one append-only idea appearing across databases, version control, and distributed systems." />
+<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/log-in-several-systems.png" alt="Handwritten map connecting logs to databases, version control, and distributed systems" width={1280} height={835} caption="The note that started this series: one append-only idea appearing across databases, version control, and distributed systems." />
 
 I was studying the Write-Ahead-Log for a personal project and decided to do a
 presentation at [DULSS](https://discord.gg/hbMFVErE7). I came up with the slides

@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { cloudinaryImageLoader } from '@/lib/cloudinary';
 import { useEffect, useState } from 'react';
 import { Figure } from '../Figure';
 import styles from './LogVisuals.module.css';
@@ -8,6 +9,8 @@ import styles from './LogVisuals.module.css';
 const OPERATIONS = ['SET x=1', 'ADD user', 'COMMIT', 'SET y=2', 'DELETE x'];
 const RECORDS = Array.from({ length: 9 }, (_, index) => index + 1);
 const SEGMENTS = [RECORDS.slice(0, 3), RECORDS.slice(3, 6), RECORDS.slice(6, 9)];
+const abstractLogSketchSrc =
+    'https://res.cloudinary.com/cloudlord/image/upload/v1790165229/portfolio/blog/abstract-shape-of-a-log.png';
 
 const useAutoCycle = (maximum: number, intervalMs: number, pauseSteps = 2) => {
     const [step, setStep] = useState(1);
@@ -140,10 +143,12 @@ export const AbstractLogSketch = () => (
     <figure className="not-prose my-8">
         <div className={styles.sketchFrame}>
             <Image
-                src="/image/abstract-shape-of-a-log.png"
+                src={abstractLogSketchSrc}
                 alt="Hand-drawn log with numbered records appended from left to right and a new fifth record at the tail"
                 width={768}
                 height={1280}
+                loader={cloudinaryImageLoader}
+                sizes="(max-width: 768px) 100vw, 768px"
                 className={styles.sketchImage}
             />
         </div>

@@ -18,14 +18,21 @@ await generateBlogContent(projectRoot);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    images: {
+        deviceSizes: [360, 640, 750, 828, 1080, 1200, 1600, 1920],
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'res.cloudinary.com',
+                pathname: '/**/image/upload/**',
+            },
+        ],
+    },
     async headers() {
         return ['dark', 'light'].map((theme) => ({
             source: `/giscus-${theme}.css`,
             headers: [{ key: 'Access-Control-Allow-Origin', value: '*' }],
         }));
-    },
-    outputFileTracingIncludes: {
-        '/api/blog-image/*': ['./public/image/**/*'],
     },
     pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
     webpack(config) {

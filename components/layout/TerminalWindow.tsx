@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import {
     useState,
     type CSSProperties,
@@ -14,7 +15,6 @@ import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
 import { MobileNavBar } from '@/components/ui/MobileNavBar';
 import { PaneShellSessionProvider } from '@/components/ui/shell/session';
 import type { NavLinkType } from '@/types/types.navigation';
-import { SplitPaneContent } from './SplitPaneContent';
 import {
     MAX_PANES,
     PANE_NAV_ROUTES,
@@ -23,6 +23,11 @@ import {
     useSplitWorkspace,
     type PaneTheme,
 } from './split-state';
+
+const SplitPaneContent = dynamic(
+    () => import('./SplitPaneContent').then(module => module.SplitPaneContent),
+    { loading: () => <p className="ink-faint">loading pane…</p> },
+);
 
 interface TerminalWindowProps {
     currentPage: NavLinkType;

@@ -119,3 +119,21 @@ fields, invalid dates/statuses, or duplicate part numbers in the content files.
 `npm run test:blog` checks discovery, ordering, publication rules, and URL
 metadata. Do not edit `meta/blog.generated.ts` or `PostContent.generated.tsx`
 manually.
+
+### Blog images on Cloudinary
+
+Article source files use versioned Cloudinary delivery URLs. The shared image
+component adds responsive widths plus automatic format and quality selection,
+and cover-image social previews are transformed from the same assets.
+
+Copy the Cloudinary variables from `.env.example` into `.env.local`. Get
+`CLOUDINARY_URL` from the API Keys page in the Cloudinary console and never
+commit it or expose the API secret through a `NEXT_PUBLIC_` variable. Add the
+same variables to the production deployment environment.
+
+Run `npm run images:upload:dry-run` to inspect the local-to-Cloudinary mapping,
+then run `npm run images:upload` to upload or replace every image in
+`public/image`. Assets use stable IDs under `portfolio/blog`, so rerunning the
+command updates them without creating duplicates. Keep the local directory as
+the editable source for future uploads; production requests use the versioned
+Cloudinary URLs stored in the articles.

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
+import { cloudinaryImageLoader, isCloudinaryImage } from '@/lib/cloudinary';
 
 interface ImageProps extends HTMLAttributes<HTMLImageElement> {
     src: string;
@@ -17,6 +18,7 @@ const Img = ({ src, alt, width, height, className, caption, maxWidth }: ImagePro
     const resolvedWidth = typeof width === 'number' ? width : Number(width) || 1280;
     const resolvedHeight = typeof height === 'number' ? height : Number(height) || 720;
     const label = caption ?? alt;
+    const cloudinary = isCloudinaryImage(src);
 
     return (
         <figure className="mdx-image-frame" style={{ maxWidth }}>
@@ -25,7 +27,12 @@ const Img = ({ src, alt, width, height, className, caption, maxWidth }: ImagePro
                 alt={alt}
                 width={resolvedWidth}
                 height={resolvedHeight}
-                sizes={maxWidth ? `(max-width: ${maxWidth}px) 100vw, ${maxWidth}px` : undefined}
+                loader={cloudinary ? cloudinaryImageLoader : undefined}
+                sizes={
+                    maxWidth
+                        ? `(max-width: ${maxWidth}px) 100vw, ${maxWidth}px`
+                        : '(max-width: 768px) 100vw, (max-width: 1100px) 760px, 820px'
+                }
                 className={cn(
                     'h-auto w-full rounded-[4px] border',
                     className,

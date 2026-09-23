@@ -10,12 +10,13 @@ export const post = {
     ],
     "status": "done",
     "coverImage": {
-        "src": "/image/cpu-pipelining-cover.webp",
+        "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165232/portfolio/blog/cpu-pipelining-cover.webp",
         "alt": "Industrial robots working along an automated factory conveyor"
     }
 };
 
 import { PipelineRobots } from '@/components/ui/blog/cpu-pipelining/PipelineRobots';
+import ArticleImage from '@/components/mdx/elements/Img';
 
 # CPU Pipelining, Explained with Robots
 
@@ -32,7 +33,7 @@ stages:
 Real processors split this work into more stages, but these three are enough to
 see the idea behind pipelining.
 
-<img src="/image/cpu-pipelining-cover.webp" alt="Industrial robots working along an automated factory conveyor" width="1800" height="1010" caption="An automated factory line makes the pipeline metaphor literal. Photo by Simon Kadula on Unsplash." />
+<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165232/portfolio/blog/cpu-pipelining-cover.webp" alt="Industrial robots working along an automated factory conveyor" width={1800} height={1010} caption="An automated factory line makes the pipeline metaphor literal. Photo by Simon Kadula on Unsplash." />
 
 Photo: [Simon Kadula](https://unsplash.com/@simonkadula) ·
 [view the original on Unsplash](https://unsplash.com/photos/8gr6bObQLOI) · free

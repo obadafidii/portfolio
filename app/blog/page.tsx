@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { motion } from 'framer-motion';
 
 import { TerminalWindow } from '@/components/layout/TerminalWindow';
 import { CommandLine, Prompt } from '@/components/ui/shell/CommandLine';
@@ -147,11 +146,7 @@ const BlogsPage = () => {
             }
         >
             <CommandLine cwd="~/writing">
-            <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-            >
+            <div className="page-enter">
                 <div className="flex flex-wrap items-baseline gap-x-2">
                     <Prompt cwd="~/writing" />
                     <span className="term-cmd">ls -t {flags}</span>
@@ -225,7 +220,7 @@ const BlogsPage = () => {
                         <span>·</span> draft — only published posts are readable
                     </p>
                 </div>
-            </motion.div>
+            </div>
             </CommandLine>
         </TerminalWindow>
     );

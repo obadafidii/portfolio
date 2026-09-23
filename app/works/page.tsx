@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
 
 import info from '@/misc/info';
 import { TerminalWindow } from '@/components/layout/TerminalWindow';
@@ -64,11 +63,7 @@ const WorksPage = () => {
             }
         >
             <CommandLine cwd="~/works">
-            <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-            >
+            <div className="page-enter">
                 <div className="flex flex-wrap items-baseline gap-x-2">
                     <Prompt cwd="~/works" />
                     <span className="term-cmd">
@@ -140,7 +135,7 @@ const WorksPage = () => {
                         ))}
                     </div>
                 </div>
-            </motion.div>
+            </div>
             </CommandLine>
         </TerminalWindow>
     );

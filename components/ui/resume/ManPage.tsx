@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { useEffect, type CSSProperties } from 'react';
 
 import info from '@/misc/info';
@@ -279,11 +278,7 @@ export const ManPageContent = ({ resume }: { resume: Resume }) => {
 
     return (
         <CommandLine cwd="~/resume">
-            <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-            >
+            <div className="page-enter">
                 <div className="flex flex-wrap items-baseline gap-x-2">
                     <Prompt cwd="~/resume" />
                     <span className="term-cmd">man david</span>
@@ -326,7 +321,7 @@ export const ManPageContent = ({ resume }: { resume: Resume }) => {
                 <p className="ink-faint mt-6 text-[11px]">
                     open --resume for the pdf · ⌘P prints a plain copy with URLs expanded
                 </p>
-            </motion.div>
+            </div>
         </CommandLine>
     );
 };

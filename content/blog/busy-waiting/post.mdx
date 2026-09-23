@@ -10,13 +10,14 @@ export const post = {
     ],
     "status": "done",
     "coverImage": {
-        "src": "/image/busy-waiting-cover.webp",
+        "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165230/portfolio/blog/busy-waiting-cover.webp",
         "alt": "Network cables connected to rows of servers in a data centre"
     }
 };
 
 import { PollingLab } from '@/components/ui/blog/busy-waiting/PollingLab';
 import { WakeSet } from '@/components/ui/blog/busy-waiting/WakeSet';
+import ArticleImage from '@/components/mdx/elements/Img';
 
 # Busy-Waiting: When Doing Nothing Uses Everything
 
@@ -29,7 +30,7 @@ whether something has changed, or it can stop running and ask the scheduler to
 wake it when change is possible. Both approaches wait. Only one of them keeps
 sending the CPU a bill.
 
-<img src="/image/busy-waiting-cover.webp" alt="Network cables connected to rows of servers in a data centre" width="1800" height="1010" caption="The infrastructure behind a wait. Photo by Taylor Vick on Unsplash." />
+<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165230/portfolio/blog/busy-waiting-cover.webp" alt="Network cables connected to rows of servers in a data centre" width={1800} height={1010} caption="The infrastructure behind a wait. Photo by Taylor Vick on Unsplash." />
 
 Photo: [Taylor Vick](https://unsplash.com/@tvick) ·
 [view the original on Unsplash](https://unsplash.com/photos/cable-network-M5tzZtFCOfs)

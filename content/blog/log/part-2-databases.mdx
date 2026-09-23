@@ -4,7 +4,7 @@ export const post = {
     "publishedOn": "2026-09-03T00:00:00.000Z",
     "status": "done",
     "coverImage": {
-        "src": "/image/journey-of-a-write.jpeg",
+        "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/journey-of-a-write.jpg",
         "alt": "Handwritten diagram tracing a write request from a client to the database"
     },
     "part": 2,
@@ -31,7 +31,7 @@ write be it an update, insert or deletion (basically any state-altering
 command), what happens to this process. In this part we are going to go deeper
 in to the responsibilities and purpose of a Log in database.
 
-<ArticleImage src="/image/journey-of-a-write.jpeg" alt="An image describing the
+<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/journey-of-a-write.jpg" alt="An image describing the
 flow of a write request from a client to the database"
     width={1600}
     height={985}
@@ -46,7 +46,7 @@ performance, because writing to a disk (SSDs or spinning disks) is very costly.
 How should this be mitigated? How do we achieve `strong` durability and
 performance?
 
-<ArticleImage src="/image/database-to-disk.jpeg" alt="An image describing the
+<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165233/portfolio/blog/database-to-disk.jpg" alt="An image describing the
 flow of a write request from a client to the database to disk"
     width={1600}
     height={985}
@@ -58,7 +58,7 @@ all incoming writes will be applied to then _after a while_ or _when this
 in-memory structure is fiiled up_ we _"flush"_ to the disk
 ([SSTables](https://www.igvita.com/2012/02/06/sstable-and-log-structured-storage-leveldb/)).
 
-<ArticleImage src="/image/memtables-to-disk.jpeg" alt="An image describing the
+<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165241/portfolio/blog/memtables-to-disk.jpg" alt="An image describing the
 flow of a write request from a client to the database to disk"
         width={1600}
         height={985}
@@ -125,7 +125,7 @@ structured concerned. But should we celebrate now?
 ## Fsync? Its Strength & Pitfalls
 
 <ArticleImage
-    src="/image/fsync-description.png"
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790165236/portfolio/blog/fsync-description.png"
     alt="An image describing the fsync API"
     width={1000}
     height={186}

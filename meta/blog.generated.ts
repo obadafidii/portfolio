@@ -16,9 +16,22 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         ],
         "status": "done",
         "coverImage": {
-            "src": "/image/busy-waiting-cover.webp",
+            "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165230/portfolio/blog/busy-waiting-cover.webp",
             "alt": "Network cables connected to rows of servers in a data centre"
         }
+    },
+    "computer-arch": {
+        "title": "I Went Back to the Basics",
+        "summary": "Why I am revisiting computer architecture from first principles, starting with processing units and stored programs.",
+        "publishedOn": "2026-09-23T00:00:00.000Z",
+        "year": "2026",
+        "slug": "computer-arch",
+        "tags": [
+            "computer-architecture",
+            "cpu",
+            "stored-programs"
+        ],
+        "status": "draft"
     },
     "cpu-pipelining": {
         "title": "CPU Pipelining, Explained with Robots",
@@ -34,7 +47,7 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         ],
         "status": "done",
         "coverImage": {
-            "src": "/image/cpu-pipelining-cover.webp",
+            "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165232/portfolio/blog/cpu-pipelining-cover.webp",
             "alt": "Industrial robots working along an automated factory conveyor"
         }
     },
@@ -52,6 +65,34 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         ],
         "status": "in-progress"
     },
+    "llvm-fflush": {
+        "title": "Fixing fflush in LLVM libc",
+        "summary": "How I fixed LLVM libc's fflush behavior when a stream contains data without a trailing newline.",
+        "publishedOn": "2026-09-23T00:00:00.000Z",
+        "year": "2026",
+        "slug": "llvm-fflush",
+        "tags": [
+            "llvm",
+            "compilers",
+            "libc",
+            "stdio"
+        ],
+        "status": "draft"
+    },
+    "llvm-first-contribution": {
+        "title": "My First Contribution to LLVM",
+        "summary": "What I learned while refactoring and testing file-mode handling in LLVM libc.",
+        "publishedOn": "2026-09-23T00:00:00.000Z",
+        "year": "2026",
+        "slug": "llvm-first-contribution",
+        "tags": [
+            "llvm",
+            "compilers",
+            "libc",
+            "open-source"
+        ],
+        "status": "draft"
+    },
     "log/part-1-introduction": {
         "title": "Understanding Log: Introduction",
         "summary": "What a log is and why an ordered history of events is useful.",
@@ -66,7 +107,7 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         ],
         "status": "done",
         "coverImage": {
-            "src": "/image/log-in-several-systems.png",
+            "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/log-in-several-systems.png",
             "alt": "Handwritten map connecting logs to databases, version control, and distributed systems"
         },
         "series": "log",
@@ -84,7 +125,7 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         ],
         "status": "done",
         "coverImage": {
-            "src": "/image/journey-of-a-write.jpeg",
+            "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/journey-of-a-write.jpg",
             "alt": "Handwritten diagram tracing a write request from a client to the database"
         },
         "series": "log",
@@ -145,7 +186,7 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         ],
         "status": "draft",
         "coverImage": {
-            "src": "/image/log-in-several-systems.png",
+            "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/log-in-several-systems.png",
             "alt": "heterogeneous computing through Mojo"
         }
     },
@@ -174,6 +215,20 @@ export const blogMetadata: Record<string, BlogMetadata> = {
             "distributed-systems",
             "disk",
             "memory"
+        ],
+        "status": "draft"
+    },
+    "zigng": {
+        "title": "ZigNG: My Vision, Goals, and Plans",
+        "summary": "Why I am starting a Nigerian community for Zig and low-level systems programming.",
+        "publishedOn": "2026-09-23T00:00:00.000Z",
+        "year": "2026",
+        "slug": "zigng",
+        "tags": [
+            "zig",
+            "nigeria",
+            "community",
+            "systems-programming"
         ],
         "status": "draft"
     }

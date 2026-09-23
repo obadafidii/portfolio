@@ -1,7 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
-
 import info from '@/misc/info';
 import { TerminalWindow } from '@/components/layout/TerminalWindow';
 import { CommandLine, Prompt } from '@/components/ui/shell/CommandLine';
@@ -23,11 +21,7 @@ const ContactPage = () => {
             status={<span>reply time ~24h</span>}
         >
             <CommandLine cwd="~/contact">
-            <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-            >
+            <div className="page-enter">
                 <div className="flex flex-wrap items-baseline gap-x-2">
                     <Prompt cwd="~/contact" />
                     <span className="term-cmd">mail david</span>
@@ -77,7 +71,7 @@ const ContactPage = () => {
                 <p className="ink-faint mt-8 text-[11px]">
                     open --email · open --resume · or type below
                 </p>
-            </motion.div>
+            </div>
             </CommandLine>
         </TerminalWindow>
     );

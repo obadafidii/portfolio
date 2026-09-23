@@ -1,7 +1,5 @@
-import { readFile } from 'node:fs/promises';
-import path from 'node:path';
-import sharp from 'sharp';
 import { getBlogMetadata } from '@/lib/blogs';
+import { isCloudinaryImage, resolveBlogImage } from '@/lib/cloudinary';
 
 export const runtime = 'nodejs';
 
@@ -9,25 +7,22 @@ export const runtime = 'nodejs';
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string[] }> }) {
     const post = getBlogMetadata((await params).slug.join('/'));
     const src = post?.coverImage?.src;
-    if (!src?.startsWith('/image/')) return new Response('Image not found', { status: 404 });
-
-    const imageRoot = path.join(process.cwd(), 'public', 'image');
-    const file = path.resolve(imageRoot, src.slice('/image/'.length));
-    if (!file.startsWith(`${imageRoot}${path.sep}`)) {
+    if (!src || !isCloudinaryImage(src)) {
         return new Response('Image not found', { status: 404 });
     }
 
-    const bytes = await sharp(await readFile(file))
-        .rotate()
-        .resize(1200, 630, { fit: 'contain', background: '#10141b' })
-        .flatten({ background: '#10141b' })
-        .jpeg({ quality: 85 })
-        .toBuffer();
-
-    return new Response(new Uint8Array(bytes), {
+    const cloudinarySrc = resolveBlogImage(src, {
+        width: 1200,
+        height: 630,
+        fit: 'pad',
+        background: 'rgb:10141b',
+        format: 'jpg',
+    });
+    return new Response(null, {
+        status: 307,
         headers: {
-            'Content-Type': 'image/jpeg',
-            'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+            Location: cloudinarySrc,
+            'Cache-Control': 'public, max-age=31536000, immutable',
         },
     });
 }

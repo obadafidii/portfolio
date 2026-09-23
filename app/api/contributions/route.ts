@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server';
 import { savedContributions, type Contribution } from '@/content/contributions';
 
 const USERNAME = 'obadafidii';
+const CACHE_HEADERS = {
+    'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+};
 
 type GitHubIssue = {
     title: string;
@@ -68,15 +71,21 @@ export async function GET() {
 
         const byUrl = new Map(savedContributions.map(item => [item.url, item]));
         items.forEach(item => byUrl.set(item.url, item));
-        return NextResponse.json({
-            items: [...byUrl.values()].sort((a, b) => b.date.localeCompare(a.date)),
-            source: 'github',
-        });
+        return NextResponse.json(
+            {
+                items: [...byUrl.values()].sort((a, b) => b.date.localeCompare(a.date)),
+                source: 'github',
+            },
+            { headers: CACHE_HEADERS },
+        );
     } catch {
-        return NextResponse.json({
-            items: savedContributions,
-            source: 'saved',
-            notice: 'Showing saved contributions while GitHub is unavailable.',
-        });
+        return NextResponse.json(
+            {
+                items: savedContributions,
+                source: 'saved',
+                notice: 'Showing saved contributions while GitHub is unavailable.',
+            },
+            { headers: CACHE_HEADERS },
+        );
     }
 }

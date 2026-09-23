@@ -10,6 +10,7 @@ import { SplitWorkspaceProvider } from '@/components/layout/SplitWorkspaceProvid
 const sans = Manrope({
     variable: '--font-sans',
     subsets: ['latin'],
+    preload: false,
 });
 
 const mono = IBM_Plex_Mono({
@@ -22,6 +23,7 @@ const code = Fira_Code({
     variable: '--font-code',
     subsets: ['latin'],
     weight: ['400', '500', '600'],
+    preload: false,
 });
 
 export const metadata: Metadata = {

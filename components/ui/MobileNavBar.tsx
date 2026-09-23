@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Spiral as Hamburger } from 'hamburger-react';
-import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
@@ -28,23 +26,25 @@ export const MobileNavBar = (props: MobileNavBarProps) => {
         <>
             <div className="z-50 flex items-center gap-1 sm:hidden">
                 <ThemeSwitcher />
-                <Hamburger size={16} color="currentColor" toggled={isOpen} toggle={setIsOpen} />
+                <button
+                    type="button"
+                    className="grid h-7 w-7 cursor-pointer place-items-center rounded-[4px] text-[18px] leading-none text-[var(--paper-muted)] hover:bg-[var(--paper-accent-soft)] hover:text-[var(--paper-bright)]"
+                    aria-label={isOpen ? 'Close navigation' : 'Open navigation'}
+                    aria-expanded={isOpen}
+                    onClick={() => setIsOpen(open => !open)}
+                >
+                    <span aria-hidden="true">{isOpen ? '×' : '≡'}</span>
+                </button>
             </div>
 
             {isOpen && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-40 flex items-center justify-center px-6 backdrop-blur-sm"
+                <div
+                    className="mobile-menu-enter fixed inset-0 z-40 flex items-center justify-center px-6 backdrop-blur-sm"
                     style={{ background: 'color-mix(in oklab, var(--paper) 88%, transparent)' }}
                     onClick={() => setIsOpen(false)}
                 >
-                    <motion.div
-                        initial={{ y: 12, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ type: 'tween', duration: 0.25 }}
-                        className="term-chrome w-full max-w-xs"
+                    <div
+                        className="mobile-menu-panel term-chrome w-full max-w-xs"
                         onClick={event => event.stopPropagation()}
                     >
                         <div className="term-bar">
@@ -82,8 +82,8 @@ export const MobileNavBar = (props: MobileNavBarProps) => {
                                 );
                             })}
                         </ul>
-                    </motion.div>
-                </motion.div>
+                    </div>
+                </div>
             )}
         </>
     );

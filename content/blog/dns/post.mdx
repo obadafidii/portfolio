@@ -14,6 +14,7 @@ export const post = {
 import Mermaid from '@/components/ui/blog/Mermaid';
 import { HeaderLayout } from '@/components/ui/blog/dns/HeaderLayout';
 import { ResolutionWalk } from '@/components/ui/blog/dns/ResolutionWalk';
+import ArticleImage from '@/components/mdx/elements/Img';
 
 # Domain Name System
 
@@ -430,7 +431,7 @@ dig google.com -t A     # ipv4
 ```
 
 <br/>
-<img src="/image/dig_google_A.png" alt="dig output for the google.com A record"/>
+<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165234/portfolio/blog/dig_google_A.png" alt="dig output for the google.com A record" />
 <br/>
 
 ```bash
@@ -438,7 +439,7 @@ dig google.com -t AAAA  # ipv6
 ```
 
 <br/>
-<img src="/image/dig_google_AAAA.png" alt="dig output for the google.com AAAA record"/>
+<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165235/portfolio/blog/dig_google_AAAA.png" alt="dig output for the google.com AAAA record" />
 <br/>
 
 #### 2. CNAME
@@ -793,13 +794,13 @@ incident that sent me down this path.
 The server resolves and returns the address for amazon.com:
 
 <br/>
-<img src="/image/lookup_amazon.png" alt="resolver output for amazon.com"/>
+<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165238/portfolio/blog/lookup_amazon.png" alt="resolver output for amazon.com" />
 <br/>
 
 And the same for google.com:
 
 <br/>
-<img src="/image/lookup_google.png" alt="resolver output for google.com"/>
+<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165240/portfolio/blog/lookup_google.png" alt="resolver output for google.com" />
 <br/>
 
 ### 2. Domains that do not exist
@@ -808,7 +809,7 @@ An NXDOMAIN response, distinguished from a failure — the name does not exist, 
 opposed to the server being unable to tell you:
 
 <br/>
-<img src="/image/lookup_fake_domain.png" alt="resolver output for an invalid domain"/>
+<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165239/portfolio/blog/lookup_fake_domain.png" alt="resolver output for an invalid domain" />
 <br/>
 
 ---

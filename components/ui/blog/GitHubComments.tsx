@@ -1,7 +1,7 @@
 'use client';
 
 import { useTheme } from 'next-themes';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import styles from './GitHubComments.module.css';
 
@@ -13,10 +13,31 @@ const CATEGORY_ID = process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID || 'DIC_kwDOOxqf3
 export function GitHubComments({ postKey }: { postKey: string }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const { resolvedTheme } = useTheme();
+    const [nearViewport, setNearViewport] = useState(false);
 
     useEffect(() => {
         const container = containerRef.current;
-        if (!container || !resolvedTheme) return;
+        if (!container || nearViewport) return;
+        if (!('IntersectionObserver' in window)) {
+            setNearViewport(true);
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            entries => {
+                if (!entries.some(entry => entry.isIntersecting)) return;
+                setNearViewport(true);
+                observer.disconnect();
+            },
+            { rootMargin: '600px 0px' },
+        );
+        observer.observe(container);
+        return () => observer.disconnect();
+    }, [nearViewport]);
+
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container || !resolvedTheme || !nearViewport) return;
 
         const script = document.createElement('script');
         script.src = 'https://giscus.app/client.js';
@@ -40,7 +61,7 @@ export function GitHubComments({ postKey }: { postKey: string }) {
         container.replaceChildren(script);
 
         return () => container.replaceChildren();
-    }, [postKey, resolvedTheme]);
+    }, [nearViewport, postKey, resolvedTheme]);
 
     return (
         <section className={styles.comments} aria-labelledby={`comments-${postKey}`}>
