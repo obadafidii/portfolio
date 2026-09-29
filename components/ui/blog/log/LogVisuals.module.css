@@ -18,7 +18,11 @@
 .directionRule {
     height: 1px;
     flex: 1;
-    background: linear-gradient(90deg, var(--paper-line-strong), var(--term-green));
+    background: linear-gradient(
+        90deg,
+        var(--paper-line-strong),
+        var(--term-green)
+    );
 }
 
 .operationTrack {
@@ -53,7 +57,11 @@
 }
 
 .operationVisible {
-    border-color: color-mix(in oklab, var(--term-blue) 58%, var(--paper-line-strong));
+    border-color: color-mix(
+        in oklab,
+        var(--term-blue) 58%,
+        var(--paper-line-strong)
+    );
     color: var(--paper-ink);
     opacity: 1;
     transform: translateX(0);
@@ -84,10 +92,28 @@
     animation: file-created 300ms ease-out both;
 }
 
-.capacity { height: 5px; margin: 0 8px; background: var(--paper-line); }
-.capacity span { display: block; height: 100%; background: var(--term-green); transition: width 300ms ease; }
-.fileCount { padding: 6px 8px; color: var(--paper-muted); font-size: 10px; }
-@keyframes file-created { from { opacity: 0; transform: translateY(10px); } }
+.capacity {
+    height: 5px;
+    margin: 0 8px;
+    background: var(--paper-line);
+}
+.capacity span {
+    display: block;
+    height: 100%;
+    background: var(--term-green);
+    transition: width 300ms ease;
+}
+.fileCount {
+    padding: 6px 8px;
+    color: var(--paper-muted);
+    font-size: 10px;
+}
+@keyframes file-created {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
 
 .segment {
     min-width: 0;
@@ -162,7 +188,11 @@
 }
 
 .recordVisible {
-    border-color: color-mix(in oklab, var(--term-green) 48%, var(--paper-line-strong));
+    border-color: color-mix(
+        in oklab,
+        var(--term-green) 48%,
+        var(--paper-line-strong)
+    );
     opacity: 1;
     transform: translateY(0);
 }
@@ -247,19 +277,47 @@
 @keyframes head-pulse {
     to {
         background: color-mix(in oklab, var(--term-green) 10%, transparent);
-        box-shadow: 0 0 14px color-mix(in oklab, var(--term-green) 25%, transparent);
+        box-shadow: 0 0 14px
+            color-mix(in oklab, var(--term-green) 25%, transparent);
     }
 }
 
 @media (max-width: 620px) {
-    .segmentFlow { flex-direction: column; min-height: 390px; justify-content: flex-start; }
-    .segmentGroup { flex: 0 0 auto; width: 100%; }
-    .segmentArrow { display: none; }
-    .operationTrack { min-width: 0; grid-template-columns: repeat(5, minmax(0, 1fr)) 18px; gap: 3px; }
-    .operation { padding: 8px 3px; font-size: 8px; overflow-wrap: anywhere; }
-    .numberedTrack { min-width: 0; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; }
-    .numberedTrack .record { padding: 7px 2px; text-align: center; }
-    .numberedTrack .recordPayload, .tailMarker { display: none; }
+    .segmentFlow {
+        flex-direction: column;
+        min-height: 390px;
+        justify-content: flex-start;
+    }
+    .segmentGroup {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+    .segmentArrow {
+        display: none;
+    }
+    .operationTrack {
+        min-width: 0;
+        grid-template-columns: repeat(5, minmax(0, 1fr)) 18px;
+        gap: 3px;
+    }
+    .operation {
+        padding: 8px 3px;
+        font-size: 8px;
+        overflow-wrap: anywhere;
+    }
+    .numberedTrack {
+        min-width: 0;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 3px;
+    }
+    .numberedTrack .record {
+        padding: 7px 2px;
+        text-align: center;
+    }
+    .numberedTrack .recordPayload,
+    .tailMarker {
+        display: none;
+    }
     .appendScene,
     .segmentScene,
     .numberedScene {
@@ -275,6 +333,10 @@
         animation: none;
         transition: none;
     }
-    .segmentGroup { animation: none; }
-    .capacity span { transition: none; }
+    .segmentGroup {
+        animation: none;
+    }
+    .capacity span {
+        transition: none;
+    }
 }

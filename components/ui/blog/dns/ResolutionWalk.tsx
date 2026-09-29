@@ -94,7 +94,10 @@ export const ResolutionWalk = () => {
                     <Button onClick={reset}>reset</Button>
                     <span
                         className="ml-auto text-[11px]"
-                        style={{ fontFamily: 'var(--font-mono)', color: 'var(--paper-faint)' }}
+                        style={{
+                            fontFamily: 'var(--font-mono)',
+                            color: 'var(--paper-faint)',
+                        }}
                     >
                         {cached
                             ? '1 hop, ~0ms'
@@ -111,12 +114,14 @@ export const ResolutionWalk = () => {
                     style={{
                         fontFamily: 'var(--font-mono)',
                         borderColor: 'var(--term-green)',
-                        background: 'color-mix(in oklab, var(--term-green) 12%, transparent)',
+                        background:
+                            'color-mix(in oklab, var(--term-green) 12%, transparent)',
                         color: 'var(--paper-bright)',
                     }}
                 >
-                    cache hit — answered locally, no packets sent. this is why DNS survives at
-                    internet scale, and why a bad record lingers for exactly its TTL.
+                    cache hit — answered locally, no packets sent. this is why
+                    DNS survives at internet scale, and why a bad record lingers
+                    for exactly its TTL.
                 </div>
             )}
 
@@ -143,8 +148,13 @@ export const ResolutionWalk = () => {
                                     : 'transparent',
                             }}
                         >
-                            <div style={{ color: 'var(--paper-bright)' }}>{hop.server}</div>
-                            <div className="mt-1" style={{ color: 'var(--paper-faint)' }}>
+                            <div style={{ color: 'var(--paper-bright)' }}>
+                                {hop.server}
+                            </div>
+                            <div
+                                className="mt-1"
+                                style={{ color: 'var(--paper-faint)' }}
+                            >
                                 → {hop.asks}
                             </div>
                             <div

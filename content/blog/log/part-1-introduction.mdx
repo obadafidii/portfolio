@@ -1,19 +1,14 @@
 export const post = {
-    "title": "Understanding Log: Introduction",
-    "summary": "What a log is and why an ordered history of events is useful.",
-    "publishedOn": "2026-09-03T00:00:00.000Z",
-    "status": "done",
-    "part": 1,
-    "coverImage": {
-        "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/log-in-several-systems.png",
-        "alt": "Handwritten map connecting logs to databases, version control, and distributed systems"
+    title: 'Understanding Log: Introduction',
+    summary: 'What a log is and why an ordered history of events is useful.',
+    publishedOn: '2026-09-03T00:00:00.000Z',
+    status: 'done',
+    part: 1,
+    coverImage: {
+        src: 'https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/log-in-several-systems.png',
+        alt: 'Handwritten map connecting logs to databases, version control, and distributed systems',
     },
-    "tags": [
-        "logs",
-        "databases",
-        "version-control",
-        "distributed-systems"
-    ]
+    tags: ['logs', 'databases', 'version-control', 'distributed-systems'],
 };
 
 import {
@@ -26,7 +21,13 @@ import ArticleImage from '@/components/mdx/elements/Img';
 
 # Understanding Log - Part 1
 
-<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/log-in-several-systems.png" alt="Handwritten map connecting logs to databases, version control, and distributed systems" width={1280} height={835} caption="The note that started this series: one append-only idea appearing across databases, version control, and distributed systems." />
+<ArticleImage
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/log-in-several-systems.png"
+    alt="Handwritten map connecting logs to databases, version control, and distributed systems"
+    width={1280}
+    height={835}
+    caption="The note that started this series: one append-only idea appearing across databases, version control, and distributed systems."
+/>
 
 I was studying the Write-Ahead-Log for a personal project and decided to do a
 presentation at [DULSS](https://discord.gg/hbMFVErE7). I came up with the slides
@@ -100,24 +101,24 @@ an input.
 
 1. **Insertion**: A log can be inserted to from left-to-right only or top-bottom
    only. You cannot append a particular position in a log
-only the end.
+   only the end.
 
 <AppendDirection />
 
 2. **Segmentation**: Once we start appending to a log, the size begins to grow,
    and it because too large for a process, a log can now segment
-itself into smaller chunks of logs that allows faster processing.
+   itself into smaller chunks of logs that allows faster processing.
 
 <SegmentRotation />
 
 3. **Durability**: This is one key area of a log, it must be durable, the
    contents of the Log should not be lost in case of a crash. If a log is not
-durable, then it cannot act an authoritative source.
+   durable, then it cannot act an authoritative source.
 
 4. **Ordered**: The entries of a log must be ordered. Since one of the key areas
    logs are used is in `state-replication` there must be order in the way
-changes are tracked so that we can acheieve the same state across distributed
-nodes.
+   changes are tracked so that we can acheieve the same state across distributed
+   nodes.
 
 ## Shape of a Log
 
@@ -147,6 +148,7 @@ log in several systems like `databases` and how logs helps in
 partitions are also **durable log streams**.
 
 Something you keep in your mind
+
 > Many concepts in computer science/software technology replay themselves in
 > different systems using different names
 

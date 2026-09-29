@@ -3,7 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { useCallback, useId, useRef, useState, type ReactNode } from 'react';
 
-import { runCommand, suggestionsFor, type Cwd } from '@/components/ui/shell/registry';
+import {
+    runCommand,
+    suggestionsFor,
+    type Cwd,
+} from '@/components/ui/shell/registry';
 import { usePaneNavigation } from '@/components/layout/split-state';
 import { usePaneShellSession, type ShellBlock } from './session';
 
@@ -21,7 +25,11 @@ export const Prompt = ({ cwd }: { cwd: Cwd }) => (
     </>
 );
 
-export const CommandLine = ({ cwd, children, autoFocus = false }: CommandLineProps) => {
+export const CommandLine = ({
+    cwd,
+    children,
+    autoFocus = false,
+}: CommandLineProps) => {
     const router = useRouter();
     const paneNavigate = usePaneNavigation();
     const paneSession = usePaneShellSession();
@@ -46,22 +54,32 @@ export const CommandLine = ({ cwd, children, autoFocus = false }: CommandLinePro
     const inputId = useId();
     const suggestionsId = `${inputId}-suggestions`;
     const suggestions = suggestionsDismissed ? [] : suggestionsFor(input, cwd);
-    const activeSuggestion = Math.min(selectedSuggestion, suggestions.length - 1);
+    const activeSuggestion = Math.min(
+        selectedSuggestion,
+        suggestions.length - 1,
+    );
 
     const submit = useCallback(
         (command: string) => {
             const output = runCommand(command, {
                 cwd,
-                navigate: href => (paneNavigate ? paneNavigate(href) : router.push(href)),
+                navigate: href =>
+                    paneNavigate ? paneNavigate(href) : router.push(href),
                 clear: () => setBlocks([]),
             });
 
             if (output === 'CLEARED') return;
             if (output === null) return;
 
-            setBlocks(prev => [...prev, { id: nextId.current++, command, cwd, output }]);
+            setBlocks(prev => [
+                ...prev,
+                { id: nextId.current++, command, cwd, output },
+            ]);
             window.requestAnimationFrame(() =>
-                endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }),
+                endRef.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'nearest',
+                }),
             );
         },
         [cwd, nextId, paneNavigate, router, setBlocks],
@@ -91,21 +109,28 @@ export const CommandLine = ({ cwd, children, autoFocus = false }: CommandLinePro
     const complete = () => {
         if (suggestions.length === 0) return;
         const fragment = input.slice(input.lastIndexOf(' ') + 1);
-        const prefixMatches = suggestions.filter(item => item.startsWith(fragment));
+        const prefixMatches = suggestions.filter(item =>
+            item.startsWith(fragment),
+        );
         const matches = prefixMatches.length > 0 ? prefixMatches : suggestions;
         const shared = matches.reduce((acc, item) => {
             let i = 0;
             while (i < acc.length && i < item.length && acc[i] === item[i]) i++;
             return acc.slice(0, i);
         });
-        const completion = matches.length === 1 || !shared.startsWith(fragment)
-            ? suggestions[Math.max(activeSuggestion, 0)]
-            : shared;
+        const completion =
+            matches.length === 1 || !shared.startsWith(fragment)
+                ? suggestions[Math.max(activeSuggestion, 0)]
+                : shared;
         acceptSuggestion(completion, matches.length === 1);
     };
 
     const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter' && suggestions.length > 0 && activeSuggestion >= 0) {
+        if (
+            event.key === 'Enter' &&
+            suggestions.length > 0 &&
+            activeSuggestion >= 0
+        ) {
             const suggestion = suggestions[activeSuggestion];
             const fragment = input.slice(input.lastIndexOf(' ') + 1);
             if (suggestion !== fragment) {
@@ -142,7 +167,9 @@ export const CommandLine = ({ cwd, children, autoFocus = false }: CommandLinePro
         if (event.key === 'ArrowDown') {
             event.preventDefault();
             if (suggestions.length > 0) {
-                setSelectedSuggestion(index => (index + 1) % suggestions.length);
+                setSelectedSuggestion(
+                    index => (index + 1) % suggestions.length,
+                );
                 return;
             }
             const idx = historyIdx - 1;
@@ -156,7 +183,11 @@ export const CommandLine = ({ cwd, children, autoFocus = false }: CommandLinePro
             className="min-h-full"
             role="presentation"
             onClick={event => {
-                if (!(event.target as HTMLElement).closest('a,button,input,textarea,select,[contenteditable="true"]')) {
+                if (
+                    !(event.target as HTMLElement).closest(
+                        'a,button,input,textarea,select,[contenteditable="true"]',
+                    )
+                ) {
                     inputRef.current?.focus();
                 }
             }}
@@ -174,7 +205,10 @@ export const CommandLine = ({ cwd, children, autoFocus = false }: CommandLinePro
             ))}
 
             <div className="mt-3">
-                <form onSubmit={onSubmit} className="terminal-prompt-form flex items-baseline gap-x-2">
+                <form
+                    onSubmit={onSubmit}
+                    className="terminal-prompt-form flex items-baseline gap-x-2"
+                >
                     <Prompt cwd={cwd} />
                     <label htmlFor={inputId} className="sr-only">
                         Terminal command
@@ -197,7 +231,9 @@ export const CommandLine = ({ cwd, children, autoFocus = false }: CommandLinePro
                         role="combobox"
                         aria-label="Terminal command"
                         aria-autocomplete="list"
-                        aria-controls={suggestions.length > 0 ? suggestionsId : undefined}
+                        aria-controls={
+                            suggestions.length > 0 ? suggestionsId : undefined
+                        }
                         aria-expanded={suggestions.length > 0}
                         aria-activedescendant={
                             activeSuggestion >= 0
@@ -209,10 +245,16 @@ export const CommandLine = ({ cwd, children, autoFocus = false }: CommandLinePro
                 </form>
 
                 {suggestions.length > 0 ? (
-                    <div id={suggestionsId} className="term-completions" role="listbox">
+                    <div
+                        id={suggestionsId}
+                        className="term-completions"
+                        role="listbox"
+                    >
                         <div className="term-completions__hint">
                             <span>completions</span>
-                            <span>↑↓ select · enter/tab accept · esc close</span>
+                            <span>
+                                ↑↓ select · enter/tab accept · esc close
+                            </span>
                         </div>
                         {suggestions.map((suggestion, index) => (
                             <button

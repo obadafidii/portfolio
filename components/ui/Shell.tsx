@@ -14,10 +14,15 @@ const Listing = () => (
         {ROUTES.map(route => (
             <Link key={route.href} href={route.href} className="term-row group">
                 <span className="ink-faint w-[11ch] shrink-0">drwxr-xr-x</span>
-                <span className="group-hover:underline" style={{ color: 'var(--term-blue)' }}>
+                <span
+                    className="group-hover:underline"
+                    style={{ color: 'var(--term-blue)' }}
+                >
                     {route.name}/
                 </span>
-                <span className="ink-muted ml-auto text-[11px]">{route.note}</span>
+                <span className="ink-muted ml-auto text-[11px]">
+                    {route.note}
+                </span>
             </Link>
         ))}
     </div>
@@ -37,10 +42,18 @@ export const Shell = () => {
         const timers: ReturnType<typeof setTimeout>[] = [];
         BOOT_COMMAND.split('').forEach((_, idx) => {
             timers.push(
-                setTimeout(() => setTyped(BOOT_COMMAND.slice(0, idx + 1)), TYPE_MS * (idx + 1)),
+                setTimeout(
+                    () => setTyped(BOOT_COMMAND.slice(0, idx + 1)),
+                    TYPE_MS * (idx + 1),
+                ),
             );
         });
-        timers.push(setTimeout(() => setBooted(true), TYPE_MS * (BOOT_COMMAND.length + 5)));
+        timers.push(
+            setTimeout(
+                () => setBooted(true),
+                TYPE_MS * (BOOT_COMMAND.length + 5),
+            ),
+        );
 
         return () => timers.forEach(clearTimeout);
     }, []);
@@ -49,7 +62,9 @@ export const Shell = () => {
         <div>
             <div className="flex flex-wrap items-baseline gap-x-2">
                 <Prompt cwd="~" />
-                <span className={booted ? 'term-cmd' : 'term-cmd caret'}>{typed}</span>
+                <span className={booted ? 'term-cmd' : 'term-cmd caret'}>
+                    {typed}
+                </span>
             </div>
 
             {booted && (
@@ -58,8 +73,9 @@ export const Shell = () => {
                         David Dada — backend + infrastructure engineer
                     </div>
                     <div className="ink-faint mt-3">
-                        type <span style={{ color: 'var(--term-blue)' }}>help</span> for commands,
-                        or click a directory below.
+                        type{' '}
+                        <span style={{ color: 'var(--term-blue)' }}>help</span>{' '}
+                        for commands, or click a directory below.
                     </div>
                     <div className="mt-3 flex flex-wrap items-baseline gap-x-2">
                         <Prompt cwd="~" />

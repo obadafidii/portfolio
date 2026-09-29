@@ -12,7 +12,8 @@ const Home = () => {
                 <>
                     <span className="hidden sm:inline">Lagos, NG</span>
                     <span>
-                        <span style={{ color: 'var(--term-blue)' }}>help</span> for commands
+                        <span style={{ color: 'var(--term-blue)' }}>help</span>{' '}
+                        for commands
                     </span>
                 </>
             }

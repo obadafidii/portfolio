@@ -16,9 +16,13 @@ export function PostNavigation({ currentKey }: { currentKey: string }) {
     if (!current) return null;
 
     const publishedPosts = getReadableBlogs();
-    const publishedIndex = publishedPosts.findIndex(post => post.slug === currentKey);
-    const olderPost = publishedIndex >= 0 ? publishedPosts[publishedIndex + 1] : undefined;
-    const newerPost = publishedIndex > 0 ? publishedPosts[publishedIndex - 1] : undefined;
+    const publishedIndex = publishedPosts.findIndex(
+        post => post.slug === currentKey,
+    );
+    const olderPost =
+        publishedIndex >= 0 ? publishedPosts[publishedIndex + 1] : undefined;
+    const newerPost =
+        publishedIndex > 0 ? publishedPosts[publishedIndex - 1] : undefined;
 
     let previous = olderPost;
     let next = newerPost;
@@ -27,9 +31,10 @@ export function PostNavigation({ currentKey }: { currentKey: string }) {
         const parts = getSeriesParts(current.series);
         const seriesIndex = parts.findIndex(part => part.slug === currentKey);
         previous = seriesIndex > 0 ? parts[seriesIndex - 1] : olderPost;
-        next = seriesIndex >= 0 && seriesIndex < parts.length - 1
-            ? parts[seriesIndex + 1]
-            : newerPost;
+        next =
+            seriesIndex >= 0 && seriesIndex < parts.length - 1
+                ? parts[seriesIndex + 1]
+                : newerPost;
     }
 
     return (

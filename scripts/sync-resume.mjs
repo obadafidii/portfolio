@@ -86,7 +86,9 @@ try {
     );
 
     const sections = (markdown.match(/^##\s+/gm) ?? []).length;
-    console.log(`Wrote content/resume.md — ${markdown.length} chars, ${sections} sections.`);
+    console.log(
+        `Wrote content/resume.md — ${markdown.length} chars, ${sections} sections.`,
+    );
     console.log('Review the diff, then commit it.');
 } catch (error) {
     console.error(`Resume sync failed: ${error.message}`);

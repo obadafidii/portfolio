@@ -26,5 +26,5 @@ export interface BlogSeries extends BlogMetadata {
 
 export interface Blog {
     metadata: BlogMetadata;
-    content: string; 
+    content: string;
 }

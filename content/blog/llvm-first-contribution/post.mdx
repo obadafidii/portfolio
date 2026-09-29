@@ -1,12 +1,168 @@
+import Img from '@/components/mdx/elements/Img';
+
 export const post = {
-    "title": "My First Contribution to LLVM",
-    "summary": "What I learned while refactoring and testing file-mode handling in LLVM libc.",
-    "publishedOn": "2026-09-23T00:00:00.000Z",
-    "tags": [
-        "llvm",
-        "compilers",
-        "libc",
-        "open-source"
-    ],
-    "status": "draft"
+    title: 'My First Contribution to LLVM',
+    summary:
+        'What I learned while refactoring and testing file-mode handling in LLVM libc.',
+    publishedOn: '2026-09-23T00:00:00.000Z',
+    tags: ['llvm', 'compilers', 'libc', 'open-source'],
+    status: 'done',
 };
+
+<Img
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790719806/portfolio/blog/llvm-logo.png"
+    alt="The LLVM wyvern logo"
+    width={700}
+    height={439}
+    caption=""
+/>
+
+<p style={{ textAlign: 'center' }}>
+    <a
+        href="https://llvm.org/Logo.html"
+        style={{ color: 'var(--paper-faint)' }}
+    >
+        {'LLVM logo source'}
+    </a>
+</p>
+
+I have been interested in compilers and systems programming since my second year
+in university. I remember when my lecturer,
+[Dr. Sawyer](https://www.linkedin.com/in/babatunde-sawyerr-41802a22/), taught me
+about [MIPS](https://en.wikipedia.org/wiki/MIPS_architecture) (_Million Instructions Per Second_), and
+[Mr. Abass](https://www.linkedin.com/in/abass-rasheed-85912a71/) taught me about
+finite automata. I was thrilled. That was the moment I fell in love with computer
+science. It wasn't that I disliked it before; I just that I didn't like and want to be building and integrating CRUD endpoints 🫠
+
+I had already built my own mini-Laravel framework from scratch because I've
+always wanted to understand how things work under the hood. Enough yapping,
+though. Let me tell you about a major milestone for me.
+
+## Finding my first issue
+
+At the beginning of this year, I decided to take compiler design seriously. I
+bought a course and started learning LLVM internals, taking my time and leaving
+plenty of comments in my code. I'm not done with the course, but I'm making
+progress.
+
+Then I came across
+[issue #213374: refactor file-mode handling in LLVM libc](https://github.com/llvm/llvm-project/issues/213374)
+and decided to tackle it. My fluency in C++ and LLVM was nothing to write home
+about. I'm basically the backend guy who enjoys Go a little too much, and I had
+never done professional work with C++ or LLVM.
+
+## Making file modes easier to read
+
+The issue was about how libc represented a file's mode: whether it could be read,
+written to, appended to, and so on. The code stored these properties as bits, and
+some callers checked them with manual bit masks. There were already helpers for
+reading and writing, but the remaining checks were harder to follow.
+
+At first, I wasn't sure where to start. I was unfamiliar with the codebase, so I
+read the issue, traced the existing implementation, and introduced a `FileMode`
+class to bring the parsing and mode checks together.
+
+The class provides methods such as `read_allowed()`, `write_allowed()`,
+`is_append()`, `is_update()`, `is_binary_format()`, and `is_exclusive_create()`.
+The bitwise operations still exist inside the class, but callers can ask a named
+question instead of decoding the flags themselves.
+
+After implementing it, I updated the places using the previous representation to
+use `FileMode`. You can see the changes in
+[PR #220906](https://github.com/llvm/llvm-project/pull/220906).
+
+## Understanding constexpr
+
+While working on the constructor and helper methods, I learnt about `constexpr`.
+That word was vague to me at first. What does it actually mean? 🤔
+
+A `constexpr` variable must have a constant initializer. A `constexpr` function or
+constructor can be used in a constant expression when its arguments and
+operations allow it. It can also run at runtime; the keyword alone doesn't force
+every call to happen at compile time. The
+[C++ specification's constexpr section](https://eel.is/c++draft/dcl.constexpr)
+describes that distinction.
+
+Here's a small, standalone example:
+
+```cpp
+constexpr bool is_main_mode(char mode) {
+  return mode == 'r' || mode == 'w' || mode == 'a';
+}
+
+constexpr bool valid = is_main_mode('r');
+static_assert(valid, "r is a valid main mode");
+
+bool check_mode(char mode_from_input) {
+  return is_main_mode(mode_from_input);
+}
+```
+
+The initializer for `valid` is a constant expression, and `static_assert` checks
+it at compile time. `check_mode` can use the same helper with input that is only
+known while the program runs.
+
+In my contribution, making the `FileMode` constructor and its helpers `constexpr`
+allowed mode objects and their checks to be used in constant expressions too.
+
+## Following LLVM's file conventions
+
+I also learnt to pay attention to the
+[LLVM file-header conventions](https://llvm.org/docs/CodingStandards.html#file-headers).
+New source files need the project's license header, and the description should
+explain what that particular file contains.
+
+For `file_mode.h`, that means describing `FileMode`, rather than copying an
+unrelated class description from an example:
+
+```cpp
+//===----------------------------------------------------------------------===//
+//
+// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+///
+/// \file
+/// Parsing and mode queries for the FileMode class.
+///
+//===----------------------------------------------------------------------===//
+```
+
+## Seeing the first tests pass
+
+I wrote tests for the valid mode combinations and invalid inputs, checking both
+the parsing and the helper methods. The tests use LLVM libc's own unit-test
+framework, with familiar `TEST` and `EXPECT_TRUE` macros. This also led me to
+learn about [GoogleTest](https://github.com/google/googletest), which uses a
+similar style of C++ unit testing.
+
+I still remember when the first two test cases passed after several days of
+implementation. I was super excited and motivated to keep going. 🔥
+
+<Img
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790708180/portfolio/blog/llvm-libc.jpg"
+    alt="Terminal output showing two FileMode tests passing, with PASS: 2 and FAIL: 0"
+    width={1532}
+    height={292}
+    caption="The first two FileMode tests passing. This was an early milestone, before the rest of the test suite."
+/>
+
+While testing, I noticed that two existing tests kept failing outside the new
+suite I had written. I tried to fix them, but mehn, I couldn't figure it out. I
+asked the reviewer for help, and they pointed out that I had accidentally removed
+some existing logic during the refactor. I restored it, and the tests passed.
+
+That experience taught me that a refactor needs to preserve existing behaviour,
+even when the code looks much cleaner afterwards.
+
+## Getting it merged
+
+[My contribution was merged on September 15, 2026](https://github.com/llvm/llvm-project/pull/220906),
+and I was really excited to see it happen. I hadn't thought I could start
+contributing to LLVM while I was still so new to compiler development.
+
+I didn't arrive knowing the whole codebase. I started with one issue, read the
+code around it, wrote tests, and asked for help when I got stuck. That was enough
+to make my first contribution, and it gave me the confidence to keep going.

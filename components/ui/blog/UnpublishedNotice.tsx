@@ -56,7 +56,9 @@ export const UnpublishedNotice = ({
     const [reduced, setReduced] = useState(false);
 
     useEffect(() => {
-        const quiet = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const quiet = window.matchMedia(
+            '(prefers-reduced-motion: reduce)',
+        ).matches;
         setReduced(quiet);
 
         if (quiet) {
@@ -73,7 +75,10 @@ export const UnpublishedNotice = ({
 
     useEffect(() => {
         if (reduced) return;
-        const tick = setInterval(() => setFrame(f => (f + 1) % SPINNER.length), 90);
+        const tick = setInterval(
+            () => setFrame(f => (f + 1) % SPINNER.length),
+            90,
+        );
         return () => clearInterval(tick);
     }, [reduced]);
 
@@ -107,10 +112,14 @@ export const UnpublishedNotice = ({
                                 className="flex flex-wrap items-baseline gap-x-3 transition-opacity duration-200"
                                 style={{ opacity: done > idx ? 1 : 0 }}
                             >
-                                <span style={{ color: 'var(--term-green)' }}>[ ok ]</span>
+                                <span style={{ color: 'var(--term-green)' }}>
+                                    [ ok ]
+                                </span>
                                 <span className="ink-muted">{step.label}</span>
                                 {step.detail && (
-                                    <span className="ink-faint text-[11px]">{step.detail}</span>
+                                    <span className="ink-faint text-[11px]">
+                                        {step.detail}
+                                    </span>
                                 )}
                             </div>
                         ))}
@@ -122,8 +131,12 @@ export const UnpublishedNotice = ({
                             <span style={{ color: status.colour }}>
                                 [{reduced ? ' .. ' : ` ${SPINNER[frame]}  `}]
                             </span>
-                            <span style={{ color: 'var(--paper-bright)' }}>{status.stall}</span>
-                            <span className="ink-faint text-[11px]">no eta</span>
+                            <span style={{ color: 'var(--paper-bright)' }}>
+                                {status.stall}
+                            </span>
+                            <span className="ink-faint text-[11px]">
+                                no eta
+                            </span>
                         </div>
 
                         <div
@@ -139,14 +152,21 @@ export const UnpublishedNotice = ({
                         <div className="mt-6">
                             <p style={{ color: 'var(--paper-bright)' }}>
                                 {blog.title}
-                                <span style={{ color: status.colour }}> — {status.label}</span>
+                                <span style={{ color: status.colour }}>
+                                    {' '}
+                                    — {status.label}
+                                </span>
                             </p>
-                            <p className="ink-muted measure mt-2">{status.blurb}</p>
+                            <p className="ink-muted measure mt-2">
+                                {status.blurb}
+                            </p>
 
                             {blog.summary && (
                                 <p
                                     className="ink-faint measure mt-3 border-l-2 pl-3 text-[12.5px]"
-                                    style={{ borderColor: 'var(--paper-line-strong)' }}
+                                    style={{
+                                        borderColor: 'var(--paper-line-strong)',
+                                    }}
                                 >
                                     {blog.summary}
                                 </p>
@@ -155,7 +175,9 @@ export const UnpublishedNotice = ({
                             <div className="mt-8">
                                 <div className="flex flex-wrap items-baseline gap-x-2">
                                     <Prompt cwd="~/writing" />
-                                    <span className="term-cmd">ls --published</span>
+                                    <span className="term-cmd">
+                                        ls --published
+                                    </span>
                                 </div>
 
                                 {others.length > 0 ? (
@@ -173,7 +195,9 @@ export const UnpublishedNotice = ({
                                                 </span>
                                                 <span
                                                     className="group-hover:underline"
-                                                    style={{ color: 'var(--term-blue)' }}
+                                                    style={{
+                                                        color: 'var(--term-blue)',
+                                                    }}
                                                 >
                                                     {post.title}
                                                 </span>
@@ -182,7 +206,8 @@ export const UnpublishedNotice = ({
                                     </div>
                                 ) : (
                                     <p className="ink-faint mt-1">
-                                        nothing published yet — everything here is still cooking
+                                        nothing published yet — everything here
+                                        is still cooking
                                     </p>
                                 )}
                             </div>

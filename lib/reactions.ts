@@ -6,14 +6,18 @@ export type ReactionState = { like: number; love: number; selected: Reaction };
 export const READER_COOKIE = 'blog-reader';
 
 function configuration() {
-    const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-    const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+    const url =
+        process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+    const token =
+        process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
     if (!url || !token) throw new Error('Reactions storage is not configured');
     return { url, token, secret: process.env.REACTIONS_COOKIE_SECRET || token };
 }
 
 function signature(id: string) {
-    return createHmac('sha256', configuration().secret).update(id).digest('hex');
+    return createHmac('sha256', configuration().secret)
+        .update(id)
+        .digest('hex');
 }
 
 export function readerIdentity(cookie?: string) {
@@ -69,10 +73,17 @@ export async function readOrUpdateReaction(
     if (reaction !== undefined) keys.push(`${prefix}:limit:${reader}`);
     const response = await fetch(url, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
         body: JSON.stringify([
-            'EVAL', reaction === undefined ? READ : UPDATE_REACTION_SCRIPT,
-            keys.length, ...keys, reader, ...(reaction === undefined ? [] : [reaction || '']),
+            'EVAL',
+            reaction === undefined ? READ : UPDATE_REACTION_SCRIPT,
+            keys.length,
+            ...keys,
+            reader,
+            ...(reaction === undefined ? [] : [reaction || '']),
         ]),
         cache: 'no-store',
         signal: AbortSignal.timeout(8000),
@@ -86,8 +97,13 @@ export async function readOrUpdateReaction(
     const [likeValue, loveValue, selected] = payload.result;
     const like = Number(likeValue);
     const love = Number(loveValue);
-    if (!Number.isSafeInteger(like) || like < 0 || !Number.isSafeInteger(love) || love < 0
-        || !['', 'like', 'love'].includes(selected)) {
+    if (
+        !Number.isSafeInteger(like) ||
+        like < 0 ||
+        !Number.isSafeInteger(love) ||
+        love < 0 ||
+        !['', 'like', 'love'].includes(selected)
+    ) {
         throw new Error('Invalid reaction totals');
     }
     return { like, love, selected: selected || null };

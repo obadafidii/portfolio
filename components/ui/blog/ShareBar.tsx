@@ -46,7 +46,9 @@ export const ShareBar = ({ title, summary, path }: ShareBarProps) => {
             if (event.key !== 'Tab' || !dialogRef.current) return;
 
             const focusable = Array.from(
-                dialogRef.current.querySelectorAll<HTMLElement>('a[href], button'),
+                dialogRef.current.querySelectorAll<HTMLElement>(
+                    'a[href], button',
+                ),
             ).filter(element => !element.hasAttribute('disabled'));
             const first = focusable[0];
             const last = focusable.at(-1);
@@ -87,7 +89,8 @@ export const ShareBar = ({ title, summary, path }: ShareBarProps) => {
             await navigator.share({ title, text: summary, url });
             setOpen(false);
         } catch (error) {
-            if (error instanceof DOMException && error.name === 'AbortError') return;
+            if (error instanceof DOMException && error.name === 'AbortError')
+                return;
             await copyLink('link copied — paste it into Instagram');
         }
     };
@@ -131,7 +134,10 @@ export const ShareBar = ({ title, summary, path }: ShareBarProps) => {
                                 <p id={titleId} className="share-modal__title">
                                     share article
                                 </p>
-                                <p id={descriptionId} className="share-modal__description">
+                                <p
+                                    id={descriptionId}
+                                    className="share-modal__description"
+                                >
                                     {title}
                                 </p>
                             </div>
@@ -186,7 +192,11 @@ export const ShareBar = ({ title, summary, path }: ShareBarProps) => {
                             </button>
                         </div>
 
-                        <p className="share-modal__status" role="status" aria-live="polite">
+                        <p
+                            className="share-modal__status"
+                            role="status"
+                            aria-live="polite"
+                        >
                             {status || 'instagram opens your device share menu'}
                         </p>
                     </div>

@@ -31,7 +31,8 @@ export const contributionNotes: Record<
     { changed: string; why: string; learned?: string; article?: string }
 > = {
     'https://github.com/It4innovations/hyperqueue/pull/844': {
-        changed: 'Improved structured JSON output and added regression coverage.',
+        changed:
+            'Improved structured JSON output and added regression coverage.',
         why: 'Reliable machine-readable output makes HyperQueue easier to use from other tools.',
     },
     'https://github.com/dicedb/dicedb/pull/531': {

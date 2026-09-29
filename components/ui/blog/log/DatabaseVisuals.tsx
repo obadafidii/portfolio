@@ -25,11 +25,11 @@ function useTimeline(lastStep: number) {
         lastStep,
         toggle() {
             if (step === lastStep) setStep(0);
-            setPlaying((current) => !current);
+            setPlaying(current => !current);
         },
         next() {
             setPlaying(false);
-            setStep((current) => Math.min(current + 1, lastStep));
+            setStep(current => Math.min(current + 1, lastStep));
         },
         reset() {
             setPlaying(false);
@@ -41,7 +41,11 @@ function useTimeline(lastStep: number) {
 function Controls({ timeline }: { timeline: ReturnType<typeof useTimeline> }) {
     return (
         <div className={styles.controls}>
-            <button type="button" onClick={timeline.toggle} aria-pressed={timeline.playing}>
+            <button
+                type="button"
+                onClick={timeline.toggle}
+                aria-pressed={timeline.playing}
+            >
                 {timeline.playing
                     ? 'Pause'
                     : timeline.step === timeline.lastStep
@@ -111,7 +115,11 @@ export function WalDiskWrite() {
         {
             title: 'Kernel page cache',
             label:
-                step >= 4 ? '✓ pages synced' : step >= 2 ? 'dirty WAL pages' : 'no pending bytes',
+                step >= 4
+                    ? '✓ pages synced'
+                    : step >= 2
+                      ? 'dirty WAL pages'
+                      : 'no pending bytes',
             active: step === 2 || step === 3,
             filled: step >= 2,
         },
@@ -129,23 +137,33 @@ export function WalDiskWrite() {
     ];
 
     return (
-        <section aria-label="WAL write to disk animation" className={styles.visual}>
+        <section
+            aria-label="WAL write to disk animation"
+            className={styles.visual}
+        >
             <Figure
                 caption="A synchronous WAL write: buffer → dirty pages → disk → acknowledgement. The disk stores the WAL here; flushing a memtable to an SSTable is a separate operation."
                 controls={<Controls timeline={timeline} />}
             >
-                <div className={styles.eyebrow}>01 / the durability boundary</div>
+                <div className={styles.eyebrow}>
+                    01 / the durability boundary
+                </div>
                 <div className={styles.writeFlow}>
                     {nodes.map((node, index) => (
                         <div className={styles.nodeGroup} key={node.title}>
                             <div
                                 className={`${styles.node} ${node.filled ? styles.filled : ''} ${node.active ? styles.active : ''}`}
                             >
-                                <span className={styles.nodeIndex}>0{index + 1}</span>
+                                <span className={styles.nodeIndex}>
+                                    0{index + 1}
+                                </span>
                                 <strong>{node.title}</strong>
                                 <span>{node.label}</span>
-                                <div className={styles.bytes} aria-hidden="true">
-                                    {[0, 1, 2, 3].map((byte) => (
+                                <div
+                                    className={styles.bytes}
+                                    aria-hidden="true"
+                                >
+                                    {[0, 1, 2, 3].map(byte => (
                                         <i key={byte} />
                                     ))}
                                 </div>
@@ -161,7 +179,9 @@ export function WalDiskWrite() {
                         </div>
                     ))}
                 </div>
-                <div className={`${styles.returnPath} ${step >= 4 ? styles.acknowledged : ''}`}>
+                <div
+                    className={`${styles.returnPath} ${step >= 4 ? styles.acknowledged : ''}`}
+                >
                     <span aria-hidden="true">←</span>
                     {step === 5
                         ? 'Database → client: write committed'
@@ -169,7 +189,11 @@ export function WalDiskWrite() {
                           ? 'Disk → kernel → database: fsync() succeeded'
                           : 'Acknowledgement waits for successful fsync()'}
                 </div>
-                <div className={styles.narration} aria-live="polite" aria-atomic="true">
+                <div
+                    className={styles.narration}
+                    aria-live="polite"
+                    aria-atomic="true"
+                >
                     <strong>{WRITE_STEPS[step][0]}</strong>
                     <p>{WRITE_STEPS[step][1]}</p>
                 </div>
@@ -199,7 +223,10 @@ const RECOVERY_STEPS = [
         'Validate record 01',
         'Its length and checksum are valid. Apply PUT name = David to the new memtable.',
     ],
-    ['Validate record 02', 'The next record is valid. Apply PUT city = Lagos in sequence.'],
+    [
+        'Validate record 02',
+        'The next record is valid. Apply PUT city = Lagos in sequence.',
+    ],
     [
         'Validate record 03',
         'This valid PUT replaces the earlier name. Replaying in order changes David to Ada.',
@@ -229,12 +256,17 @@ export function WalRecovery() {
     const city = step >= 5 ? '† deleted' : step >= 3 ? 'Lagos' : '—';
 
     return (
-        <section aria-label="WAL recovery and replay animation" className={styles.visual}>
+        <section
+            aria-label="WAL recovery and replay animation"
+            className={styles.visual}
+        >
             <Figure
                 caption="Replay valid records in sequence to rebuild state. This simplified example discards an incomplete tail; handling other corruption depends on the database’s recovery policy."
                 controls={<Controls timeline={timeline} />}
             >
-                <div className={styles.eyebrow}>02 / rebuilding from the log</div>
+                <div className={styles.eyebrow}>
+                    02 / rebuilding from the log
+                </div>
                 <div className={styles.recoveryGrid}>
                     <div>
                         <div className={styles.panelTitle}>
@@ -250,7 +282,9 @@ export function WalRecovery() {
                                         key={record.lsn}
                                         className={`${styles.record} ${valid ? styles.valid : ''} ${invalid ? styles.invalid : ''} ${current ? styles.current : ''} ${invalid && step >= 7 ? styles.discarded : ''}`}
                                     >
-                                        <span className={styles.lsn}>{record.lsn}</span>
+                                        <span className={styles.lsn}>
+                                            {record.lsn}
+                                        </span>
                                         <code>{record.operation}</code>
                                         <span className={styles.recordStatus}>
                                             {invalid
@@ -275,28 +309,42 @@ export function WalRecovery() {
                                 <span>key</span>
                                 <span>value</span>
                             </div>
-                            <div key={`name-${name}`} className={step >= 2 ? styles.changed : ''}>
+                            <div
+                                key={`name-${name}`}
+                                className={step >= 2 ? styles.changed : ''}
+                            >
                                 <code>name</code>
                                 <strong>{name}</strong>
                             </div>
-                            <div key={`city-${city}`} className={step >= 3 ? styles.changed : ''}>
+                            <div
+                                key={`city-${city}`}
+                                className={step >= 3 ? styles.changed : ''}
+                            >
                                 <code>city</code>
                                 <strong>{city}</strong>
                             </div>
                         </div>
-                        <div className={`${styles.sstable} ${step === 8 ? styles.persisted : ''}`}>
+                        <div
+                            className={`${styles.sstable} ${step === 8 ? styles.persisted : ''}`}
+                        >
                             <span>
                                 {step === 8
                                     ? '↓ flushed to SSTable'
                                     : 'SSTable · waiting for flush'}
                             </span>
                             <code>
-                                {step === 8 ? 'name = Ada · city = †' : 'No recovered entries yet'}
+                                {step === 8
+                                    ? 'name = Ada · city = †'
+                                    : 'No recovered entries yet'}
                             </code>
                         </div>
                     </div>
                 </div>
-                <div className={styles.narration} aria-live="polite" aria-atomic="true">
+                <div
+                    className={styles.narration}
+                    aria-live="polite"
+                    aria-atomic="true"
+                >
                     <strong>{RECOVERY_STEPS[step][0]}</strong>
                     <p>{RECOVERY_STEPS[step][1]}</p>
                 </div>
@@ -317,7 +365,9 @@ function ReplicationNode({
     children: ReactNode;
 }) {
     return (
-        <div className={`${styles.replicationNode} ${active ? styles.active : ''}`}>
+        <div
+            className={`${styles.replicationNode} ${active ? styles.active : ''}`}
+        >
             <div className={styles.panelTitle}>
                 {title}
                 <span>{subtitle}</span>
@@ -360,12 +410,17 @@ export function PhysicalReplication() {
     const replicas = [step >= 3, step >= 4];
 
     return (
-        <section aria-label="Physical replication animation" className={styles.visual}>
+        <section
+            aria-label="Physical replication animation"
+            className={styles.visual}
+        >
             <Figure
                 caption="Physical replication streams WAL records to compatible replicas, which replay them against a shared starting snapshot. Byte values and LSNs are illustrative."
                 controls={<Controls timeline={timeline} />}
             >
-                <div className={styles.eyebrow}>03 / one WAL stream, matching replicas</div>
+                <div className={styles.eyebrow}>
+                    03 / one WAL stream, matching replicas
+                </div>
                 <ReplicationNode
                     title="Leader"
                     subtitle="physical WAL · source database"
@@ -376,11 +431,17 @@ export function PhysicalReplication() {
                     </div>
                     <div className={styles.byteStream}>
                         <span>LSN 40 · base</span>
-                        <span className={step >= 1 ? styles.bytePresent : ''}>41 · A3 0F</span>
-                        <span className={step >= 1 ? styles.bytePresent : ''}>42 · B8 21</span>
+                        <span className={step >= 1 ? styles.bytePresent : ''}>
+                            41 · A3 0F
+                        </span>
+                        <span className={step >= 1 ? styles.bytePresent : ''}>
+                            42 · B8 21
+                        </span>
                     </div>
                 </ReplicationNode>
-                <div className={`${styles.transfer} ${step >= 2 ? styles.transferReady : ''}`}>
+                <div
+                    className={`${styles.transfer} ${step >= 2 ? styles.transferReady : ''}`}
+                >
                     <span aria-hidden="true">{step >= 5 ? '↑' : '↓'}</span>
                     {step >= 5
                         ? 'Replay positions returned to leader'
@@ -397,16 +458,29 @@ export function PhysicalReplication() {
                             active={step === index + 3}
                         >
                             <div className={styles.byteStream}>
-                                <span className={step >= 2 ? styles.bytePresent : ''}>
+                                <span
+                                    className={
+                                        step >= 2 ? styles.bytePresent : ''
+                                    }
+                                >
                                     41 · A3 0F
                                 </span>
-                                <span className={step >= 2 ? styles.bytePresent : ''}>
+                                <span
+                                    className={
+                                        step >= 2 ? styles.bytePresent : ''
+                                    }
+                                >
                                     42 · B8 21
                                 </span>
                             </div>
-                            <div className={styles.replicationValue} key={String(replayed)}>
+                            <div
+                                className={styles.replicationValue}
+                                key={String(replayed)}
+                            >
                                 name ={' '}
-                                <strong className={replayed ? styles.changed : ''}>
+                                <strong
+                                    className={replayed ? styles.changed : ''}
+                                >
                                     {replayed ? 'Ada' : 'David'}
                                 </strong>
                             </div>
@@ -421,7 +495,11 @@ export function PhysicalReplication() {
                         </ReplicationNode>
                     ))}
                 </div>
-                <div className={styles.narration} aria-live="polite" aria-atomic="true">
+                <div
+                    className={styles.narration}
+                    aria-live="polite"
+                    aria-atomic="true"
+                >
                     <strong>{PHYSICAL_STEPS[step][0]}</strong>
                     <p>{PHYSICAL_STEPS[step][1]}</p>
                 </div>
@@ -462,12 +540,17 @@ export function LogicalReplication() {
     const { step } = timeline;
 
     return (
-        <section aria-label="Logical replication and Kafka animation" className={styles.visual}>
+        <section
+            aria-label="Logical replication and Kafka animation"
+            className={styles.visual}
+        >
             <Figure
                 caption="Logical decoding exposes row changes. A database subscriber applies them, while a CDC connector can publish them to Kafka for other consumers. Initial snapshots are assumed complete."
                 controls={<Controls timeline={timeline} />}
             >
-                <div className={styles.eyebrow}>04 / one change, different systems</div>
+                <div className={styles.eyebrow}>
+                    04 / one change, different systems
+                </div>
                 <div className={styles.replicaGrid}>
                     <ReplicationNode
                         title="Source database"
@@ -475,10 +558,13 @@ export function LogicalReplication() {
                         active={step === 1}
                     >
                         <div className={styles.replicationValue}>
-                            name = <strong>{step >= 1 ? 'Ada' : 'David'}</strong>
+                            name ={' '}
+                            <strong>{step >= 1 ? 'Ada' : 'David'}</strong>
                         </div>
                         <div className={styles.eventHint}>
-                            {step >= 1 ? '✓ transaction committed in WAL' : 'Ready for a write'}
+                            {step >= 1
+                                ? '✓ transaction committed in WAL'
+                                : 'Ready for a write'}
                         </div>
                     </ReplicationNode>
                     <ReplicationNode
@@ -493,11 +579,15 @@ export function LogicalReplication() {
                             <code>name: David → Ada</code>
                         </div>
                         <div className={styles.eventHint}>
-                            {step >= 2 ? 'Decoded event ready' : 'Waiting for committed WAL'}
+                            {step >= 2
+                                ? 'Decoded event ready'
+                                : 'Waiting for committed WAL'}
                         </div>
                     </ReplicationNode>
                 </div>
-                <div className={`${styles.transfer} ${step >= 2 ? styles.transferReady : ''}`}>
+                <div
+                    className={`${styles.transfer} ${step >= 2 ? styles.transferReady : ''}`}
+                >
                     <span aria-hidden="true">↓</span>
                     {step >= 2
                         ? 'Publish the logical change to independent consumers'
@@ -509,14 +599,19 @@ export function LogicalReplication() {
                         subtitle="apply the row change"
                         active={step === 3}
                     >
-                        <div className={styles.replicationValue} key={String(step >= 3)}>
+                        <div
+                            className={styles.replicationValue}
+                            key={String(step >= 3)}
+                        >
                             name ={' '}
                             <strong className={step >= 3 ? styles.changed : ''}>
                                 {step >= 3 ? 'Ada' : 'David'}
                             </strong>
                         </div>
                         <div className={styles.eventHint}>
-                            {step >= 3 ? '✓ UPDATE applied to user 1' : 'Waiting for the update'}
+                            {step >= 3
+                                ? '✓ UPDATE applied to user 1'
+                                : 'Waiting for the update'}
                         </div>
                     </ReplicationNode>
                     <ReplicationNode
@@ -531,11 +626,17 @@ export function LogicalReplication() {
                             <code>after: name = Ada</code>
                         </div>
                         <div className={styles.eventHint}>
-                            {step >= 4 ? '✓ 1 event available to consumers' : '0 new events'}
+                            {step >= 4
+                                ? '✓ 1 event available to consumers'
+                                : '0 new events'}
                         </div>
                     </ReplicationNode>
                 </div>
-                <div className={styles.narration} aria-live="polite" aria-atomic="true">
+                <div
+                    className={styles.narration}
+                    aria-live="polite"
+                    aria-atomic="true"
+                >
                     <strong>{LOGICAL_STEPS[step][0]}</strong>
                     <p>{LOGICAL_STEPS[step][1]}</p>
                 </div>

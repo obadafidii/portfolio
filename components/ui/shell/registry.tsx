@@ -18,9 +18,24 @@ export interface ShellContext {
 export type CommandResult = ReactNode | null;
 
 export const ROUTES = [
-    { name: 'works', href: '/works', cwd: '~/works', note: 'systems built and shipped' },
-    { name: 'blog', href: '/blog', cwd: '~/writing', note: 'notes on how things work' },
-    { name: 'open-source', href: '/open-source', cwd: '~/open-source', note: 'contributions and the stories behind them' },
+    {
+        name: 'works',
+        href: '/works',
+        cwd: '~/works',
+        note: 'systems built and shipped',
+    },
+    {
+        name: 'blog',
+        href: '/blog',
+        cwd: '~/writing',
+        note: 'notes on how things work',
+    },
+    {
+        name: 'open-source',
+        href: '/open-source',
+        cwd: '~/open-source',
+        note: 'contributions and the stories behind them',
+    },
     { name: 'resume', href: '/resume', cwd: '~/resume', note: 'the man page' },
     { name: 'contact', href: '/contact', cwd: '~/contact', note: 'say hello' },
 ];
@@ -63,10 +78,15 @@ const postFile = (slug: string) => `${slug.replace(/^post\//, '')}.md`;
 
 /** Resolve a post by filename or slug, published or not. */
 const findPost = (arg: string) => {
-    const key = arg.replace(/\/$/, '').replace(/\.md$/, '').replace(/^post\//, '');
+    const key = arg
+        .replace(/\/$/, '')
+        .replace(/\.md$/, '')
+        .replace(/^post\//, '');
     const posts = getAllBlogs();
-    return posts.find(item => item.slug === key)
-        ?? posts.find(item => item.slug.endsWith(`/${key}`));
+    return (
+        posts.find(item => item.slug === key) ??
+        posts.find(item => item.slug.endsWith(`/${key}`))
+    );
 };
 
 /** Section names shown by `ls` inside ~/resume. Kept in sync by the page. */
@@ -78,10 +98,14 @@ export const setResumeSections = (sections: string[]) => {
 
 /** Everything the shell can complete or resolve, per directory. */
 export const entriesFor = (cwd: Cwd): string[] => {
-    if (cwd === '~/works') return [...info.works.map(work => work.file), '--tags'];
+    if (cwd === '~/works')
+        return [...info.works.map(work => work.file), '--tags'];
     if (cwd === '~/open-source') return ['archive', 'github'];
     if (cwd === '~/writing') {
-        return [...getAllBlogs().map(post => postFile(post.slug)), ...Object.keys(POST_FILTERS)];
+        return [
+            ...getAllBlogs().map(post => postFile(post.slug)),
+            ...Object.keys(POST_FILTERS),
+        ];
     }
     if (cwd === '~/resume') return ['resume.md', 'resume.pdf', 'david'];
     return ROUTES.map(route => route.name);
@@ -106,7 +130,11 @@ const HELP_ROWS: { name: string; args?: string; help: string }[] = [
         args: '--done|--draft|--wip|--all',
         help: 'in ~/writing, filter posts by status',
     },
-    { name: 'cd', args: '<dir>', help: 'works, blog, open-source, resume, contact, .. or ~' },
+    {
+        name: 'cd',
+        args: '<dir>',
+        help: 'works, blog, open-source, resume, contact, .. or ~',
+    },
     { name: 'cat', args: '<name>', help: 'read an entry here' },
     { name: 'man', args: 'david', help: 'the resume, as a manual page' },
     { name: 'open', args: '<name>', help: 'open a project, post or profile' },
@@ -118,9 +146,14 @@ const HELP_ROWS: { name: string; args?: string; help: string }[] = [
 const Help = () => (
     <div className="mt-1 space-y-0.5">
         {HELP_ROWS.map(row => (
-            <div key={row.name} className="flex flex-wrap items-baseline gap-x-3">
+            <div
+                key={row.name}
+                className="flex flex-wrap items-baseline gap-x-3"
+            >
                 <span className="w-[22ch] shrink-0">
-                    <span style={{ color: 'var(--paper-bright)' }}>{row.name}</span>
+                    <span style={{ color: 'var(--paper-bright)' }}>
+                        {row.name}
+                    </span>
                     {row.args && <span className="ink-faint"> {row.args}</span>}
                 </span>
                 <span className="ink-muted">{row.help}</span>
@@ -137,10 +170,15 @@ const RouteListing = () => (
         {ROUTES.map(route => (
             <Link key={route.href} href={route.href} className="term-row group">
                 <span className="ink-faint w-[11ch] shrink-0">drwxr-xr-x</span>
-                <span className="group-hover:underline" style={{ color: 'var(--term-blue)' }}>
+                <span
+                    className="group-hover:underline"
+                    style={{ color: 'var(--term-blue)' }}
+                >
                     {route.name}/
                 </span>
-                <span className="ink-muted ml-auto text-[11px]">{route.note}</span>
+                <span className="ink-muted ml-auto text-[11px]">
+                    {route.note}
+                </span>
             </Link>
         ))}
     </div>
@@ -165,28 +203,46 @@ const WorksListing = () => (
                 >
                     {work.file}
                 </span>
-                <span className="ink-muted min-w-0 flex-1 text-[12px]">{work.description}</span>
+                <span className="ink-muted min-w-0 flex-1 text-[12px]">
+                    {work.description}
+                </span>
             </a>
         ))}
     </div>
 );
 
-const STATUS_MARK: Record<BlogStatus, { mark: string; colour: string; label: string }> = {
+const STATUS_MARK: Record<
+    BlogStatus,
+    { mark: string; colour: string; label: string }
+> = {
     done: { mark: '✓', colour: 'var(--term-green)', label: 'published' },
-    'in-progress': { mark: '~', colour: 'var(--term-amber)', label: 'in progress' },
+    'in-progress': {
+        mark: '~',
+        colour: 'var(--term-amber)',
+        label: 'in progress',
+    },
     draft: { mark: '·', colour: 'var(--paper-faint)', label: 'draft' },
 };
 
 /** `ls` flags accepted in ~/writing, and the statuses each selects. */
-export const POST_FILTERS: Record<string, { statuses: BlogStatus[]; label: string }> = {
-    '--all': { statuses: ['done', 'in-progress', 'draft'], label: 'everything' },
+export const POST_FILTERS: Record<
+    string,
+    { statuses: BlogStatus[]; label: string }
+> = {
+    '--all': {
+        statuses: ['done', 'in-progress', 'draft'],
+        label: 'everything',
+    },
     '--done': { statuses: ['done'], label: 'published' },
     '--published': { statuses: ['done'], label: 'published' },
     '--in-progress': { statuses: ['in-progress'], label: 'in progress' },
     '--wip': { statuses: ['in-progress'], label: 'in progress' },
     '--draft': { statuses: ['draft'], label: 'draft' },
     '--drafts': { statuses: ['draft'], label: 'draft' },
-    '--unpublished': { statuses: ['in-progress', 'draft'], label: 'not yet published' },
+    '--unpublished': {
+        statuses: ['in-progress', 'draft'],
+        label: 'not yet published',
+    },
 };
 
 const isSubsequence = (fragment: string, candidate: string) => {
@@ -216,15 +272,26 @@ export const suggestionsFor = (value: string, cwd: Cwd): string[] => {
         switch (verb) {
             case 'ls':
             case 'll':
-                pool = cwd === '~/writing'
-                    ? ['--tags', ...Object.keys(POST_FILTERS)]
-                    : ['--tags'];
+                pool =
+                    cwd === '~/writing'
+                        ? ['--tags', ...Object.keys(POST_FILTERS)]
+                        : ['--tags'];
                 break;
             case 'cd':
-                pool = ['..', '~', ...ROUTES.map(route => route.name), ...entriesFor(cwd)];
+                pool = [
+                    '..',
+                    '~',
+                    ...ROUTES.map(route => route.name),
+                    ...entriesFor(cwd),
+                ];
                 break;
             case 'cat':
-                pool = ['about.md', 'resume.md', 'resume.pdf', ...entriesFor(cwd)];
+                pool = [
+                    'about.md',
+                    'resume.md',
+                    'resume.pdf',
+                    ...entriesFor(cwd),
+                ];
                 break;
             case 'man':
                 pool = ['david', 'resume', ...ROUTES.map(route => route.name)];
@@ -256,7 +323,10 @@ export const suggestionsFor = (value: string, cwd: Cwd): string[] => {
             return { candidate, score };
         })
         .filter(match => match.score < 3)
-        .sort((a, b) => a.score - b.score || a.candidate.localeCompare(b.candidate))
+        .sort(
+            (a, b) =>
+                a.score - b.score || a.candidate.localeCompare(b.candidate),
+        )
         .slice(0, 7)
         .map(match => match.candidate);
 };
@@ -278,10 +348,16 @@ const PostsListing = ({ statuses }: { statuses: BlogStatus[] }) => {
                         key={post.slug}
                         href={`/blog/${post.slug}`}
                         className="term-row group"
-                        title={published ? undefined : `${status.label} — not published yet`}
+                        title={
+                            published
+                                ? undefined
+                                : `${status.label} — not published yet`
+                        }
                     >
                         <span className="ink-faint w-[11ch] shrink-0">
-                            {new Date(post.publishedOn).toISOString().slice(0, 10)}
+                            {new Date(post.publishedOn)
+                                .toISOString()
+                                .slice(0, 10)}
                         </span>
                         {showMarks && (
                             <span
@@ -295,12 +371,16 @@ const PostsListing = ({ statuses }: { statuses: BlogStatus[] }) => {
                         <span
                             className="group-hover:underline"
                             style={{
-                                color: published ? 'var(--term-blue)' : 'var(--paper-faint)',
+                                color: published
+                                    ? 'var(--term-blue)'
+                                    : 'var(--paper-faint)',
                             }}
                         >
                             {postFile(post.slug)}
                         </span>
-                        <span className="ink-muted ml-auto text-[11px]">{post.title}</span>
+                        <span className="ink-muted ml-auto text-[11px]">
+                            {post.title}
+                        </span>
                     </Link>
                 );
             })}
@@ -312,14 +392,22 @@ const ResumeListing = () => (
     <div className="mt-1 space-y-0.5">
         <a href="/resume.pdf" className="term-row group">
             <span className="ink-faint w-[11ch] shrink-0">-rw-r--r--</span>
-            <span className="group-hover:underline" style={{ color: 'var(--term-blue)' }}>
+            <span
+                className="group-hover:underline"
+                style={{ color: 'var(--term-blue)' }}
+            >
                 resume.pdf
             </span>
-            <span className="ink-muted ml-auto text-[11px]">the printable one</span>
+            <span className="ink-muted ml-auto text-[11px]">
+                the printable one
+            </span>
         </a>
         {resumeSections.length > 0 && (
             <div className="ink-muted pt-2 text-[12px]">
-                sections: <span className="ink-faint">{resumeSections.join(' · ').toLowerCase()}</span>
+                sections:{' '}
+                <span className="ink-faint">
+                    {resumeSections.join(' · ').toLowerCase()}
+                </span>
             </div>
         )}
     </div>
@@ -354,9 +442,13 @@ const TagsListing = ({ cwd }: { cwd: Cwd }) => {
     );
 };
 
-const parentOf = (cwd: Cwd) => (cwd === '~' ? '/' : cwd === '~/writing' ? '/' : '/');
+const parentOf = (cwd: Cwd) =>
+    cwd === '~' ? '/' : cwd === '~/writing' ? '/' : '/';
 
-export const runCommand = (raw: string, ctx: ShellContext): CommandResult | 'CLEARED' => {
+export const runCommand = (
+    raw: string,
+    ctx: ShellContext,
+): CommandResult | 'CLEARED' => {
     const input = raw.trim();
     if (!input) return null;
 
@@ -407,7 +499,8 @@ export const runCommand = (raw: string, ctx: ShellContext): CommandResult | 'CLE
 
         case 'ls':
         case 'll': {
-            if (rest.some(flag => flag.startsWith('--tag'))) return <TagsListing cwd={cwd} />;
+            if (rest.some(flag => flag.startsWith('--tag')))
+                return <TagsListing cwd={cwd} />;
 
             if (cwd === '~/writing') {
                 const flags = rest.filter(item => item.startsWith('--'));
@@ -434,13 +527,25 @@ export const runCommand = (raw: string, ctx: ShellContext): CommandResult | 'CLE
                 const statuses =
                     flags.length === 0
                         ? (['done'] as BlogStatus[])
-                        : [...new Set(flags.flatMap(flag => POST_FILTERS[flag].statuses))];
+                        : [
+                              ...new Set(
+                                  flags.flatMap(
+                                      flag => POST_FILTERS[flag].statuses,
+                                  ),
+                              ),
+                          ];
 
                 return <PostsListing statuses={statuses} />;
             }
 
             if (cwd === '~/works') return <WorksListing />;
-            if (cwd === '~/open-source') return <Hint>use the year and month selectors above to browse contributions</Hint>;
+            if (cwd === '~/open-source')
+                return (
+                    <Hint>
+                        use the year and month selectors above to browse
+                        contributions
+                    </Hint>
+                );
             if (cwd === '~/resume') return <ResumeListing />;
             return <RouteListing />;
         }
@@ -468,7 +573,9 @@ export const runCommand = (raw: string, ctx: ShellContext): CommandResult | 'CLE
             const post = findPost(arg);
             if (post) {
                 ctx.navigate(`/blog/${post.slug}`);
-                return <div className="ink-muted mt-1">→ /blog/{post.slug}</div>;
+                return (
+                    <div className="ink-muted mt-1">→ /blog/{post.slug}</div>
+                );
             }
 
             return <Err>cd: no such directory: {arg}</Err>;
@@ -484,7 +591,9 @@ export const runCommand = (raw: string, ctx: ShellContext): CommandResult | 'CLE
 
             if (arg === 'resume.pdf') {
                 window.open('/resume.pdf', '_blank', 'noopener,noreferrer');
-                return <div className="ink-muted mt-1">opening resume.pdf…</div>;
+                return (
+                    <div className="ink-muted mt-1">opening resume.pdf…</div>
+                );
             }
 
             if (arg === 'about' || arg === 'about.md') {
@@ -497,12 +606,18 @@ export const runCommand = (raw: string, ctx: ShellContext): CommandResult | 'CLE
                 );
             }
 
-            const work = info.works.find(item => item.file === arg.replace(/\/$/, ''));
+            const work = info.works.find(
+                item => item.file === arg.replace(/\/$/, ''),
+            );
             if (work) {
                 return (
                     <div className="mt-1">
-                        <div className="ink-muted measure">{work.description}</div>
-                        <div className="ink-faint mt-1">{work.tags.join(' · ')}</div>
+                        <div className="ink-muted measure">
+                            {work.description}
+                        </div>
+                        <div className="ink-faint mt-1">
+                            {work.tags.join(' · ')}
+                        </div>
                         <a
                             href={work.url}
                             target="_blank"
@@ -526,13 +641,18 @@ export const runCommand = (raw: string, ctx: ShellContext): CommandResult | 'CLE
                         <div className="ink-muted measure">{post.summary}</div>
                         <div className="ink-faint mt-1">
                             {post.tags.join(' · ')}
-                            <span style={{ color: status.colour }}> · {status.label}</span>
+                            <span style={{ color: status.colour }}>
+                                {' '}
+                                · {status.label}
+                            </span>
                         </div>
                         <Link
                             href={`/blog/${post.slug}`}
                             className="mt-1 inline-block underline"
                             style={{
-                                color: published ? 'var(--term-blue)' : 'var(--paper-muted)',
+                                color: published
+                                    ? 'var(--term-blue)'
+                                    : 'var(--paper-muted)',
                             }}
                         >
                             {published ? 'read it →' : 'see status →'}
@@ -563,7 +683,9 @@ export const runCommand = (raw: string, ctx: ShellContext): CommandResult | 'CLE
             const post = findPost(arg);
             if (post) {
                 ctx.navigate(`/blog/${post.slug}`);
-                return <div className="ink-muted mt-1">→ /blog/{post.slug}</div>;
+                return (
+                    <div className="ink-muted mt-1">→ /blog/{post.slug}</div>
+                );
             }
 
             const social = SOCIALS[arg];
@@ -572,10 +694,14 @@ export const runCommand = (raw: string, ctx: ShellContext): CommandResult | 'CLE
                 return <div className="ink-muted mt-1">opening {arg}…</div>;
             }
 
-            const work = info.works.find(item => item.file === arg.replace(/\/$/, ''));
+            const work = info.works.find(
+                item => item.file === arg.replace(/\/$/, ''),
+            );
             if (work) {
                 window.open(work.url, '_blank', 'noopener,noreferrer');
-                return <div className="ink-muted mt-1">opening {work.name}…</div>;
+                return (
+                    <div className="ink-muted mt-1">opening {work.name}…</div>
+                );
             }
 
             return (

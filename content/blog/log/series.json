@@ -2,10 +2,5 @@
     "title": "Understanding Log",
     "summary": "A four-part series exploring logs, from the basic idea to databases, version control, and distributed systems.",
     "publishedOn": "2026-09-03T00:00:00.000Z",
-    "tags": [
-        "logs",
-        "databases",
-        "version-control",
-        "distributed-systems"
-    ]
+    "tags": ["logs", "databases", "version-control", "distributed-systems"]
 }

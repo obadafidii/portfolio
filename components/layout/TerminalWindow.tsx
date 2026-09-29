@@ -46,7 +46,13 @@ const PANE_THEMES: { value: PaneTheme; label: string }[] = [
 const pathLabel = (path: string) =>
     PANE_ROUTES.find(route => route.href === path)?.label ?? path;
 
-const SplitButton = ({ count, onClick }: { count: number; onClick: () => void }) => {
+const SplitButton = ({
+    count,
+    onClick,
+}: {
+    count: number;
+    onClick: () => void;
+}) => {
     const full = count >= MAX_PANES;
 
     return (
@@ -55,9 +61,13 @@ const SplitButton = ({ count, onClick }: { count: number; onClick: () => void })
             onClick={onClick}
             disabled={full}
             className="term-split-button"
-            aria-label={full ? 'Maximum of four panes reached' : 'Add split pane'}
+            aria-label={
+                full ? 'Maximum of four panes reached' : 'Add split pane'
+            }
             data-active={count > 1}
-            title={full ? 'Four-pane maximum reached' : 'Add pane · Ctrl/Cmd + \\'}
+            title={
+                full ? 'Four-pane maximum reached' : 'Add pane · Ctrl/Cmd + \\'
+            }
         >
             <span aria-hidden="true">⊞</span>
             <span className="hidden lg:inline">split {count}/4</span>
@@ -67,7 +77,12 @@ const SplitButton = ({ count, onClick }: { count: number; onClick: () => void })
 
 const clampRatio = (value: number) => Math.min(75, Math.max(25, value));
 
-export const TerminalWindow = ({ currentPage, path, status, children }: TerminalWindowProps) => {
+export const TerminalWindow = ({
+    currentPage,
+    path,
+    status,
+    children,
+}: TerminalWindowProps) => {
     const embedded = useEmbeddedPane();
     const workspace = useSplitWorkspace();
     const [dragging, setDragging] = useState<'column' | 'row' | null>(null);
@@ -75,32 +90,42 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
     if (embedded) return <>{children}</>;
 
     const activePane =
-        workspace.panes.find(pane => pane.id === workspace.activePane) ?? workspace.panes[0];
-    const activePaneIndex = workspace.panes.findIndex(pane => pane.id === activePane.id);
+        workspace.panes.find(pane => pane.id === workspace.activePane) ??
+        workspace.panes[0];
+    const activePaneIndex = workspace.panes.findIndex(
+        pane => pane.id === activePane.id,
+    );
 
     const resizeColumn = (clientX: number, target: HTMLElement) => {
         const bounds = target.parentElement?.getBoundingClientRect();
         if (!bounds) return;
-        workspace.setColumnRatio(clampRatio(((clientX - bounds.left) / bounds.width) * 100));
+        workspace.setColumnRatio(
+            clampRatio(((clientX - bounds.left) / bounds.width) * 100),
+        );
     };
 
     const resizeRow = (clientY: number, target: HTMLElement) => {
         const bounds = target.parentElement?.getBoundingClientRect();
         if (!bounds) return;
-        workspace.setRowRatio(clampRatio(((clientY - bounds.top) / bounds.height) * 100));
+        workspace.setRowRatio(
+            clampRatio(((clientY - bounds.top) / bounds.height) * 100),
+        );
     };
 
     const onDividerKeyDown = (
         axis: 'column' | 'row',
         event: KeyboardEvent<HTMLDivElement>,
     ) => {
-        const previous = axis === 'column' ? workspace.columnRatio : workspace.rowRatio;
+        const previous =
+            axis === 'column' ? workspace.columnRatio : workspace.rowRatio;
         const negativeKey = axis === 'column' ? 'ArrowLeft' : 'ArrowUp';
         const positiveKey = axis === 'column' ? 'ArrowRight' : 'ArrowDown';
         if (event.key !== negativeKey && event.key !== positiveKey) return;
 
         event.preventDefault();
-        const next = clampRatio(previous + (event.key === negativeKey ? -2 : 2));
+        const next = clampRatio(
+            previous + (event.key === negativeKey ? -2 : 2),
+        );
         if (axis === 'column') workspace.setColumnRatio(next);
         else workspace.setRowRatio(next);
     };
@@ -116,7 +141,8 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
     };
 
     const onDividerPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-        if (dragging === 'column') resizeColumn(event.clientX, event.currentTarget);
+        if (dragging === 'column')
+            resizeColumn(event.clientX, event.currentTarget);
         if (dragging === 'row') resizeRow(event.clientY, event.currentTarget);
     };
 
@@ -128,7 +154,9 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
     };
 
     return (
-        <div className={`term-page ${workspace.splitOpen ? 'term-page--split' : ''}`}>
+        <div
+            className={`term-page ${workspace.splitOpen ? 'term-page--split' : ''}`}
+        >
             <header className="term-titlebar">
                 <div className="hidden shrink-0 items-center gap-2 sm:flex">
                     <span className="term-dot" />
@@ -137,7 +165,10 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
                 </div>
 
                 <span className="ink-faint hidden min-w-0 truncate text-[11px] lg:block">
-                    david@obadafidi — {workspace.splitOpen ? `${workspace.panes.length} panes` : path}
+                    david@obadafidi —{' '}
+                    {workspace.splitOpen
+                        ? `${workspace.panes.length} panes`
+                        : path}
                 </span>
 
                 <nav className="ml-auto hidden items-center gap-1 sm:flex">
@@ -156,13 +187,21 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
                             style={{ background: 'var(--paper-line-strong)' }}
                         />
                     )}
-                    <SplitButton count={workspace.panes.length} onClick={workspace.addPane} />
+                    <SplitButton
+                        count={workspace.panes.length}
+                        onClick={workspace.addPane}
+                    />
                     <ThemeSwitcher />
                 </nav>
 
                 <div className="ml-auto flex items-center gap-1 sm:hidden">
-                    <SplitButton count={workspace.panes.length} onClick={workspace.addPane} />
-                    {!workspace.splitOpen && <MobileNavBar active={currentPage} />}
+                    <SplitButton
+                        count={workspace.panes.length}
+                        onClick={workspace.addPane}
+                    />
+                    {!workspace.splitOpen && (
+                        <MobileNavBar active={currentPage} />
+                    )}
                 </div>
             </header>
 
@@ -172,7 +211,11 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
                         className="term-split-tabs"
                         role="tablist"
                         aria-label="Portfolio panes"
-                        style={{ '--pane-count': workspace.panes.length } as CSSProperties}
+                        style={
+                            {
+                                '--pane-count': workspace.panes.length,
+                            } as CSSProperties
+                        }
                     >
                         {workspace.panes.map((pane, index) => (
                             <button
@@ -201,13 +244,25 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
                                 key={pane.id}
                                 className={`term-pane term-pane--slot-${index + 1} ${workspace.activePane === pane.id ? 'term-pane--active' : ''}`}
                                 data-pane-theme={pane.theme}
-                                data-mobile-visible={workspace.activePane === pane.id}
-                                onPointerDown={() => workspace.setActivePane(pane.id)}
+                                data-mobile-visible={
+                                    workspace.activePane === pane.id
+                                }
+                                onPointerDown={() =>
+                                    workspace.setActivePane(pane.id)
+                                }
                             >
                                 <div className="term-pane-head">
-                                    <span className="term-pane-focus" aria-hidden="true" />
-                                    <span className="min-w-0 truncate">{pathLabel(pane.path)}</span>
-                                    <label className="sr-only" htmlFor={`pane-theme-${pane.id}`}>
+                                    <span
+                                        className="term-pane-focus"
+                                        aria-hidden="true"
+                                    />
+                                    <span className="min-w-0 truncate">
+                                        {pathLabel(pane.path)}
+                                    </span>
+                                    <label
+                                        className="sr-only"
+                                        htmlFor={`pane-theme-${pane.id}`}
+                                    >
                                         Pane {index + 1} background
                                     </label>
                                     <select
@@ -223,14 +278,19 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
                                         title="Pane background"
                                     >
                                         {PANE_THEMES.map(theme => (
-                                            <option key={theme.value} value={theme.value}>
+                                            <option
+                                                key={theme.value}
+                                                value={theme.value}
+                                            >
                                                 {theme.label}
                                             </option>
                                         ))}
                                     </select>
                                     <button
                                         type="button"
-                                        onClick={() => workspace.closePane(pane.id)}
+                                        onClick={() =>
+                                            workspace.closePane(pane.id)
+                                        }
                                         className="term-pane-close"
                                         aria-label={`Close pane ${index + 1}`}
                                         title="Close pane"
@@ -247,8 +307,17 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
                                         <button
                                             key={route.href}
                                             type="button"
-                                            aria-current={pane.path === route.href ? 'page' : undefined}
-                                            onClick={() => workspace.setPanePath(pane.id, route.href)}
+                                            aria-current={
+                                                pane.path === route.href
+                                                    ? 'page'
+                                                    : undefined
+                                            }
+                                            onClick={() =>
+                                                workspace.setPanePath(
+                                                    pane.id,
+                                                    route.href,
+                                                )
+                                            }
                                         >
                                             {route.navLabel}
                                         </button>
@@ -260,7 +329,10 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
                                         <SplitPaneContent
                                             path={pane.path}
                                             navigate={nextPath =>
-                                                workspace.setPanePath(pane.id, nextPath)
+                                                workspace.setPanePath(
+                                                    pane.id,
+                                                    nextPath,
+                                                )
                                             }
                                         />
                                     </PaneShellSessionProvider>
@@ -278,8 +350,12 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
                             aria-valuenow={Math.round(workspace.columnRatio)}
                             tabIndex={0}
                             onDoubleClick={() => workspace.setColumnRatio(50)}
-                            onKeyDown={event => onDividerKeyDown('column', event)}
-                            onPointerDown={event => onDividerPointerDown('column', event)}
+                            onKeyDown={event =>
+                                onDividerKeyDown('column', event)
+                            }
+                            onPointerDown={event =>
+                                onDividerPointerDown('column', event)
+                            }
                             onPointerMove={onDividerPointerMove}
                             onPointerUp={finishResize}
                             onPointerCancel={finishResize}
@@ -296,8 +372,12 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
                                 aria-valuenow={Math.round(workspace.rowRatio)}
                                 tabIndex={0}
                                 onDoubleClick={() => workspace.setRowRatio(50)}
-                                onKeyDown={event => onDividerKeyDown('row', event)}
-                                onPointerDown={event => onDividerPointerDown('row', event)}
+                                onKeyDown={event =>
+                                    onDividerKeyDown('row', event)
+                                }
+                                onPointerDown={event =>
+                                    onDividerPointerDown('row', event)
+                                }
                                 onPointerMove={onDividerPointerMove}
                                 onPointerUp={finishResize}
                                 onPointerCancel={finishResize}
@@ -317,7 +397,8 @@ export const TerminalWindow = ({ currentPage, path, status, children }: Terminal
                 <span className="hidden sm:inline">utf-8</span>
                 {workspace.splitOpen && (
                     <span className="hidden md:inline">
-                        pane {activePaneIndex + 1} of {workspace.panes.length} · {activePane.theme}
+                        pane {activePaneIndex + 1} of {workspace.panes.length} ·{' '}
+                        {activePane.theme}
                     </span>
                 )}
                 <span className="ml-auto flex items-center gap-4">

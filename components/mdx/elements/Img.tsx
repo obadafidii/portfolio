@@ -14,9 +14,19 @@ interface ImageProps extends HTMLAttributes<HTMLImageElement> {
     maxWidth?: number;
 }
 
-const Img = ({ src, alt, width, height, className, caption, maxWidth }: ImageProps) => {
-    const resolvedWidth = typeof width === 'number' ? width : Number(width) || 1280;
-    const resolvedHeight = typeof height === 'number' ? height : Number(height) || 720;
+const Img = ({
+    src,
+    alt,
+    width,
+    height,
+    className,
+    caption,
+    maxWidth,
+}: ImageProps) => {
+    const resolvedWidth =
+        typeof width === 'number' ? width : Number(width) || 1280;
+    const resolvedHeight =
+        typeof height === 'number' ? height : Number(height) || 720;
     const label = caption ?? alt;
     const cloudinary = isCloudinaryImage(src);
 
@@ -33,10 +43,7 @@ const Img = ({ src, alt, width, height, className, caption, maxWidth }: ImagePro
                         ? `(max-width: ${maxWidth}px) 100vw, ${maxWidth}px`
                         : '(max-width: 768px) 100vw, (max-width: 1100px) 760px, 820px'
                 }
-                className={cn(
-                    'h-auto w-full rounded-[4px] border',
-                    className,
-                )}
+                className={cn('h-auto w-full rounded-[4px] border', className)}
                 style={{ borderColor: 'var(--paper-line-strong)' }}
             />
             {label && (

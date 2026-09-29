@@ -44,18 +44,25 @@ interface SplitWorkspaceValue {
     setRowRatio: (ratio: number) => void;
 }
 
-export const SplitWorkspaceContext = createContext<SplitWorkspaceValue | null>(null);
+export const SplitWorkspaceContext = createContext<SplitWorkspaceValue | null>(
+    null,
+);
 
 export const useSplitWorkspace = () => {
     const value = useContext(SplitWorkspaceContext);
-    if (!value) throw new Error('useSplitWorkspace must be used inside SplitWorkspaceProvider');
+    if (!value)
+        throw new Error(
+            'useSplitWorkspace must be used inside SplitWorkspaceProvider',
+        );
     return value;
 };
 
 const EmbeddedPaneContext = createContext(false);
 
 export const EmbeddedPaneProvider = ({ children }: { children: ReactNode }) => (
-    <EmbeddedPaneContext.Provider value>{children}</EmbeddedPaneContext.Provider>
+    <EmbeddedPaneContext.Provider value>
+        {children}
+    </EmbeddedPaneContext.Provider>
 );
 
 export const useEmbeddedPane = () => useContext(EmbeddedPaneContext);
@@ -70,6 +77,10 @@ export const PaneNavigationProvider = ({
 }: {
     navigate: (href: string) => void;
     children: ReactNode;
-}) => <PaneNavigationContext.Provider value={navigate}>{children}</PaneNavigationContext.Provider>;
+}) => (
+    <PaneNavigationContext.Provider value={navigate}>
+        {children}
+    </PaneNavigationContext.Provider>
+);
 
 export const usePaneNavigation = () => useContext(PaneNavigationContext);

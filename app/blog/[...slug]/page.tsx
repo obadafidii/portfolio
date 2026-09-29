@@ -1,6 +1,11 @@
 import { notFound, redirect } from 'next/navigation';
 import { PostView } from '@/components/ui/blog/PostView';
-import { buildPostMetadata, getAllPosts, getBlogMetadata, getBlogSeries } from '@/lib/blogs';
+import {
+    buildPostMetadata,
+    getAllPosts,
+    getBlogMetadata,
+    getBlogSeries,
+} from '@/lib/blogs';
 import info from '@/misc/info';
 
 type Props = { params: Promise<{ slug: string[] }> };

@@ -8,7 +8,11 @@ import styles from './LogVisuals.module.css';
 
 const OPERATIONS = ['SET x=1', 'ADD user', 'COMMIT', 'SET y=2', 'DELETE x'];
 const RECORDS = Array.from({ length: 9 }, (_, index) => index + 1);
-const SEGMENTS = [RECORDS.slice(0, 3), RECORDS.slice(3, 6), RECORDS.slice(6, 9)];
+const SEGMENTS = [
+    RECORDS.slice(0, 3),
+    RECORDS.slice(3, 6),
+    RECORDS.slice(6, 9),
+];
 const abstractLogSketchSrc =
     'https://res.cloudinary.com/cloudlord/image/upload/v1790165229/portfolio/blog/abstract-shape-of-a-log.png';
 
@@ -16,14 +20,18 @@ const useAutoCycle = (maximum: number, intervalMs: number, pauseSteps = 2) => {
     const [step, setStep] = useState(1);
 
     useEffect(() => {
-        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const reducedMotion = window.matchMedia(
+            '(prefers-reduced-motion: reduce)',
+        );
         if (reducedMotion.matches) {
             setStep(maximum);
             return;
         }
 
         const timer = window.setInterval(() => {
-            setStep(current => (current >= maximum + pauseSteps ? 1 : current + 1));
+            setStep(current =>
+                current >= maximum + pauseSteps ? 1 : current + 1,
+            );
         }, intervalMs);
 
         return () => window.clearInterval(timer);
@@ -32,12 +40,20 @@ const useAutoCycle = (maximum: number, intervalMs: number, pauseSteps = 2) => {
     return Math.min(step, maximum);
 };
 
-const Record = ({ number, visible = true }: { number: number; visible?: boolean }) => (
+const Record = ({
+    number,
+    visible = true,
+}: {
+    number: number;
+    visible?: boolean;
+}) => (
     <div
         className={`${styles.record} ${visible ? styles.recordVisible : ''}`}
         aria-hidden={!visible}
     >
-        <span className={styles.recordIndex}>{String(number).padStart(2, '0')}</span>
+        <span className={styles.recordIndex}>
+            {String(number).padStart(2, '0')}
+        </span>
         <span className={styles.recordPayload}>event</span>
     </div>
 );
@@ -90,42 +106,69 @@ export const SegmentRotation = () => {
                 aria-label="Nine log records filling three segment files in order"
             >
                 <div className={styles.segmentFlow}>
-                    {SEGMENTS.slice(0, activeSegment + 1).map((segment, segmentIndex) => {
-                        const isSealed = segmentIndex < activeSegment;
-                        const isActive = segmentIndex === activeSegment;
-                        const count = isSealed ? 3 : recordsInFile;
+                    {SEGMENTS.slice(0, activeSegment + 1).map(
+                        (segment, segmentIndex) => {
+                            const isSealed = segmentIndex < activeSegment;
+                            const isActive = segmentIndex === activeSegment;
+                            const count = isSealed ? 3 : recordsInFile;
 
-                        return (
-                            <div key={segmentIndex} className={styles.segmentGroup}>
+                            return (
                                 <div
-                                    className={`${styles.segment} ${isActive ? styles.segmentActive : ''} ${isSealed ? styles.segmentSealed : ''}`}
+                                    key={segmentIndex}
+                                    className={styles.segmentGroup}
                                 >
-                                    <div className={styles.segmentHeader}>
-                                        <span>log-{String(segmentIndex + 1).padStart(4, '0')}</span>
-                                        <span>{isSealed ? 'sealed' : count === 3 ? 'FULL' : 'appending'}</span>
-                                    </div>
-                                    <div className={styles.segmentRecords}>
-                                        {segment.map(number => (
-                                            <Record
-                                                key={number}
-                                                number={number}
-                                                visible={number <= writtenRecords}
+                                    <div
+                                        className={`${styles.segment} ${isActive ? styles.segmentActive : ''} ${isSealed ? styles.segmentSealed : ''}`}
+                                    >
+                                        <div className={styles.segmentHeader}>
+                                            <span>
+                                                log-
+                                                {String(
+                                                    segmentIndex + 1,
+                                                ).padStart(4, '0')}
+                                            </span>
+                                            <span>
+                                                {isSealed
+                                                    ? 'sealed'
+                                                    : count === 3
+                                                      ? 'FULL'
+                                                      : 'appending'}
+                                            </span>
+                                        </div>
+                                        <div className={styles.segmentRecords}>
+                                            {segment.map(number => (
+                                                <Record
+                                                    key={number}
+                                                    number={number}
+                                                    visible={
+                                                        number <= writtenRecords
+                                                    }
+                                                />
+                                            ))}
+                                        </div>
+                                        <div className={styles.capacity}>
+                                            <span
+                                                style={{
+                                                    width: `${(count / 3) * 100}%`,
+                                                }}
                                             />
-                                        ))}
+                                        </div>
+                                        <div className={styles.fileCount}>
+                                            {count} / 3 records
+                                        </div>
                                     </div>
-                                    <div className={styles.capacity}>
-                                        <span style={{ width: `${count / 3 * 100}%` }} />
-                                    </div>
-                                    <div className={styles.fileCount}>{count} / 3 records</div>
+                                    {segmentIndex < activeSegment ? (
+                                        <span
+                                            className={styles.segmentArrow}
+                                            aria-hidden="true"
+                                        >
+                                            →
+                                        </span>
+                                    ) : null}
                                 </div>
-                                {segmentIndex < activeSegment ? (
-                                    <span className={styles.segmentArrow} aria-hidden="true">
-                                        →
-                                    </span>
-                                ) : null}
-                            </div>
-                        );
-                    })}
+                            );
+                        },
+                    )}
                 </div>
                 <div className={styles.segmentLegend}>
                     {recordsInFile === 0
@@ -153,7 +196,8 @@ export const AbstractLogSketch = () => (
             />
         </div>
         <figcaption className={styles.caption}>
-            fig 4 — the original sketch: previous entries stay fixed while record 5 is appended at the tail.
+            fig 4 — the original sketch: previous entries stay fixed while
+            record 5 is appended at the tail.
         </figcaption>
     </figure>
 );
@@ -171,13 +215,21 @@ export const NumberedAppend = () => {
                 <div className={styles.numberedTrack}>
                     {Array.from({ length: 7 }, (_, index) => {
                         const number = index + 1;
-                        return <Record key={number} number={number} visible={number <= visibleRecords} />;
+                        return (
+                            <Record
+                                key={number}
+                                number={number}
+                                visible={number <= visibleRecords}
+                            />
+                        );
                     })}
                     <span className={styles.tailMarker}>tail</span>
                 </div>
                 <div className={styles.sequenceReadout}>
                     <span>next sequence number</span>
-                    <strong>{String((visibleRecords % 7) + 1).padStart(2, '0')}</strong>
+                    <strong>
+                        {String((visibleRecords % 7) + 1).padStart(2, '0')}
+                    </strong>
                 </div>
             </div>
         </Figure>

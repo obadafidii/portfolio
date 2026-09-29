@@ -28,7 +28,10 @@ export const PollingLab = () => {
     useEffect(() => {
         if (!running || ready || mode !== 'busy') return;
 
-        const timer = window.setInterval(() => setPolls(value => value + 1), 90);
+        const timer = window.setInterval(
+            () => setPolls(value => value + 1),
+            90,
+        );
         return () => window.clearInterval(timer);
     }, [mode, ready, running]);
 
@@ -56,13 +59,22 @@ export const PollingLab = () => {
             caption="fig 1 — the same wait, paid for differently. busy-waiting spends CPU on repeated checks; a condition variable parks the worker until a signal arrives."
             controls={
                 <>
-                    <Button onClick={() => chooseMode('busy')} active={mode === 'busy'}>
+                    <Button
+                        onClick={() => chooseMode('busy')}
+                        active={mode === 'busy'}
+                    >
                         busy-wait
                     </Button>
-                    <Button onClick={() => chooseMode('parked')} active={mode === 'parked'}>
+                    <Button
+                        onClick={() => chooseMode('parked')}
+                        active={mode === 'parked'}
+                    >
                         condition variable
                     </Button>
-                    <Button onClick={() => setRunning(true)} active={running && !ready}>
+                    <Button
+                        onClick={() => setRunning(true)}
+                        active={running && !ready}
+                    >
                         start
                     </Button>
                     <Button
@@ -92,19 +104,21 @@ export const PollingLab = () => {
                             width: 62,
                             height: 62,
                             border: '4px solid var(--paper-line-strong)',
-                            borderTopColor:
-                                ready
-                                    ? 'var(--term-green)'
-                                    : running && mode === 'busy'
-                                      ? 'var(--term-red)'
-                                      : 'var(--term-blue)',
+                            borderTopColor: ready
+                                ? 'var(--term-green)'
+                                : running && mode === 'busy'
+                                  ? 'var(--term-red)'
+                                  : 'var(--term-blue)',
                             borderRadius: '999px',
                         }}
                         aria-hidden="true"
                     />
                     <span
                         className="mt-3 text-[12px]"
-                        style={{ color: 'var(--paper-faint)', fontFamily: 'var(--font-mono)' }}
+                        style={{
+                            color: 'var(--paper-faint)',
+                            fontFamily: 'var(--font-mono)',
+                        }}
                     >
                         worker thread
                     </span>
@@ -135,7 +149,9 @@ export const PollingLab = () => {
                             borderColor: ready
                                 ? 'var(--term-green)'
                                 : 'var(--paper-line-strong)',
-                            color: ready ? 'var(--term-green)' : 'var(--paper-muted)',
+                            color: ready
+                                ? 'var(--term-green)'
+                                : 'var(--paper-muted)',
                             fontFamily: 'var(--font-mono)',
                         }}
                         aria-live="polite"
@@ -159,9 +175,18 @@ const Metric = ({
 }) => (
     <div
         className="flex items-baseline justify-between gap-4 border-b py-1.5 text-[12px]"
-        style={{ borderColor: 'var(--paper-line)', fontFamily: 'var(--font-mono)' }}
+        style={{
+            borderColor: 'var(--paper-line)',
+            fontFamily: 'var(--font-mono)',
+        }}
     >
         <span style={{ color: 'var(--paper-faint)' }}>{label}</span>
-        <span style={{ color: warning ? 'var(--term-red)' : 'var(--paper-bright)' }}>{value}</span>
+        <span
+            style={{
+                color: warning ? 'var(--term-red)' : 'var(--paper-bright)',
+            }}
+        >
+            {value}
+        </span>
     </div>
 );

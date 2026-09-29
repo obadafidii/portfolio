@@ -21,7 +21,8 @@ export const WakeSet = () => {
         });
     };
 
-    const broadcast = () => setWorkers(current => current.map(() => 'runnable'));
+    const broadcast = () =>
+        setWorkers(current => current.map(() => 'runnable'));
     const reset = () => setWorkers(INITIAL);
 
     return (
@@ -59,7 +60,9 @@ export const WakeSet = () => {
                             <span>worker {index + 1}</span>
                             <span
                                 className={
-                                    state === 'runnable' ? 'motion-safe:animate-pulse' : ''
+                                    state === 'runnable'
+                                        ? 'motion-safe:animate-pulse'
+                                        : ''
                                 }
                                 style={{
                                     color:
@@ -98,7 +101,9 @@ export const WakeSet = () => {
                 }}
             >
                 <span>shared mutex</span>
-                <span style={{ color: 'var(--term-amber)' }}>one owner at a time</span>
+                <span style={{ color: 'var(--term-amber)' }}>
+                    one owner at a time
+                </span>
             </div>
         </Figure>
     );

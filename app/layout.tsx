@@ -68,7 +68,11 @@ export default function RootLayout({
             className={`${sans.variable} ${mono.variable} ${code.variable}`}
         >
             <body className="antialiased">
-                <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false}>
+                <ThemeProvider
+                    attribute="data-theme"
+                    defaultTheme="dark"
+                    enableSystem={false}
+                >
                     <SplitWorkspaceProvider>{children}</SplitWorkspaceProvider>
                 </ThemeProvider>
                 <Analytics />

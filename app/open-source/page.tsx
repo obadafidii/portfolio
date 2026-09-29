@@ -1,6 +1,13 @@
 'use client';
 
-import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
+import {
+    useEffect,
+    useId,
+    useMemo,
+    useRef,
+    useState,
+    type KeyboardEvent,
+} from 'react';
 
 import { TerminalWindow } from '@/components/layout/TerminalWindow';
 import { CommandLine, Prompt } from '@/components/ui/shell/CommandLine';
@@ -34,13 +41,24 @@ export default function OpenSourcePage() {
                     error?: string;
                     notice?: string;
                 };
-                if (!response.ok) throw new Error(data.error ?? 'Unable to load contributions.');
+                if (!response.ok)
+                    throw new Error(
+                        data.error ?? 'Unable to load contributions.',
+                    );
                 setItems(data.items);
                 setNotice(data.notice ?? '');
             })
             .catch(cause => {
-                if (cause instanceof DOMException && cause.name === 'AbortError') return;
-                setError(cause instanceof Error ? cause.message : 'Unable to load contributions.');
+                if (
+                    cause instanceof DOMException &&
+                    cause.name === 'AbortError'
+                )
+                    return;
+                setError(
+                    cause instanceof Error
+                        ? cause.message
+                        : 'Unable to load contributions.',
+                );
             })
             .finally(() => {
                 if (!controller.signal.aborted) setLoading(false);
@@ -48,7 +66,10 @@ export default function OpenSourcePage() {
         return () => controller.abort();
     }, []);
 
-    const years = useMemo(() => [...new Set(items.map(item => item.date.slice(0, 4)))], [items]);
+    const years = useMemo(
+        () => [...new Set(items.map(item => item.date.slice(0, 4)))],
+        [items],
+    );
     const activeYear = year || years[0] || new Date().getFullYear().toString();
     const visible = useMemo(
         () => items.filter(item => item.date.startsWith(activeYear)),
@@ -81,7 +102,9 @@ export default function OpenSourcePage() {
             if (event.key !== 'Tab' || !dialogRef.current) return;
 
             const focusable = Array.from(
-                dialogRef.current.querySelectorAll<HTMLElement>('a[href], button'),
+                dialogRef.current.querySelectorAll<HTMLElement>(
+                    'a[href], button',
+                ),
             );
             const first = focusable[0];
             const last = focusable.at(-1);
@@ -105,7 +128,9 @@ export default function OpenSourcePage() {
     const onRowsKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
         if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
         const rows = [
-            ...event.currentTarget.querySelectorAll<HTMLButtonElement>('[data-contribution-row]'),
+            ...event.currentTarget.querySelectorAll<HTMLButtonElement>(
+                '[data-contribution-row]',
+            ),
         ];
         const index = rows.indexOf(document.activeElement as HTMLButtonElement);
         if (index < 0) return;
@@ -133,7 +158,10 @@ export default function OpenSourcePage() {
                 <div className="contribution-heading">
                     <div>
                         <h1>Open source</h1>
-                        <p>Work I have contributed to beyond my own repositories.</p>
+                        <p>
+                            Work I have contributed to beyond my own
+                            repositories.
+                        </p>
                     </div>
                     {years.length > 0 ? (
                         <label className="contribution-year-select">
@@ -149,7 +177,11 @@ export default function OpenSourcePage() {
                                 {years.map(value => (
                                     <option key={value} value={value}>
                                         {value} ·{' '}
-                                        {items.filter(item => item.date.startsWith(value)).length}
+                                        {
+                                            items.filter(item =>
+                                                item.date.startsWith(value),
+                                            ).length
+                                        }
                                     </option>
                                 ))}
                             </select>
@@ -157,15 +189,24 @@ export default function OpenSourcePage() {
                     ) : null}
                 </div>
 
-                {loading ? <p className="ink-faint mt-8">loading contributions…</p> : null}
+                {loading ? (
+                    <p className="ink-faint mt-8">loading contributions…</p>
+                ) : null}
                 {error ? <p className="term-err mt-8">{error}</p> : null}
-                {notice ? <p className="ink-faint mt-4 text-xs">{notice}</p> : null}
+                {notice ? (
+                    <p className="ink-faint mt-4 text-xs">{notice}</p>
+                ) : null}
                 {!loading && !error && items.length === 0 ? (
-                    <p className="ink-faint mt-8">No public pull requests found yet.</p>
+                    <p className="ink-faint mt-8">
+                        No public pull requests found yet.
+                    </p>
                 ) : null}
 
                 {visible.length > 0 ? (
-                    <div className="contribution-archive" onKeyDown={onRowsKeyDown}>
+                    <div
+                        className="contribution-archive"
+                        onKeyDown={onRowsKeyDown}
+                    >
                         {groups.map(([month, monthItems]) => (
                             <section key={month} className="contribution-month">
                                 <div className="contribution-month__heading">
@@ -177,11 +218,14 @@ export default function OpenSourcePage() {
                                         <button
                                             key={item.url}
                                             ref={element => {
-                                                rowRefs.current[item.url] = element;
+                                                rowRefs.current[item.url] =
+                                                    element;
                                             }}
                                             type="button"
                                             data-contribution-row
-                                            onClick={() => setSelectedUrl(item.url)}
+                                            onClick={() =>
+                                                setSelectedUrl(item.url)
+                                            }
                                             className="contribution-row"
                                             aria-haspopup="dialog"
                                         >
@@ -201,7 +245,10 @@ export default function OpenSourcePage() {
                                             >
                                                 {item.status}
                                             </span>
-                                            <span className="contribution-row__arrow" aria-hidden="true">
+                                            <span
+                                                className="contribution-row__arrow"
+                                                aria-hidden="true"
+                                            >
                                                 →
                                             </span>
                                         </button>
@@ -217,7 +264,8 @@ export default function OpenSourcePage() {
                 <div
                     className="contribution-modal__backdrop"
                     onMouseDown={event => {
-                        if (event.currentTarget === event.target) setSelectedUrl('');
+                        if (event.currentTarget === event.target)
+                            setSelectedUrl('');
                     }}
                 >
                     <div
@@ -246,7 +294,10 @@ export default function OpenSourcePage() {
                             </button>
                         </div>
 
-                        <div id={descriptionId} className="contribution-modal__body">
+                        <div
+                            id={descriptionId}
+                            className="contribution-modal__body"
+                        >
                             {note ? (
                                 <>
                                     <section>
@@ -271,7 +322,8 @@ export default function OpenSourcePage() {
                                 </section>
                             ) : (
                                 <p className="ink-faint">
-                                    The pull request contains the implementation and discussion.
+                                    The pull request contains the implementation
+                                    and discussion.
                                 </p>
                             )}
                         </div>
@@ -280,7 +332,11 @@ export default function OpenSourcePage() {
                             {note?.article ? (
                                 <a href={note.article}>Read the full writeup</a>
                             ) : null}
-                            <a href={selected.url} target="_blank" rel="noopener noreferrer">
+                            <a
+                                href={selected.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
                                 View on GitHub ↗
                             </a>
                         </div>

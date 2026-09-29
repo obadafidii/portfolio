@@ -26,8 +26,7 @@ On a fresh clone, run `vercel link --yes --project portfolio` followed by
 `vercel env pull .env.local --yes`. The saved CLI login and project link avoid
 repeating browser authentication during normal development.
 
-Without storage, the controls show an unavailable message and the API returns
-503. It never substitutes local counts or displays invented totals.
+Without storage, the controls show an unavailable message and the API returns 503. It never substitutes local counts or displays invented totals.
 
 ## Behavior and verification
 

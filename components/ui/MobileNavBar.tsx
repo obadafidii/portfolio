@@ -40,7 +40,10 @@ export const MobileNavBar = (props: MobileNavBarProps) => {
             {isOpen && (
                 <div
                     className="mobile-menu-enter fixed inset-0 z-40 flex items-center justify-center px-6 backdrop-blur-sm"
-                    style={{ background: 'color-mix(in oklab, var(--paper) 88%, transparent)' }}
+                    style={{
+                        background:
+                            'color-mix(in oklab, var(--paper) 88%, transparent)',
+                    }}
                     onClick={() => setIsOpen(false)}
                 >
                     <div
@@ -51,7 +54,9 @@ export const MobileNavBar = (props: MobileNavBarProps) => {
                             <span className="term-dot" />
                             <span className="term-dot" />
                             <span className="term-dot" />
-                            <span className="ink-faint ml-2 text-[11px]">cd</span>
+                            <span className="ink-faint ml-2 text-[11px]">
+                                cd
+                            </span>
                         </div>
 
                         <ul className="px-3 py-3 text-[13px]">
@@ -64,7 +69,8 @@ export const MobileNavBar = (props: MobileNavBarProps) => {
                                             onClick={() => setIsOpen(false)}
                                             className={cn(
                                                 'flex items-baseline gap-2 rounded-[4px] px-2 py-2',
-                                                isActive && 'bg-[var(--paper-accent-soft)]',
+                                                isActive &&
+                                                    'bg-[var(--paper-accent-soft)]',
                                             )}
                                         >
                                             <span className="term-sym">$</span>
@@ -75,7 +81,10 @@ export const MobileNavBar = (props: MobileNavBarProps) => {
                                                         : 'var(--term-blue)',
                                                 }}
                                             >
-                                                cd {item.title === 'home' ? '~' : item.title}
+                                                cd{' '}
+                                                {item.title === 'home'
+                                                    ? '~'
+                                                    : item.title}
                                             </span>
                                         </Link>
                                     </li>

@@ -80,11 +80,17 @@ export const HeaderLayout = () => {
                                 active === idx
                                     ? `color-mix(in oklab, ${bit.color} 24%, transparent)`
                                     : `color-mix(in oklab, ${bit.color} 8%, transparent)`,
-                            color: active === idx ? 'var(--paper-bright)' : 'var(--paper-muted)',
+                            color:
+                                active === idx
+                                    ? 'var(--paper-bright)'
+                                    : 'var(--paper-muted)',
                         }}
                     >
                         <span className="block truncate">{bit.name}</span>
-                        <span className="block" style={{ color: 'var(--paper-faint)' }}>
+                        <span
+                            className="block"
+                            style={{ color: 'var(--paper-faint)' }}
+                        >
                             {bit.width}
                         </span>
                     </button>
@@ -93,7 +99,10 @@ export const HeaderLayout = () => {
 
             <div
                 className="mt-3 flex items-baseline justify-between text-[11px]"
-                style={{ fontFamily: 'var(--font-mono)', color: 'var(--paper-faint)' }}
+                style={{
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--paper-faint)',
+                }}
             >
                 <span>bit 0</span>
                 <span>16 bits · offset 2 in the header</span>
@@ -104,7 +113,9 @@ export const HeaderLayout = () => {
                 className="mt-3 min-h-[3.2em] text-[12.5px]"
                 style={{ color: 'var(--paper-muted)', lineHeight: 1.6 }}
             >
-                {active === null ? 'Pick a field to see what it controls.' : BITS[active].note}
+                {active === null
+                    ? 'Pick a field to see what it controls.'
+                    : BITS[active].note}
             </p>
         </Figure>
     );

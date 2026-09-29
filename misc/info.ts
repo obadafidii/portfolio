@@ -23,7 +23,14 @@ const info = {
             kind: 'product' as const,
             url: 'https://app.terrace.fi/i',
             description: 'CEX and DEX pool aggregator',
-            tags: ['go', 'solana', 'kubernetes', 'timescaledb', 'neo4j', 'crypto'],
+            tags: [
+                'go',
+                'solana',
+                'kubernetes',
+                'timescaledb',
+                'neo4j',
+                'crypto',
+            ],
         },
         {
             name: 'Curaboard',
@@ -46,7 +53,8 @@ const info = {
             file: 'minired',
             kind: 'build' as const,
             url: 'https://github.com/obadafidii/minired',
-            description: 'Redis core functionality implemented in Go from scratch',
+            description:
+                'Redis core functionality implemented in Go from scratch',
             tags: ['go', 'database', 'backend'],
         },
         {
@@ -54,7 +62,8 @@ const info = {
             file: 'orchestra',
             kind: 'build' as const,
             url: 'https://github.com/obadafidii/orchestra',
-            description: 'Lightweight task orchestration, coordinating workers in Go',
+            description:
+                'Lightweight task orchestration, coordinating workers in Go',
             tags: ['go', 'backend'],
         },
         {
@@ -62,7 +71,8 @@ const info = {
             file: 'go-dns',
             kind: 'build' as const,
             url: 'https://github.com/obadafidii/go-dns',
-            description: 'Domain name server in Go, written after the AWS DNS outage',
+            description:
+                'Domain name server in Go, written after the AWS DNS outage',
             tags: ['go', 'dns', 'backend'],
         },
         {
@@ -70,7 +80,8 @@ const info = {
             file: 'search-engine',
             kind: 'build' as const,
             url: 'https://github.com/obadafidii/search-engine',
-            description: 'Search engine in C#, built for performance and reliability',
+            description:
+                'Search engine in C#, built for performance and reliability',
             tags: ['c#', 'algorithms', 'backend'],
         },
         {
@@ -86,7 +97,8 @@ const info = {
             file: 'slide-scribe',
             kind: 'build' as const,
             url: 'https://github.com/obadafidii/SlideScribeAI-Backend',
-            description: 'Hackathon backend for transcribing and processing slides',
+            description:
+                'Hackathon backend for transcribing and processing slides',
             tags: ['typescript', 'backend', 'hackathon'],
         },
     ],

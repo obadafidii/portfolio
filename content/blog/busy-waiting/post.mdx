@@ -1,18 +1,14 @@
 export const post = {
-    "title": "Busy-Waiting: When Doing Nothing Uses Everything",
-    "summary": "Why a thread can do no useful work and still consume an entire CPU core — and how condition variables replace repeated polling with an efficient sleep-and-wake protocol.",
-    "publishedOn": "2026-08-25T12:00:00.000Z",
-    "tags": [
-        "concurrency",
-        "operating-systems",
-        "go",
-        "synchronization"
-    ],
-    "status": "done",
-    "coverImage": {
-        "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165230/portfolio/blog/busy-waiting-cover.webp",
-        "alt": "Network cables connected to rows of servers in a data centre"
-    }
+    title: 'Busy-Waiting: When Doing Nothing Uses Everything',
+    summary:
+        'Why a thread can do no useful work and still consume an entire CPU core — and how condition variables replace repeated polling with an efficient sleep-and-wake protocol.',
+    publishedOn: '2026-08-25T12:00:00.000Z',
+    tags: ['concurrency', 'operating-systems', 'go', 'synchronization'],
+    status: 'done',
+    coverImage: {
+        src: 'https://res.cloudinary.com/cloudlord/image/upload/v1790165230/portfolio/blog/busy-waiting-cover.webp',
+        alt: 'Network cables connected to rows of servers in a data centre',
+    },
 };
 
 import { PollingLab } from '@/components/ui/blog/busy-waiting/PollingLab';
@@ -30,7 +26,13 @@ whether something has changed, or it can stop running and ask the scheduler to
 wake it when change is possible. Both approaches wait. Only one of them keeps
 sending the CPU a bill.
 
-<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165230/portfolio/blog/busy-waiting-cover.webp" alt="Network cables connected to rows of servers in a data centre" width={1800} height={1010} caption="The infrastructure behind a wait. Photo by Taylor Vick on Unsplash." />
+<ArticleImage
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790165230/portfolio/blog/busy-waiting-cover.webp"
+    alt="Network cables connected to rows of servers in a data centre"
+    width={1800}
+    height={1010}
+    caption="The infrastructure behind a wait. Photo by Taylor Vick on Unsplash."
+/>
 
 Photo: [Taylor Vick](https://unsplash.com/@tvick) ·
 [view the original on Unsplash](https://unsplash.com/photos/cable-network-M5tzZtFCOfs)

@@ -101,7 +101,9 @@ const SYNCED = /<!--\s*synced from google docs on (\d{4}-\d{2}-\d{2})\s*-->/;
  */
 const unwrapHref = (href: string): string => {
     const trimmed = href.trim();
-    const match = trimmed.match(/^https?:\/\/(?:www\.)?google\.com\/url\?(.*)$/);
+    const match = trimmed.match(
+        /^https?:\/\/(?:www\.)?google\.com\/url\?(.*)$/,
+    );
     if (!match) return trimmed;
 
     const q = new URLSearchParams(match[1]).get('q');
@@ -125,7 +127,8 @@ const normaliseHref = (href: string): string => {
 const LINK = /\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/;
 const AUTOLINK = /<((?:https?:\/\/|mailto:)[^>\s]+)>/;
 const BARE_URL = /(?<![("\w])((?:https?:\/\/|www\.)[^\s<>()[\]",]+)/;
-const BARE_EMAIL = /(?<![("\w])([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/;
+const BARE_EMAIL =
+    /(?<![("\w])([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/;
 const BOLD = /\*\*([^*]+)\*\*|__([^_]+)__/;
 const ITALIC = /(?<![*\w])\*([^*\n]+)\*(?!\*)|(?<![_\w])_([^_\n]+)_(?![_\w])/;
 const CODE = /`([^`]+)`/;
@@ -183,10 +186,17 @@ export const parseInline = (input: string, style: Style = {}): Inline[] => {
             },
         ]) ??
         split(AUTOLINK, m => [
-            { type: 'link', label: unwrapHref(m[1]), href: normaliseHref(m[1]), ...style },
+            {
+                type: 'link',
+                label: unwrapHref(m[1]),
+                href: normaliseHref(m[1]),
+                ...style,
+            },
         ]) ??
         split(BOLD, m => parseInline(m[1] ?? m[2], { ...style, bold: true })) ??
-        split(ITALIC, m => parseInline(m[1] ?? m[2], { ...style, italic: true })) ??
+        split(ITALIC, m =>
+            parseInline(m[1] ?? m[2], { ...style, italic: true }),
+        ) ??
         split(BARE_URL, m => [
             { type: 'link', label: m[1], href: normaliseHref(m[1]), ...style },
         ]) ??
@@ -208,7 +218,8 @@ const splitRow = (line: string): string[] =>
         .split('|')
         .map(cell => cell.trim());
 
-const isDivider = (line: string) => /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(line) && line.includes('-');
+const isDivider = (line: string) =>
+    /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(line) && line.includes('-');
 
 /* ------------------------------------------------------------------ parser */
 
@@ -219,7 +230,9 @@ const ROW_KEY = /^([A-Za-z][A-Za-z0-9 /&+.#-]{0,22}):\s+(.+)$/;
 const MONTHS = 'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec';
 
 /** "Backend Engineer (Blockchain)Mar 2026 – Present" → title + date. */
-const GLUED_DATE = new RegExp(`^(.*?[a-z)\\.])((?:${MONTHS})[a-z]*\\.?\\s*\\d{4}\\b.*)$`);
+const GLUED_DATE = new RegExp(
+    `^(.*?[a-z)\\.])((?:${MONTHS})[a-z]*\\.?\\s*\\d{4}\\b.*)$`,
+);
 
 /** "B.Sc. Computer ScienceLagos, Nigeria" → qualification + place. */
 const GLUED_PLACE = /^(.*?[a-z])([A-Z][a-z]+,\s*[A-Z][a-z]+)$/;
@@ -268,7 +281,11 @@ export const adaptGoogleDoc = (markdown: string): string => {
 
         /* header block: the layout table holding name and contact details --- */
 
-        if (!hasTitle && isTableLine(line) && /@|\bRemote\b|\d{7,}/.test(line)) {
+        if (
+            !hasTitle &&
+            isTableLine(line) &&
+            /@|\bRemote\b|\d{7,}/.test(line)
+        ) {
             const cells: string[] = [];
             while (i < src.length && isTableLine(src[i].trim())) {
                 const row = src[i].trim();
@@ -285,7 +302,9 @@ export const adaptGoogleDoc = (markdown: string): string => {
                 if (!cell) continue;
 
                 if (!name) {
-                    const caps = cell.match(/^((?:[A-Z][A-Z'’-]+\s+){1,3})(.*)$/);
+                    const caps = cell.match(
+                        /^((?:[A-Z][A-Z'’-]+\s+){1,3})(.*)$/,
+                    );
                     if (caps) {
                         name = caps[1].trim();
                         if (caps[2].trim()) tagline.push(caps[2].trim());
@@ -309,7 +328,9 @@ export const adaptGoogleDoc = (markdown: string): string => {
                     rest = rest.replace(link[0], ' ');
                 }
 
-                const email = rest.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/);
+                const email = rest.match(
+                    /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/,
+                );
                 if (email) {
                     contact.push(`- email: ${email[0]}`);
                     rest = rest.replace(email[0], ' ');
@@ -325,7 +346,8 @@ export const adaptGoogleDoc = (markdown: string): string => {
                 rest = rest.replace(/\s{2,}/g, ' ').trim();
                 if (!rest) continue;
 
-                if (/remote|relocat|based in|open to/i.test(rest)) contact.push(`- location: ${rest}`);
+                if (/remote|relocat|based in|open to/i.test(rest))
+                    contact.push(`- location: ${rest}`);
                 else tagline.push(rest);
             }
 
@@ -401,7 +423,6 @@ export const adaptGoogleDoc = (markdown: string): string => {
         }
 
         out.push(src[i]);
-
     }
 
     return out.join('\n');
@@ -443,7 +464,11 @@ export const parseResume = (input: string): Resume => {
         }
 
         if (/^##\s+/.test(line)) {
-            openSection(inlineToText(parseInline(line.replace(/^##\s+/, ''))).toUpperCase());
+            openSection(
+                inlineToText(
+                    parseInline(line.replace(/^##\s+/, '')),
+                ).toUpperCase(),
+            );
             continue;
         }
 
@@ -488,7 +513,9 @@ export const parseResume = (input: string): Resume => {
             const isKeyValue =
                 first.length === 2 &&
                 cells.every(row => row.length === 2) &&
-                [first, ...cells].every(row => row[0].replace(/\*/g, '').length <= 26);
+                [first, ...cells].every(
+                    row => row[0].replace(/\*/g, '').length <= 26,
+                );
 
             if (isKeyValue) {
                 for (const [key, value] of [first, ...cells]) {
@@ -529,9 +556,10 @@ export const parseResume = (input: string): Resume => {
             const ordered = /\d/.test(bullet[2]);
             const text = bullet[3].trim();
 
-            const pair = depth === 0 && !ordered && !sectionHasEntries()
-                ? text.match(ROW_KEY)
-                : null;
+            const pair =
+                depth === 0 && !ordered && !sectionHasEntries()
+                    ? text.match(ROW_KEY)
+                    : null;
 
             if (pair && !pair[2].startsWith('//')) {
                 current().blocks.push({
@@ -565,7 +593,9 @@ export const parseResume = (input: string): Resume => {
             const blocks = current().blocks;
             const previous = blocks[blocks.length - 1];
             if (previous?.type === 'entry' && !previous.subtitle) {
-                previous.subtitle = parseInline((italicOnly[1] ?? italicOnly[2]).trim());
+                previous.subtitle = parseInline(
+                    (italicOnly[1] ?? italicOnly[2]).trim(),
+                );
                 continue;
             }
         }

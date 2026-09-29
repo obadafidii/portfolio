@@ -14,9 +14,15 @@ const PaneLoading = () => <p className="ink-faint">loading pane…</p>;
 
 const Home = dynamic(() => import('@/app/page'), { loading: PaneLoading });
 const Blog = dynamic(() => import('@/app/blog/page'), { loading: PaneLoading });
-const OpenSource = dynamic(() => import('@/app/open-source/page'), { loading: PaneLoading });
-const Contact = dynamic(() => import('@/app/contact/page'), { loading: PaneLoading });
-const Works = dynamic(() => import('@/app/works/page'), { loading: PaneLoading });
+const OpenSource = dynamic(() => import('@/app/open-source/page'), {
+    loading: PaneLoading,
+});
+const Contact = dynamic(() => import('@/app/contact/page'), {
+    loading: PaneLoading,
+});
+const Works = dynamic(() => import('@/app/works/page'), {
+    loading: PaneLoading,
+});
 
 const MissingPane = ({ path }: { path: string }) => (
     <CommandLine cwd="~">
@@ -51,7 +57,11 @@ const ResumePane = () => {
             })
             .then(setResume)
             .catch(error => {
-                if (error instanceof DOMException && error.name === 'AbortError') return;
+                if (
+                    error instanceof DOMException &&
+                    error.name === 'AbortError'
+                )
+                    return;
                 setFailed(true);
             });
 
@@ -72,7 +82,8 @@ const resolveContent = (path: string) => {
     if (path === '/contact') return <Contact />;
     const postKey = getPostKey(path);
     if (postKey && getBlogSeries(postKey)) return <Blog />;
-    if (postKey && getBlogMetadata(postKey)) return <PostView key={postKey} postKey={postKey} />;
+    if (postKey && getBlogMetadata(postKey))
+        return <PostView key={postKey} postKey={postKey} />;
 
     return <MissingPane path={path} />;
 };
@@ -85,10 +96,23 @@ export const SplitPaneContent = ({
     navigate: (path: string) => void;
 }) => {
     const interceptInternalLinks = (event: MouseEvent<HTMLDivElement>) => {
-        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey) return;
+        if (
+            event.defaultPrevented ||
+            event.button !== 0 ||
+            event.metaKey ||
+            event.ctrlKey
+        )
+            return;
 
-        const anchor = (event.target as HTMLElement).closest<HTMLAnchorElement>('a[href]');
-        if (!anchor || anchor.target === '_blank' || anchor.hasAttribute('download')) return;
+        const anchor = (event.target as HTMLElement).closest<HTMLAnchorElement>(
+            'a[href]',
+        );
+        if (
+            !anchor ||
+            anchor.target === '_blank' ||
+            anchor.hasAttribute('download')
+        )
+            return;
 
         const url = new URL(anchor.href, window.location.origin);
         if (url.origin !== window.location.origin || url.hash) return;
@@ -100,7 +124,9 @@ export const SplitPaneContent = ({
     return (
         <PaneNavigationProvider navigate={navigate}>
             <EmbeddedPaneProvider>
-                <div onClickCapture={interceptInternalLinks}>{resolveContent(path)}</div>
+                <div onClickCapture={interceptInternalLinks}>
+                    {resolveContent(path)}
+                </div>
             </EmbeddedPaneProvider>
         </PaneNavigationProvider>
     );

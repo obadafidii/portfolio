@@ -45,16 +45,26 @@ export const WalFlow = () => {
             caption="fig 1 — the write-ahead rule: the log is durable before the memtable changes, and long before the client hears yes."
             controls={
                 <>
-                    <Button onClick={playing ? () => setPlaying(false) : play} active={playing}>
+                    <Button
+                        onClick={playing ? () => setPlaying(false) : play}
+                        active={playing}
+                    >
                         {playing ? 'pause' : 'play'}
                     </Button>
                     <Button onClick={reset}>reset</Button>
-                    <Button onClick={() => setStep(s => Math.min(s + 1, STAGES.length - 1))}>
+                    <Button
+                        onClick={() =>
+                            setStep(s => Math.min(s + 1, STAGES.length - 1))
+                        }
+                    >
                         step →
                     </Button>
                     <span
                         className="ml-auto text-[11px]"
-                        style={{ color: 'var(--paper-faint)', fontFamily: 'var(--font-mono)' }}
+                        style={{
+                            color: 'var(--paper-faint)',
+                            fontFamily: 'var(--font-mono)',
+                        }}
                     >
                         {step < 0 ? 'idle' : STAGES[step].note}
                     </span>
@@ -86,10 +96,14 @@ export const WalFlow = () => {
                                         : done
                                           ? 'var(--paper-ink)'
                                           : 'var(--paper-faint)',
-                                    transform: active ? 'translateX(6px)' : 'translateX(0)',
+                                    transform: active
+                                        ? 'translateX(6px)'
+                                        : 'translateX(0)',
                                 }}
                             >
-                                <span style={{ color: 'var(--paper-faint)' }}>{idx + 1}. </span>
+                                <span style={{ color: 'var(--paper-faint)' }}>
+                                    {idx + 1}.{' '}
+                                </span>
                                 {stage.label}
                                 {stage.id === 'fsync' && (
                                     <span

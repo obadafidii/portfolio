@@ -1,20 +1,23 @@
 export const post = {
-    "title": "Understanding Log: Databases",
-    "summary": "How databases use logs to record changes and recover their state.",
-    "publishedOn": "2026-09-03T00:00:00.000Z",
-    "status": "done",
-    "coverImage": {
-        "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/journey-of-a-write.jpg",
-        "alt": "Handwritten diagram tracing a write request from a client to the database"
+    title: 'Understanding Log: Databases',
+    summary:
+        'How databases use logs to record changes and recover their state.',
+    publishedOn: '2026-09-03T00:00:00.000Z',
+    status: 'done',
+    coverImage: {
+        src: 'https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/journey-of-a-write.jpg',
+        alt: 'Handwritten diagram tracing a write request from a client to the database',
     },
-    "part": 2,
-    "tags": [
-        "logs",
-        "databases",
-    ]
+    part: 2,
+    tags: ['logs', 'databases'],
 };
 
-import { WalDiskWrite, WalRecovery, PhysicalReplication, LogicalReplication } from '@/components/ui/blog/log/DatabaseVisuals';
+import {
+    WalDiskWrite,
+    WalRecovery,
+    PhysicalReplication,
+    LogicalReplication,
+} from '@/components/ui/blog/log/DatabaseVisuals';
 import ArticleImage from '@/components/mdx/elements/Img';
 
 # Understanding Log: Databases
@@ -31,12 +34,15 @@ write be it an update, insert or deletion (basically any state-altering
 command), what happens to this process. In this part we are going to go deeper
 in to the responsibilities and purpose of a Log in database.
 
-<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/journey-of-a-write.jpg" alt="An image describing the
+<ArticleImage
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790165237/portfolio/blog/journey-of-a-write.jpg"
+    alt="An image describing the
 flow of a write request from a client to the database"
     width={1600}
     height={985}
-caption="An image describing the flow of a write request from a client to the
-database drawn by David Dada" />
+    caption="An image describing the flow of a write request from a client to the
+database drawn by David Dada"
+/>
 
 In previous years when a client writes to the database, the database immediately
 writes it to disk
@@ -46,11 +52,14 @@ performance, because writing to a disk (SSDs or spinning disks) is very costly.
 How should this be mitigated? How do we achieve `strong` durability and
 performance?
 
-<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165233/portfolio/blog/database-to-disk.jpg" alt="An image describing the
+<ArticleImage
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790165233/portfolio/blog/database-to-disk.jpg"
+    alt="An image describing the
 flow of a write request from a client to the database to disk"
     width={1600}
     height={985}
-caption="An image describing writing directly from database to disk" />
+    caption="An image describing writing directly from database to disk"
+/>
 
 The answer was to build an in-memory structure
 ([Memtable](https://en.wikipedia.org/wiki/Skip_list) part of [LSM Tree]) where
@@ -58,10 +67,12 @@ all incoming writes will be applied to then _after a while_ or _when this
 in-memory structure is fiiled up_ we _"flush"_ to the disk
 ([SSTables](https://www.igvita.com/2012/02/06/sstable-and-log-structured-storage-leveldb/)).
 
-<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165241/portfolio/blog/memtables-to-disk.jpg" alt="An image describing the
+<ArticleImage
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790165241/portfolio/blog/memtables-to-disk.jpg"
+    alt="An image describing the
 flow of a write request from a client to the database to disk"
-        width={1600}
-        height={985}
+    width={1600}
+    height={985}
     caption="An image describing writing to database memtables then to disk"
 />
 
@@ -112,7 +123,7 @@ mental model for you to clarify some terms commonly used around this topic.
 2. **Committed**: This has to do with `flushing` the WAL (in the
    `kernerl-dirty-pages`) to the disk making it permanently durable. The
    [`fysnc POSIX API`](https://man7.org/linux/man-pages/man2/fsync.2.html)
-is used to synchronize the internal changes of the WAL to disk.
+   is used to synchronize the internal changes of the WAL to disk.
 
 Hurray! This is really awesome, right? If we have any write to our database, we
 store it in the WAL then call the `fysnc()` method on the file, on-success we
@@ -208,33 +219,33 @@ going to be looking at them and the role they play in this section.
 1. **Operation**: an entry into a Log must contain the operation the client just
    performed. These operations are `state-altering` changes for example
    `PUT name = David` alters the state of
-_name_ in the database and this must be recorded before applying the change to
-the `memtable`.
+   _name_ in the database and this must be recorded before applying the change to
+   the `memtable`.
 
 2. **Log Number**: each entry in a given a `monotonically` increasing number
    (sometimes `timestamps`) and it this property of the entry is used to
    establish order when replaying events.
-It can also be used to eventual consistency in distributed systems, but more on
-this when we get to distributed systems.
+   It can also be used to eventual consistency in distributed systems, but more on
+   this when we get to distributed systems.
 
 3. **Key and value**: In most entries the key and value length is stored in the
    header of the WAL, before storing the actual key and value. This helps during
    recovery and helps the reading stream to
-know how many bytes to read as the key and value.
+   know how many bytes to read as the key and value.
 
 4. **Checksum value**: This is a crucial part of a WAL entry. Checksum is an
    error-detection algorithm used to verify the validity of information, where a
    slight change in the content of the information will result in
-a different checksum. This guards against scenarios of
-_`partial or corrupted writes`_. The algorithms commonly used are
-[`CRC32`](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) or
-[`xxhash`](https://xxhash.com/). I need to elaborate on this, imagine while the
-WAL was writing to the disk there is power outage and some bytes have been
-written to the disk, this scenario is what we called `Partial Write` it means
-the state was not successfully committed and the way know about this is by
-re-computing the checksum of the data read from disk and comparing it to what
-was written into disk. The function of checksum is seen while `Replaying`
-entries during _recovery_. To understand this more, let's look at WAL Recovery
+   a different checksum. This guards against scenarios of
+   _`partial or corrupted writes`_. The algorithms commonly used are
+   [`CRC32`](https://en.wikipedia.org/wiki/Cyclic_redundancy_check) or
+   [`xxhash`](https://xxhash.com/). I need to elaborate on this, imagine while the
+   WAL was writing to the disk there is power outage and some bytes have been
+   written to the disk, this scenario is what we called `Partial Write` it means
+   the state was not successfully committed and the way know about this is by
+   re-computing the checksum of the data read from disk and comparing it to what
+   was written into disk. The function of checksum is seen while `Replaying`
+   entries during _recovery_. To understand this more, let's look at WAL Recovery
 
 ```go title="entry.go"
 package entry
@@ -274,7 +285,7 @@ simple.
 2. Perform a validation check on each entry. If we get an entry that is
    corrupted, we truncate that entry and all entries after this; this process
    helps to guard the state of the database
-against corruption.
+   against corruption.
 3. For each valid entry construct the `memtables` and when the `memtables` are
    full flush them to disk (SSTables).
 
@@ -354,27 +365,27 @@ There are 3 major bottlenecks a WAL goes through
    can reduce the lifespan of the underlying hardware. lets take count of
    everywhere a write takes place
 
-   * client to WAL buffer -> not costly
+    - client to WAL buffer -> not costly
 
-   * WAL buffer to disk -> costly
+    - WAL buffer to disk -> costly
 
-   * WAL to memtables -> not costly
+    - WAL to memtables -> not costly
 
-   * memtables to sstable -> costly (but happens asynchronously in most designs)
+    - memtables to sstable -> costly (but happens asynchronously in most designs)
 
 For every write we have at least 2 costly write operations, this leads to
 [I/O Amplification](https://en.wikipedia.org/wiki/Write_amplification). Ways
 this can be handled
 
-* write changes in batch (`group commit`),
-* compress the WAL binary before flushing to disk; this comes with a cost on CPU
+- write changes in batch (`group commit`),
+- compress the WAL binary before flushing to disk; this comes with a cost on CPU
   during compression.
   [Rock's db compression design](https://github.com/facebook/rocksdb/wiki/WAL-Compression)
 
 2. **Slow Flushing**: since WAL lives in memory, during flushing to disk if it
    is not fast enough, WAL can consume memory space and lead to `OOM` error
    (out-of-memory), this is why most databases
-give tunable variables (like knobs) to control how often flushing happens.
+   give tunable variables (like knobs) to control how often flushing happens.
 
 3. **Full disk**: in the scenario where we don't have space on disk what
    happens? An ACID compliant database would crash instead of accepting another

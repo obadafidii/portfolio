@@ -5,7 +5,9 @@ import { useTheme } from 'next-themes';
 
 const readVar = (name: string, fallback: string) => {
     if (typeof window === 'undefined') return fallback;
-    const value = getComputedStyle(document.documentElement).getPropertyValue(name);
+    const value = getComputedStyle(document.documentElement).getPropertyValue(
+        name,
+    );
     return value.trim() || fallback;
 };
 

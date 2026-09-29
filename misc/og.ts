@@ -1,4 +1,4 @@
-import info from "./info";
+import info from './info';
 
 const ogImageUrl = new URL(`${info.url}/api/og`);
 

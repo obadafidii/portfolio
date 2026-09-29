@@ -16,7 +16,8 @@ const CROSS_REF: Record<string, string> = {
     contact: '/contact',
 };
 
-const isInternal = (href: string) => href.startsWith('/') || href.startsWith('#');
+const isInternal = (href: string) =>
+    href.startsWith('/') || href.startsWith('#');
 
 const styleFor = (segment: Inline): CSSProperties => ({
     color: segment.bold ? 'var(--paper-bright)' : undefined,
@@ -35,12 +36,17 @@ const Segments = ({ content }: { content: Inline[] }) => (
                         key={idx}
                         href={segment.href}
                         target={
-                            external && !segment.href.startsWith('mailto:') ? '_blank' : undefined
+                            external && !segment.href.startsWith('mailto:')
+                                ? '_blank'
+                                : undefined
                         }
                         rel={external ? 'noopener noreferrer' : undefined}
                         data-href={segment.href}
                         className="resume-link underline decoration-dotted underline-offset-[3px] hover:decoration-solid"
-                        style={{ ...styleFor(segment), color: 'var(--term-blue)' }}
+                        style={{
+                            ...styleFor(segment),
+                            color: 'var(--term-blue)',
+                        }}
                     >
                         {segment.label}
                     </a>
@@ -72,25 +78,30 @@ const Segments = ({ content }: { content: Inline[] }) => (
 const CrossRefs = ({ content }: { content: Inline[] }) => (
     <>
         {content.map((segment, idx) => {
-            if (segment.type === 'link') return <Segments key={idx} content={[segment]} />;
+            if (segment.type === 'link')
+                return <Segments key={idx} content={[segment]} />;
 
             return (
                 <span key={idx}>
-                    {segment.value.split(/(\b[a-z]+\(\d\))/g).map((part, partIdx) => {
-                        const match = part.match(/^([a-z]+)\((\d)\)$/);
-                        const href = match ? CROSS_REF[match[1]] : undefined;
-                        if (!href) return <span key={partIdx}>{part}</span>;
-                        return (
-                            <a
-                                key={partIdx}
-                                href={href}
-                                className="hover:underline"
-                                style={{ color: 'var(--term-blue)' }}
-                            >
-                                {part}
-                            </a>
-                        );
-                    })}
+                    {segment.value
+                        .split(/(\b[a-z]+\(\d\))/g)
+                        .map((part, partIdx) => {
+                            const match = part.match(/^([a-z]+)\((\d)\)$/);
+                            const href = match
+                                ? CROSS_REF[match[1]]
+                                : undefined;
+                            if (!href) return <span key={partIdx}>{part}</span>;
+                            return (
+                                <a
+                                    key={partIdx}
+                                    href={href}
+                                    className="hover:underline"
+                                    style={{ color: 'var(--term-blue)' }}
+                                >
+                                    {part}
+                                </a>
+                            );
+                        })}
                 </span>
             );
         })}
@@ -109,7 +120,13 @@ const Leader = () => (
 
 const MARKERS = ['·', '–', '·', '–'];
 
-const BlockView = ({ block, sectionName }: { block: Block; sectionName: string }) => {
+const BlockView = ({
+    block,
+    sectionName,
+}: {
+    block: Block;
+    sectionName: string;
+}) => {
     switch (block.type) {
         case 'entry': {
             const isSub = block.level > 3;
@@ -117,11 +134,17 @@ const BlockView = ({ block, sectionName }: { block: Block; sectionName: string }
                 <div className={isSub ? 'mt-2' : 'mt-3'}>
                     <div
                         className="flex flex-wrap items-baseline"
-                        style={{ paddingLeft: isSub ? 'var(--indent-2)' : 'var(--indent)' }}
+                        style={{
+                            paddingLeft: isSub
+                                ? 'var(--indent-2)'
+                                : 'var(--indent)',
+                        }}
                     >
                         <span
                             style={{
-                                color: isSub ? 'var(--paper-ink)' : 'var(--paper-bright)',
+                                color: isSub
+                                    ? 'var(--paper-ink)'
+                                    : 'var(--paper-bright)',
                             }}
                         >
                             <Segments content={block.title} />
@@ -138,7 +161,11 @@ const BlockView = ({ block, sectionName }: { block: Block; sectionName: string }
                     {block.subtitle && (
                         <div
                             className="ink-muted text-[12.5px] italic"
-                            style={{ paddingLeft: isSub ? 'var(--indent-2)' : 'var(--indent)' }}
+                            style={{
+                                paddingLeft: isSub
+                                    ? 'var(--indent-2)'
+                                    : 'var(--indent)',
+                            }}
                         >
                             <Segments content={block.subtitle} />
                         </div>
@@ -156,7 +183,9 @@ const BlockView = ({ block, sectionName }: { block: Block; sectionName: string }
                     }}
                 >
                     <span className="ink-faint shrink-0">
-                        {block.ordered ? block.marker : MARKERS[block.depth % MARKERS.length]}
+                        {block.ordered
+                            ? block.marker
+                            : MARKERS[block.depth % MARKERS.length]}
                     </span>
                     <span>
                         <Segments content={block.content} />
@@ -167,7 +196,9 @@ const BlockView = ({ block, sectionName }: { block: Block; sectionName: string }
         case 'row':
             return (
                 <div className="indent flex flex-wrap gap-x-3">
-                    <span className="ink-faint w-[13ch] shrink-0">{block.key}</span>
+                    <span className="ink-faint w-[13ch] shrink-0">
+                        {block.key}
+                    </span>
                     <span style={{ color: 'var(--paper-ink)' }}>
                         <Segments content={block.value} />
                     </span>
@@ -184,7 +215,10 @@ const BlockView = ({ block, sectionName }: { block: Block; sectionName: string }
                                     <th
                                         key={idx}
                                         className="ink-faint border-b pr-6 pb-1 font-normal"
-                                        style={{ borderColor: 'var(--paper-line-strong)' }}
+                                        style={{
+                                            borderColor:
+                                                'var(--paper-line-strong)',
+                                        }}
                                     >
                                         <Segments content={cell} />
                                     </th>
@@ -200,7 +234,9 @@ const BlockView = ({ block, sectionName }: { block: Block; sectionName: string }
                                             className="ink-muted pr-6 align-top"
                                             style={{
                                                 color:
-                                                    cellIdx === 0 ? 'var(--paper-ink)' : undefined,
+                                                    cellIdx === 0
+                                                        ? 'var(--paper-ink)'
+                                                        : undefined,
                                             }}
                                         >
                                             <Segments content={cell} />
@@ -224,7 +260,12 @@ const BlockView = ({ block, sectionName }: { block: Block; sectionName: string }
             );
 
         case 'rule':
-            return <hr className="indent my-3" style={{ borderColor: 'var(--paper-line)' }} />;
+            return (
+                <hr
+                    className="indent my-3"
+                    style={{ borderColor: 'var(--paper-line)' }}
+                />
+            );
 
         default:
             return (
@@ -242,7 +283,9 @@ const BlockView = ({ block, sectionName }: { block: Block; sectionName: string }
 const Section = ({ section }: { section: ResumeSection }) => (
     <section className="mt-6">
         {section.name && (
-            <h2 className="ink-muted text-[12.5px] tracking-[0.08em]">{section.name}</h2>
+            <h2 className="ink-muted text-[12.5px] tracking-[0.08em]">
+                {section.name}
+            </h2>
         )}
         <div className="mt-1">
             {section.blocks.map((block, idx) => (
@@ -252,7 +295,15 @@ const Section = ({ section }: { section: ResumeSection }) => (
     </section>
 );
 
-const RunningLine = ({ left, middle, right }: { left: string; middle: string; right: string }) => (
+const RunningLine = ({
+    left,
+    middle,
+    right,
+}: {
+    left: string;
+    middle: string;
+    right: string;
+}) => (
     <div className="ink-faint flex flex-wrap gap-x-4 text-[11px]">
         <span>{left}</span>
         <span className="mx-auto hidden sm:inline">{middle}</span>
@@ -264,7 +315,9 @@ const RunningLine = ({ left, middle, right }: { left: string; middle: string; ri
 
 export const ManPageContent = ({ resume }: { resume: Resume }) => {
     useEffect(() => {
-        setResumeSections(resume.sections.map(section => section.name).filter(Boolean));
+        setResumeSections(
+            resume.sections.map(section => section.name).filter(Boolean),
+        );
     }, [resume]);
 
     const short = resume.name.split(' ')[0] || 'david';
@@ -285,13 +338,25 @@ export const ManPageContent = ({ resume }: { resume: Resume }) => {
                 </div>
 
                 <article className="manpage mt-4">
-                    <div className="border-b pb-2" style={{ borderColor: 'var(--paper-line)' }}>
-                        <RunningLine left={title} middle="User Commands" right={title} />
+                    <div
+                        className="border-b pb-2"
+                        style={{ borderColor: 'var(--paper-line)' }}
+                    >
+                        <RunningLine
+                            left={title}
+                            middle="User Commands"
+                            right={title}
+                        />
                     </div>
 
                     <section className="mt-5">
-                        <h2 className="ink-muted text-[12.5px] tracking-[0.08em]">NAME</h2>
-                        <p className="indent mt-1" style={{ color: 'var(--paper-bright)' }}>
+                        <h2 className="ink-muted text-[12.5px] tracking-[0.08em]">
+                            NAME
+                        </h2>
+                        <p
+                            className="indent mt-1"
+                            style={{ color: 'var(--paper-bright)' }}
+                        >
                             {short.toLowerCase()}
                             {resume.tagline.length > 0 && (
                                 <span className="ink-muted">
@@ -303,7 +368,10 @@ export const ManPageContent = ({ resume }: { resume: Resume }) => {
                     </section>
 
                     {resume.sections.map((section, idx) => (
-                        <Section key={`${section.name}-${idx}`} section={section} />
+                        <Section
+                            key={`${section.name}-${idx}`}
+                            section={section}
+                        />
                     ))}
 
                     <div
@@ -319,7 +387,8 @@ export const ManPageContent = ({ resume }: { resume: Resume }) => {
                 </article>
 
                 <p className="ink-faint mt-6 text-[11px]">
-                    open --resume for the pdf · ⌘P prints a plain copy with URLs expanded
+                    open --resume for the pdf · ⌘P prints a plain copy with URLs
+                    expanded
                 </p>
             </div>
         </CommandLine>
@@ -335,7 +404,9 @@ export const ManPage = ({ resume }: { resume: Resume }) => (
                 <a href="/resume.pdf" style={{ color: 'var(--term-blue)' }}>
                     pdf
                 </a>
-                <span className="hidden sm:inline">{resume.sections.length} sections</span>
+                <span className="hidden sm:inline">
+                    {resume.sections.length} sections
+                </span>
             </>
         }
     >

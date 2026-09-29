@@ -20,7 +20,8 @@ export const PipelineRobots = () => {
     const [tick, setTick] = useState(0);
     const [running, setRunning] = useState(false);
 
-    const maxTicks = mode === 'serial' ? INSTRUCTIONS.length * STAGES.length : 6;
+    const maxTicks =
+        mode === 'serial' ? INSTRUCTIONS.length * STAGES.length : 6;
 
     useEffect(() => {
         if (!running) return;
@@ -52,7 +53,9 @@ export const PipelineRobots = () => {
                 if (mode === 'serial') {
                     const activeStage = (tick - 1) % STAGES.length;
                     const instruction = Math.floor((tick - 1) / STAGES.length);
-                    return stageIndex === activeStage ? (INSTRUCTIONS[instruction] ?? null) : null;
+                    return stageIndex === activeStage
+                        ? (INSTRUCTIONS[instruction] ?? null)
+                        : null;
                 }
 
                 const instruction = tick - 1 - stageIndex;
@@ -97,14 +100,24 @@ export const PipelineRobots = () => {
             caption="fig 1 — compare one robot doing every job with three specialist robots working as a pipeline. after the pipeline fills, one instruction completes on each tick."
             controls={
                 <>
-                    <Button onClick={() => chooseMode('serial')} active={mode === 'serial'}>
+                    <Button
+                        onClick={() => chooseMode('serial')}
+                        active={mode === 'serial'}
+                    >
                         one robot
                     </Button>
-                    <Button onClick={() => chooseMode('pipeline')} active={mode === 'pipeline'}>
+                    <Button
+                        onClick={() => chooseMode('pipeline')}
+                        active={mode === 'pipeline'}
+                    >
                         three-robot pipeline
                     </Button>
                     <Button onClick={toggleRunning} active={running}>
-                        {running ? 'pause' : tick >= maxTicks ? 'replay' : 'run'}
+                        {running
+                            ? 'pause'
+                            : tick >= maxTicks
+                              ? 'replay'
+                              : 'run'}
                     </Button>
                     <Button onClick={step}>one tick</Button>
                     <Button
@@ -123,34 +136,59 @@ export const PipelineRobots = () => {
                     <Metric label="clock" value={`tick ${tick}`} />
                     <Metric
                         label="design"
-                        value={mode === 'serial' ? '1 robot · 3 jobs' : '3 robots · 1 job each'}
+                        value={
+                            mode === 'serial'
+                                ? '1 robot · 3 jobs'
+                                : '3 robots · 1 job each'
+                        }
                     />
-                    <Metric label="completed" value={`${completed} / ${INSTRUCTIONS.length}`} />
+                    <Metric
+                        label="completed"
+                        value={`${completed} / ${INSTRUCTIONS.length}`}
+                    />
                 </div>
 
                 <div className={styles.track}>
                     {STAGES.map((stage, stageIndex) => {
                         const occupant = occupants[stageIndex];
-                        const showRobot = mode === 'pipeline' || Boolean(occupant);
+                        const showRobot =
+                            mode === 'pipeline' || Boolean(occupant);
 
                         return (
                             <div
                                 key={stage.name}
                                 className={`${styles.stage} ${occupant ? styles.stageActive : ''}`}
-                                style={{ '--stage-color': stage.color } as React.CSSProperties}
+                                style={
+                                    {
+                                        '--stage-color': stage.color,
+                                    } as React.CSSProperties
+                                }
                             >
                                 <div className={styles.stageHead}>
-                                    <span className={styles.stageIndex}>0{stageIndex + 1}</span>
-                                    <span className={styles.stageName}>{stage.name}</span>
+                                    <span className={styles.stageIndex}>
+                                        0{stageIndex + 1}
+                                    </span>
+                                    <span className={styles.stageName}>
+                                        {stage.name}
+                                    </span>
                                 </div>
                                 <div className={styles.stageBody}>
-                                    <div className={styles.robotBay} aria-hidden="true">
-                                        {showRobot ? <Robot working={Boolean(occupant)} /> : null}
+                                    <div
+                                        className={styles.robotBay}
+                                        aria-hidden="true"
+                                    >
+                                        {showRobot ? (
+                                            <Robot
+                                                working={Boolean(occupant)}
+                                            />
+                                        ) : null}
                                     </div>
                                     <div
                                         className={`${styles.packet} ${occupant ? styles.packetActive : ''}`}
                                     >
-                                        {occupant ? `${occupant} · ${stage.name}` : 'idle'}
+                                        {occupant
+                                            ? `${occupant} · ${stage.name}`
+                                            : 'idle'}
                                     </div>
                                 </div>
                             </div>

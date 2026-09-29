@@ -1,18 +1,14 @@
 export const post = {
-    "title": "CPU Pipelining, Explained with Robots",
-    "summary": "A visual explanation of how a CPU overlaps fetch, decode, and execute so that one instruction can finish on almost every clock tick.",
-    "publishedOn": "2026-08-26T09:00:00.000Z",
-    "tags": [
-        "computer-architecture",
-        "cpu",
-        "pipelining",
-        "performance"
-    ],
-    "status": "done",
-    "coverImage": {
-        "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790165232/portfolio/blog/cpu-pipelining-cover.webp",
-        "alt": "Industrial robots working along an automated factory conveyor"
-    }
+    title: 'CPU Pipelining, Explained with Robots',
+    summary:
+        'A visual explanation of how a CPU overlaps fetch, decode, and execute so that one instruction can finish on almost every clock tick.',
+    publishedOn: '2026-08-26T09:00:00.000Z',
+    tags: ['computer-architecture', 'cpu', 'pipelining', 'performance'],
+    status: 'done',
+    coverImage: {
+        src: 'https://res.cloudinary.com/cloudlord/image/upload/v1790165232/portfolio/blog/cpu-pipelining-cover.webp',
+        alt: 'Industrial robots working along an automated factory conveyor',
+    },
 };
 
 import { PipelineRobots } from '@/components/ui/blog/cpu-pipelining/PipelineRobots';
@@ -33,7 +29,13 @@ stages:
 Real processors split this work into more stages, but these three are enough to
 see the idea behind pipelining.
 
-<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165232/portfolio/blog/cpu-pipelining-cover.webp" alt="Industrial robots working along an automated factory conveyor" width={1800} height={1010} caption="An automated factory line makes the pipeline metaphor literal. Photo by Simon Kadula on Unsplash." />
+<ArticleImage
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790165232/portfolio/blog/cpu-pipelining-cover.webp"
+    alt="Industrial robots working along an automated factory conveyor"
+    width={1800}
+    height={1010}
+    caption="An automated factory line makes the pipeline metaphor literal. Photo by Simon Kadula on Unsplash."
+/>
 
 Photo: [Simon Kadula](https://unsplash.com/@simonkadula) ·
 [view the original on Unsplash](https://unsplash.com/photos/8gr6bObQLOI) · free

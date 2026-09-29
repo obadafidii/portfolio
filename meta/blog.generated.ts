@@ -91,7 +91,7 @@ export const blogMetadata: Record<string, BlogMetadata> = {
             "libc",
             "open-source"
         ],
-        "status": "draft"
+        "status": "done"
     },
     "log/part-1-introduction": {
         "title": "Understanding Log: Introduction",

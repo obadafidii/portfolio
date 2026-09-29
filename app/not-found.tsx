@@ -34,54 +34,62 @@ const NotFoundPage = () => {
                     <span className="term-dot" />
                     <span className="term-dot" />
                 </div>
-                <span className="ink-faint text-[11px]">david@obadafidi — zsh</span>
+                <span className="ink-faint text-[11px]">
+                    david@obadafidi — zsh
+                </span>
             </header>
 
             <main className="term-content">
                 <CommandLine cwd="~">
-                <div className="flex flex-wrap items-baseline gap-x-2">
-                    <Prompt cwd="~" />
-                    <span className="term-cmd">cd {pathname}</span>
-                </div>
-
-                <p className="term-err mt-1">
-                    cd: no such file or directory: {pathname}
-                </p>
-
-                <p className="ink-faint mt-1">
-                    did you mean{' '}
-                    <Link
-                        href={suggestion.href}
-                        className="underline"
-                        style={{ color: 'var(--term-blue)' }}
-                    >
-                        {suggestion.name}
-                    </Link>
-                    ?
-                </p>
-
-                <div className="mt-8">
                     <div className="flex flex-wrap items-baseline gap-x-2">
                         <Prompt cwd="~" />
-                        <span className="term-cmd">ls</span>
+                        <span className="term-cmd">cd {pathname}</span>
                     </div>
-                    <div className="mt-1 space-y-0.5">
-                        {ROUTES.map(route => (
-                            <Link key={route.href} href={route.href} className="term-row group">
-                                <span className="ink-faint w-[11ch] shrink-0">drwxr-xr-x</span>
-                                <span
-                                    className="group-hover:underline"
-                                    style={{ color: 'var(--term-blue)' }}
+
+                    <p className="term-err mt-1">
+                        cd: no such file or directory: {pathname}
+                    </p>
+
+                    <p className="ink-faint mt-1">
+                        did you mean{' '}
+                        <Link
+                            href={suggestion.href}
+                            className="underline"
+                            style={{ color: 'var(--term-blue)' }}
+                        >
+                            {suggestion.name}
+                        </Link>
+                        ?
+                    </p>
+
+                    <div className="mt-8">
+                        <div className="flex flex-wrap items-baseline gap-x-2">
+                            <Prompt cwd="~" />
+                            <span className="term-cmd">ls</span>
+                        </div>
+                        <div className="mt-1 space-y-0.5">
+                            {ROUTES.map(route => (
+                                <Link
+                                    key={route.href}
+                                    href={route.href}
+                                    className="term-row group"
                                 >
-                                    {route.name}/
-                                </span>
-                                <span className="ink-muted ml-auto text-[11px]">
-                                    {route.note}
-                                </span>
-                            </Link>
-                        ))}
+                                    <span className="ink-faint w-[11ch] shrink-0">
+                                        drwxr-xr-x
+                                    </span>
+                                    <span
+                                        className="group-hover:underline"
+                                        style={{ color: 'var(--term-blue)' }}
+                                    >
+                                        {route.name}/
+                                    </span>
+                                    <span className="ink-muted ml-auto text-[11px]">
+                                        {route.note}
+                                    </span>
+                                </Link>
+                            ))}
+                        </div>
                     </div>
-                </div>
                 </CommandLine>
             </main>
 

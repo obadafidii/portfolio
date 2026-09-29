@@ -13,29 +13,36 @@ export function PostReactions({ postKey }: { postKey: string }) {
     const requestVersion = useRef(0);
     const endpoint = `/api/reactions/${postKey.split('/').map(encodeURIComponent).join('/')}`;
 
-    const load = useCallback(async (signal?: AbortSignal) => {
-        const version = ++requestVersion.current;
-        try {
-            const response = await fetch(endpoint, { cache: 'no-store', signal });
-            if (!response.ok) throw new Error();
-            const next: ReactionState = await response.json();
-            if (!signal?.aborted && version === requestVersion.current) {
-                setState(next);
-                setMessage('');
+    const load = useCallback(
+        async (signal?: AbortSignal) => {
+            const version = ++requestVersion.current;
+            try {
+                const response = await fetch(endpoint, {
+                    cache: 'no-store',
+                    signal,
+                });
+                if (!response.ok) throw new Error();
+                const next: ReactionState = await response.json();
+                if (!signal?.aborted && version === requestVersion.current) {
+                    setState(next);
+                    setMessage('');
+                }
+            } catch {
+                if (!signal?.aborted && version === requestVersion.current) {
+                    setMessage('Reactions are unavailable right now.');
+                }
             }
-        } catch {
-            if (!signal?.aborted && version === requestVersion.current) {
-                setMessage('Reactions are unavailable right now.');
-            }
-        }
-    }, [endpoint]);
+        },
+        [endpoint],
+    );
 
     useEffect(() => {
         const controller = new AbortController();
         void load(controller.signal);
         // Refresh shared totals when a reader returns to the article.
         const refresh = () => {
-            if (!document.hidden && !inFlight.current) void load(controller.signal);
+            if (!document.hidden && !inFlight.current)
+                void load(controller.signal);
         };
         document.addEventListener('visibilitychange', refresh);
         return () => {
@@ -58,11 +65,16 @@ export function PostReactions({ postKey }: { postKey: string }) {
                 body: JSON.stringify({ reaction }),
             });
             const body = await response.json();
-            if (!response.ok) throw new Error(body.error || 'Could not save your reaction.');
+            if (!response.ok)
+                throw new Error(body.error || 'Could not save your reaction.');
             setState(body);
             setMessage(reaction ? 'Thanks for reading!' : 'Reaction removed.');
         } catch (error) {
-            setMessage(error instanceof Error ? error.message : 'Could not save your reaction. Try again.');
+            setMessage(
+                error instanceof Error
+                    ? error.message
+                    : 'Could not save your reaction. Try again.',
+            );
         } finally {
             inFlight.current = false;
             setBusy(false);
@@ -70,7 +82,11 @@ export function PostReactions({ postKey }: { postKey: string }) {
     };
 
     return (
-        <section className={styles.reactions} aria-label="React to this article" aria-busy={busy}>
+        <section
+            className={styles.reactions}
+            aria-label="React to this article"
+            aria-busy={busy}
+        >
             <span className={styles.label}>Enjoyed this article?</span>
             <div className={styles.buttons}>
                 {(['like', 'love'] as const).map(choice => {
@@ -85,16 +101,29 @@ export function PostReactions({ postKey }: { postKey: string }) {
                             disabled={busy || !state}
                             onClick={() => void react(choice)}
                         >
-                            <Icon size={18} weight={selected ? 'fill' : 'regular'} aria-hidden="true" />
+                            <Icon
+                                size={18}
+                                weight={selected ? 'fill' : 'regular'}
+                                aria-hidden="true"
+                            />
                             {choice === 'like' ? 'Like' : 'Love'}
-                            <span className={styles.count}>{state ? state[choice].toLocaleString() : '—'}</span>
+                            <span className={styles.count}>
+                                {state ? state[choice].toLocaleString() : '—'}
+                            </span>
                         </button>
                     );
                 })}
             </div>
             <div className={styles.status} role="status" aria-live="polite">
-                {message || (state ? 'One reaction per reader. Tap again to undo.' : 'Loading reactions…')}
-                {!state && message && <button type="button" onClick={() => void load()}>Retry</button>}
+                {message ||
+                    (state
+                        ? 'One reaction per reader. Tap again to undo.'
+                        : 'Loading reactions…')}
+                {!state && message && (
+                    <button type="button" onClick={() => void load()}>
+                        Retry
+                    </button>
+                )}
             </div>
         </section>
     );

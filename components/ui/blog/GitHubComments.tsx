@@ -8,7 +8,8 @@ import styles from './GitHubComments.module.css';
 const REPOSITORY = 'obadafidii/portfolio';
 const REPOSITORY_ID = 'R_kgDOOxqf3g';
 const CATEGORY = process.env.NEXT_PUBLIC_GISCUS_CATEGORY ?? 'General';
-const CATEGORY_ID = process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID || 'DIC_kwDOOxqf3s4DGGuO';
+const CATEGORY_ID =
+    process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID || 'DIC_kwDOOxqf3s4DGGuO';
 
 export function GitHubComments({ postKey }: { postKey: string }) {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -53,10 +54,14 @@ export function GitHubComments({ postKey }: { postKey: string }) {
         script.dataset.reactionsEnabled = '1';
         script.dataset.emitMetadata = '0';
         script.dataset.inputPosition = 'top';
-        const themeFile = resolvedTheme === 'light' ? 'giscus-light.css' : 'giscus-dark.css';
-        script.dataset.theme = window.location.protocol === 'https:'
-            ? new URL(`/${themeFile}`, window.location.origin).href
-            : resolvedTheme === 'light' ? 'light' : 'transparent_dark';
+        const themeFile =
+            resolvedTheme === 'light' ? 'giscus-light.css' : 'giscus-dark.css';
+        script.dataset.theme =
+            window.location.protocol === 'https:'
+                ? new URL(`/${themeFile}`, window.location.origin).href
+                : resolvedTheme === 'light'
+                  ? 'light'
+                  : 'transparent_dark';
         script.dataset.lang = 'en';
         container.replaceChildren(script);
 
@@ -64,7 +69,10 @@ export function GitHubComments({ postKey }: { postKey: string }) {
     }, [nearViewport, postKey, resolvedTheme]);
 
     return (
-        <section className={styles.comments} aria-labelledby={`comments-${postKey}`}>
+        <section
+            className={styles.comments}
+            aria-labelledby={`comments-${postKey}`}
+        >
             <header className={styles.header}>
                 <div>
                     <h2 id={`comments-${postKey}`}>Comments</h2>

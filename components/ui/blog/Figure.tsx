@@ -30,7 +30,10 @@ export const Figure = ({ caption, children, controls }: FigureProps) => (
         </div>
         <figcaption
             className="mt-2 text-[12px]"
-            style={{ color: 'var(--paper-faint)', fontFamily: 'var(--font-mono)' }}
+            style={{
+                color: 'var(--paper-faint)',
+                fontFamily: 'var(--font-mono)',
+            }}
         >
             {caption}
         </figcaption>
@@ -52,7 +55,9 @@ export const Button = ({
         className="cursor-pointer rounded-[4px] border px-3 py-1.5 text-[12px] transition-colors"
         style={{
             fontFamily: 'var(--font-mono)',
-            borderColor: active ? 'var(--term-blue)' : 'var(--paper-line-strong)',
+            borderColor: active
+                ? 'var(--term-blue)'
+                : 'var(--paper-line-strong)',
             color: active ? 'var(--term-blue)' : 'var(--paper-muted)',
             background: 'transparent',
         }}

@@ -4,7 +4,10 @@ import { isCloudinaryImage, resolveBlogImage } from '@/lib/cloudinary';
 export const runtime = 'nodejs';
 
 /** Serve a small, standard-format preview without depending on an image optimizer URL. */
-export async function GET(_request: Request, { params }: { params: Promise<{ slug: string[] }> }) {
+export async function GET(
+    _request: Request,
+    { params }: { params: Promise<{ slug: string[] }> },
+) {
     const post = getBlogMetadata((await params).slug.join('/'));
     const src = post?.coverImage?.src;
     if (!src || !isCloudinaryImage(src)) {

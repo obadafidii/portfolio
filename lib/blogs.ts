@@ -2,15 +2,17 @@ import { blogMetadata, blogSeries } from '@/meta/blog.meta';
 import type { BlogMetadata } from '@/types/blog.type';
 
 /** A post body is only public after its author marks it done. */
-export const isReadable = (blog: Pick<BlogMetadata, 'status'>) => blog.status === 'done';
+export const isReadable = (blog: Pick<BlogMetadata, 'status'>) =>
+    blog.status === 'done';
 
 const asListing = (entries: Record<string, BlogMetadata>) =>
     Object.entries(entries)
         .map(([key, meta]) => ({ ...meta, slug: key }))
-        .sort((a, b) =>
-            Date.parse(b.publishedOn) - Date.parse(a.publishedOn)
-            || (a.series === b.series ? (b.part ?? 0) - (a.part ?? 0) : 0)
-            || a.slug.localeCompare(b.slug),
+        .sort(
+            (a, b) =>
+                Date.parse(b.publishedOn) - Date.parse(a.publishedOn) ||
+                (a.series === b.series ? (b.part ?? 0) - (a.part ?? 0) : 0) ||
+                a.slug.localeCompare(b.slug),
         );
 
 /** Every article and series part appears directly in the main blog list. */
@@ -38,7 +40,11 @@ export const getPostKey = (pathname: string) => {
 };
 
 export const blogStatusLabel = (status: BlogMetadata['status']) =>
-    status === 'done' ? 'published' : status === 'in-progress' ? 'in progress' : 'draft';
+    status === 'done'
+        ? 'published'
+        : status === 'in-progress'
+          ? 'in progress'
+          : 'draft';
 
 /**
  * Page metadata for a post.
@@ -47,13 +53,17 @@ export const blogStatusLabel = (status: BlogMetadata['status']) =>
  * answer 200 — so they must be explicitly noindex, or crawlers will index a
  * page whose only content is "this is not finished".
  */
-export const buildPostMetadata = (key: string, site: { me: string; icon: string }) => {
+export const buildPostMetadata = (
+    key: string,
+    site: { me: string; icon: string },
+) => {
     // Former series overview URLs redirect to the main blog list.
-    if (getBlogSeries(key)) return {
-        title: site.me,
-        alternates: { canonical: '/blog' },
-        robots: { index: false, follow: true },
-    };
+    if (getBlogSeries(key))
+        return {
+            title: site.me,
+            alternates: { canonical: '/blog' },
+            robots: { index: false, follow: true },
+        };
     const blog = getBlogMetadata(key);
 
     if (!blog) return { title: site.me };
@@ -65,7 +75,9 @@ export const buildPostMetadata = (key: string, site: { me: string; icon: string 
         type: 'article',
         v: '2',
     })}`;
-    const socialImage = blog.coverImage ? `/api/blog-image/${key}?v=2` : generatedImage;
+    const socialImage = blog.coverImage
+        ? `/api/blog-image/${key}?v=2`
+        : generatedImage;
     const canonicalUrl = `/blog/${key}`;
 
     return {
@@ -100,6 +112,10 @@ export const buildPostMetadata = (key: string, site: { me: string; icon: string 
         },
         robots: published
             ? undefined
-            : { index: false, follow: false, googleBot: { index: false, follow: false } },
+            : {
+                  index: false,
+                  follow: false,
+                  googleBot: { index: false, follow: false },
+              },
     };
 };

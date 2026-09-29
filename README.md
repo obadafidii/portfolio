@@ -131,9 +131,17 @@ Copy the Cloudinary variables from `.env.example` into `.env.local`. Get
 commit it or expose the API secret through a `NEXT_PUBLIC_` variable. Add the
 same variables to the production deployment environment.
 
+Keep image originals in `local-images/blog`, which is ignored by Git and sits
+outside `public` so originals are not included in deployments. The upload command
+creates this directory when needed; a fresh clone contains no original images.
+
 Run `npm run images:upload:dry-run` to inspect the local-to-Cloudinary mapping,
-then run `npm run images:upload` to upload or replace every image in
-`public/image`. Assets use stable IDs under `portfolio/blog`, so rerunning the
-command updates them without creating duplicates. Keep the local directory as
-the editable source for future uploads; production requests use the versioned
-Cloudinary URLs stored in the articles.
+then run `npm run images:upload` to upload or replace the images in that directory.
+Assets use stable IDs under `portfolio/blog`, so rerunning the command updates
+them without creating duplicates. Copy the returned versioned URLs into article
+sources and cover metadata. Verify those URLs before removing your local copies.
+
+The unused former avatar is archived locally in `local-images/unused`; it is not
+included in blog uploads. Keep public images out of the repository; the site's
+favicon remains in `app/icon.svg`. Removing tracked images does not remove their
+copies from older Git commits.

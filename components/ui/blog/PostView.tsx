@@ -12,7 +12,12 @@ import { PostContent } from './PostContent.generated';
 import { PostNavigation } from './PostNavigation';
 import { PostReactions } from './PostReactions';
 import { GitHubComments } from './GitHubComments';
-import { blogStatusLabel, getBlogMetadata, getReadableBlogs, isReadable } from '@/lib/blogs';
+import {
+    blogStatusLabel,
+    getBlogMetadata,
+    getReadableBlogs,
+    isReadable,
+} from '@/lib/blogs';
 import '@/app/code.css';
 
 export function PostView({ postKey }: { postKey: string }) {
@@ -36,21 +41,37 @@ export function PostView({ postKey }: { postKey: string }) {
     }
 
     return (
-        <TerminalWindow currentPage="blog" path={`~/writing/${file}`} status={
-            <>
-                <PagerProgress />
-                <Link href="/blog" style={{ color: 'var(--term-blue)' }}>q · back to ~/writing</Link>
-            </>
-        }>
+        <TerminalWindow
+            currentPage="blog"
+            path={`~/writing/${file}`}
+            status={
+                <>
+                    <PagerProgress />
+                    <Link href="/blog" style={{ color: 'var(--term-blue)' }}>
+                        q · back to ~/writing
+                    </Link>
+                </>
+            }
+        >
             <article className="blog-article">
                 <header className="pager-head">
-                    <span className="ink-faint">{new Date(blog.publishedOn).toISOString().slice(0, 10)}</span>
-                    <span style={{ color: 'var(--paper-bright)' }}>{blog.title}</span>
+                    <span className="ink-faint">
+                        {new Date(blog.publishedOn).toISOString().slice(0, 10)}
+                    </span>
+                    <span style={{ color: 'var(--paper-bright)' }}>
+                        {blog.title}
+                    </span>
                     <span style={{ color: 'var(--term-green)' }}>
                         [{blogStatusLabel(blog.status)}]
                     </span>
-                    <ShareBar title={blog.title} summary={blog.summary} path={`/blog/${postKey}`} />
-                    <span className="ink-faint ml-auto hidden text-[11px] sm:inline">{blog.tags.join(' · ')}</span>
+                    <ShareBar
+                        title={blog.title}
+                        summary={blog.summary}
+                        path={`/blog/${postKey}`}
+                    />
+                    <span className="ink-faint ml-auto hidden text-[11px] sm:inline">
+                        {blog.tags.join(' · ')}
+                    </span>
                 </header>
 
                 {navigation}
@@ -58,7 +79,10 @@ export function PostView({ postKey }: { postKey: string }) {
                     <div ref={contentRef} className="pager-body pager-prose">
                         <PostContent postKey={postKey} />
                         <PostReactions key={postKey} postKey={postKey} />
-                        <GitHubComments key={`comments-${postKey}`} postKey={postKey} />
+                        <GitHubComments
+                            key={`comments-${postKey}`}
+                            postKey={postKey}
+                        />
                     </div>
                     <TableOfContents contentRef={contentRef} />
                 </div>

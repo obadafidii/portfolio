@@ -21,6 +21,9 @@ next.config.compiled.js
 # production
 /build
 
+# Local image originals; published assets are served by Cloudinary.
+/local-images/
+
 # misc
 .DS_Store
 *.pem

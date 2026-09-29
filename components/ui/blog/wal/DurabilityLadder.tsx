@@ -5,7 +5,13 @@ import { Button, Figure } from '../Figure';
 
 type Mode = 'none' | 'write' | 'fsync' | 'group';
 
-const MODES: { id: Mode; label: string; survives: string; cost: string; detail: string }[] = [
+const MODES: {
+    id: Mode;
+    label: string;
+    survives: string;
+    cost: string;
+    detail: string;
+}[] = [
     {
         id: 'none',
         label: 'buffer only',
@@ -37,8 +43,16 @@ const MODES: { id: Mode; label: string; survives: string; cost: string; detail: 
 ];
 
 const LAYERS = [
-    { id: 'app', label: 'process buffer', reachedBy: ['none', 'write', 'fsync', 'group'] },
-    { id: 'page', label: 'kernel page cache', reachedBy: ['write', 'fsync', 'group'] },
+    {
+        id: 'app',
+        label: 'process buffer',
+        reachedBy: ['none', 'write', 'fsync', 'group'],
+    },
+    {
+        id: 'page',
+        label: 'kernel page cache',
+        reachedBy: ['write', 'fsync', 'group'],
+    },
     { id: 'disk', label: 'stable storage', reachedBy: ['fsync', 'group'] },
 ];
 
@@ -52,7 +66,11 @@ export const DurabilityLadder = () => {
             controls={
                 <>
                     {MODES.map(m => (
-                        <Button key={m.id} onClick={() => setMode(m.id)} active={mode === m.id}>
+                        <Button
+                            key={m.id}
+                            onClick={() => setMode(m.id)}
+                            active={mode === m.id}
+                        >
                             {m.label}
                         </Button>
                     ))}
@@ -75,13 +93,17 @@ export const DurabilityLadder = () => {
                                 background: reached
                                     ? 'color-mix(in oklab, var(--term-green) 10%, transparent)'
                                     : 'transparent',
-                                color: reached ? 'var(--paper-bright)' : 'var(--paper-faint)',
+                                color: reached
+                                    ? 'var(--paper-bright)'
+                                    : 'var(--paper-faint)',
                             }}
                         >
                             <span>{layer.label}</span>
                             <span
                                 style={{
-                                    color: reached ? 'var(--term-green)' : 'var(--paper-line-strong)',
+                                    color: reached
+                                        ? 'var(--term-green)'
+                                        : 'var(--paper-line-strong)',
                                 }}
                             >
                                 {reached ? '● reached' : '○ not reached'}
@@ -95,13 +117,23 @@ export const DurabilityLadder = () => {
                 className="mt-4 grid gap-3 border-t pt-3 sm:grid-cols-2"
                 style={{ borderColor: 'var(--paper-line)' }}
             >
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
+                <div
+                    style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}
+                >
                     <div style={{ color: 'var(--paper-faint)' }}>survives</div>
-                    <div style={{ color: 'var(--paper-bright)' }}>{current.survives}</div>
+                    <div style={{ color: 'var(--paper-bright)' }}>
+                        {current.survives}
+                    </div>
                 </div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
-                    <div style={{ color: 'var(--paper-faint)' }}>cost per commit</div>
-                    <div style={{ color: 'var(--term-amber)' }}>{current.cost}</div>
+                <div
+                    style={{ fontFamily: 'var(--font-mono)', fontSize: '12px' }}
+                >
+                    <div style={{ color: 'var(--paper-faint)' }}>
+                        cost per commit
+                    </div>
+                    <div style={{ color: 'var(--term-amber)' }}>
+                        {current.cost}
+                    </div>
                 </div>
             </div>
 

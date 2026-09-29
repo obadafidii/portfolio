@@ -2,7 +2,10 @@ import createMDX from '@next/mdx';
 import remarkGfm from 'remark-gfm';
 import rehypePrettyCode from 'rehype-pretty-code';
 import { fileURLToPath } from 'node:url';
-import { BlogContentPlugin, generateBlogContent } from './scripts/blog-content.mjs';
+import {
+    BlogContentPlugin,
+    generateBlogContent,
+} from './scripts/blog-content.mjs';
 
 const projectRoot = fileURLToPath(new URL('.', import.meta.url));
 await generateBlogContent(projectRoot);
@@ -29,7 +32,7 @@ const nextConfig = {
         ],
     },
     async headers() {
-        return ['dark', 'light'].map((theme) => ({
+        return ['dark', 'light'].map(theme => ({
             source: `/giscus-${theme}.css`,
             headers: [{ key: 'Access-Control-Allow-Origin', value: '*' }],
         }));

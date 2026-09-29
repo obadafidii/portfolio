@@ -1,14 +1,10 @@
 export const post = {
-    "title": "Domain Name System (DNS)",
-    "summary": "What is actually on the wire: the header, label encoding and compression pointers, walking from root to authoritative, the 512-byte limit, and why TTLs are how long your mistakes last. Built as a resolver in Go.",
-    "publishedOn": "2025-10-27T19:16:03",
-    "tags": [
-        "dns",
-        "go",
-        "networking",
-        "protocols"
-    ],
-    "status": "in-progress"
+    title: 'Domain Name System (DNS)',
+    summary:
+        'What is actually on the wire: the header, label encoding and compression pointers, walking from root to authoritative, the 512-byte limit, and why TTLs are how long your mistakes last. Built as a resolver in Go.',
+    publishedOn: '2025-10-27T19:16:03',
+    tags: ['dns', 'go', 'networking', 'protocols'],
+    status: 'in-progress',
 };
 
 import Mermaid from '@/components/ui/blog/Mermaid';
@@ -288,7 +284,7 @@ func DecodeName(msg []byte, offset int) (string, int, error) {
 Two details worth keeping. **Pointers must point backwards** — enforcing that
 alone makes loops impossible, because each jump strictly decreases the offset.
 And the function returns two offsets, because after following a pointer you must
-resume reading from where the pointer *was*, not from where it led.
+resume reading from where the pointer _was_, not from where it led.
 
 ---
 
@@ -386,20 +382,60 @@ change. Set a 24-hour TTL and a mistake stays live for a day.
 ### The types worth knowing
 
 <table border="1">
-  <thead>
-    <tr><th>Type</th><th>RDATA</th><th>What it is for</th></tr>
-  </thead>
-  <tbody>
-    <tr><td>A</td><td>4 bytes</td><td>IPv4 address</td></tr>
-    <tr><td>AAAA</td><td>16 bytes</td><td>IPv6 address</td></tr>
-    <tr><td>CNAME</td><td>name</td><td>Alias to another name</td></tr>
-    <tr><td>NS</td><td>name</td><td>Delegation — who is authoritative for this zone</td></tr>
-    <tr><td>SOA</td><td>2 names + 5 uint32</td><td>Zone metadata: serial, refresh, retry, expire, minimum</td></tr>
-    <tr><td>MX</td><td>uint16 + name</td><td>Mail exchange, with a preference number</td></tr>
-    <tr><td>TXT</td><td>length-prefixed strings</td><td>Arbitrary text. SPF, DKIM and domain verification live here</td></tr>
-    <tr><td>PTR</td><td>name</td><td>Reverse lookup, IP back to name</td></tr>
-    <tr><td>SRV</td><td>3 uint16 + name</td><td>Service location with priority, weight and port</td></tr>
-  </tbody>
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>RDATA</th>
+            <th>What it is for</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>A</td>
+            <td>4 bytes</td>
+            <td>IPv4 address</td>
+        </tr>
+        <tr>
+            <td>AAAA</td>
+            <td>16 bytes</td>
+            <td>IPv6 address</td>
+        </tr>
+        <tr>
+            <td>CNAME</td>
+            <td>name</td>
+            <td>Alias to another name</td>
+        </tr>
+        <tr>
+            <td>NS</td>
+            <td>name</td>
+            <td>Delegation — who is authoritative for this zone</td>
+        </tr>
+        <tr>
+            <td>SOA</td>
+            <td>2 names + 5 uint32</td>
+            <td>Zone metadata: serial, refresh, retry, expire, minimum</td>
+        </tr>
+        <tr>
+            <td>MX</td>
+            <td>uint16 + name</td>
+            <td>Mail exchange, with a preference number</td>
+        </tr>
+        <tr>
+            <td>TXT</td>
+            <td>length-prefixed strings</td>
+            <td>Arbitrary text. SPF, DKIM and domain verification live here</td>
+        </tr>
+        <tr>
+            <td>PTR</td>
+            <td>name</td>
+            <td>Reverse lookup, IP back to name</td>
+        </tr>
+        <tr>
+            <td>SRV</td>
+            <td>3 uint16 + name</td>
+            <td>Service location with priority, weight and port</td>
+        </tr>
+    </tbody>
 </table>
 
 #### 1. Address records
@@ -430,17 +466,23 @@ func (r Record) IP() (net.IP, error) {
 dig google.com -t A     # ipv4
 ```
 
-<br/>
-<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165234/portfolio/blog/dig_google_A.png" alt="dig output for the google.com A record" />
-<br/>
+<br />
+<ArticleImage
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790165234/portfolio/blog/dig_google_A.png"
+    alt="dig output for the google.com A record"
+/>
+<br />
 
 ```bash
 dig google.com -t AAAA  # ipv6
 ```
 
-<br/>
-<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165235/portfolio/blog/dig_google_AAAA.png" alt="dig output for the google.com AAAA record" />
-<br/>
+<br />
+<ArticleImage
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790165235/portfolio/blog/dig_google_AAAA.png"
+    alt="dig output for the google.com AAAA record"
+/>
+<br />
 
 #### 2. CNAME
 
@@ -449,15 +491,35 @@ An alias. If you own `example.com` and also serve `docs.example.com` and
 repeating the address.
 
 <table border="1">
-  <thead>
-    <tr><th>Host</th><th>Type</th><th>Value</th></tr>
-  </thead>
-  <tbody>
-    <tr><td>example.com</td><td>A</td><td>142.234.53.1</td></tr>
-    <tr><td>docs.example.com</td><td>CNAME</td><td>example.com</td></tr>
-    <tr><td>drive.example.com</td><td>CNAME</td><td>example.com</td></tr>
-    <tr><td>mail.example.com</td><td>CNAME</td><td>example.com</td></tr>
-  </tbody>
+    <thead>
+        <tr>
+            <th>Host</th>
+            <th>Type</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>example.com</td>
+            <td>A</td>
+            <td>142.234.53.1</td>
+        </tr>
+        <tr>
+            <td>docs.example.com</td>
+            <td>CNAME</td>
+            <td>example.com</td>
+        </tr>
+        <tr>
+            <td>drive.example.com</td>
+            <td>CNAME</td>
+            <td>example.com</td>
+        </tr>
+        <tr>
+            <td>mail.example.com</td>
+            <td>CNAME</td>
+            <td>example.com</td>
+        </tr>
+    </tbody>
 </table>
 
 Two rules that bite people.
@@ -793,24 +855,33 @@ incident that sent me down this path.
 
 The server resolves and returns the address for amazon.com:
 
-<br/>
-<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165238/portfolio/blog/lookup_amazon.png" alt="resolver output for amazon.com" />
-<br/>
+<br />
+<ArticleImage
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790165238/portfolio/blog/lookup_amazon.png"
+    alt="resolver output for amazon.com"
+/>
+<br />
 
 And the same for google.com:
 
-<br/>
-<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165240/portfolio/blog/lookup_google.png" alt="resolver output for google.com" />
-<br/>
+<br />
+<ArticleImage
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790165240/portfolio/blog/lookup_google.png"
+    alt="resolver output for google.com"
+/>
+<br />
 
 ### 2. Domains that do not exist
 
 An NXDOMAIN response, distinguished from a failure — the name does not exist, as
 opposed to the server being unable to tell you:
 
-<br/>
-<ArticleImage src="https://res.cloudinary.com/cloudlord/image/upload/v1790165239/portfolio/blog/lookup_fake_domain.png" alt="resolver output for an invalid domain" />
-<br/>
+<br />
+<ArticleImage
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1790165239/portfolio/blog/lookup_fake_domain.png"
+    alt="resolver output for an invalid domain"
+/>
+<br />
 
 ---
 
@@ -835,20 +906,20 @@ surprise you, usually at the worst moment.
 
 ### Future improvements
 
-* DNSSEC validation — chase the chain of trust from the root's DS records
-* Serve-stale (RFC 8767): return expired entries when the authoritative server
+- DNSSEC validation — chase the chain of trust from the root's DS records
+- Serve-stale (RFC 8767): return expired entries when the authoritative server
   is unreachable, rather than failing
-* A proper zone file parser, so it can be authoritative and not just a resolver
-* Query pipelining over the TCP path
-* 0x20 encoding — randomise the case of the query name and require it echoed
+- A proper zone file parser, so it can be authoritative and not just a resolver
+- Query pipelining over the TCP path
+- 0x20 encoding — randomise the case of the query name and require it echoed
   back, which adds entropy against spoofing at zero protocol cost
 
 ### Further reading
 
-* [RFC 1035](https://www.rfc-editor.org/rfc/rfc1035) — the original spec, and
+- [RFC 1035](https://www.rfc-editor.org/rfc/rfc1035) — the original spec, and
   unusually readable for an RFC
-* [RFC 6891](https://www.rfc-editor.org/rfc/rfc6891) — EDNS0, which is how
+- [RFC 6891](https://www.rfc-editor.org/rfc/rfc6891) — EDNS0, which is how
   anything modern fits on the wire
-* [Julia Evans: How DNS works](https://jvns.ca/blog/2022/11/01/how-updating-dns-works/)
+- [Julia Evans: How DNS works](https://jvns.ca/blog/2022/11/01/how-updating-dns-works/)
   — the clearest explanation of propagation I have found
-* [DNS Flag Day 2020](https://dnsflagday.net/2020/) — why 1232 and not 4096
+- [DNS Flag Day 2020](https://dnsflagday.net/2020/) — why 1232 and not 4096

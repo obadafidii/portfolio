@@ -88,12 +88,17 @@ export const CrashReplay = () => {
         };
     }, [playing, cursor, phase, durable]);
 
-    const visibleLog = phase === 'crashed' || phase === 'replaying' || phase === 'recovered'
-        ? durable
-        : OPS.slice(0, cursor);
+    const visibleLog =
+        phase === 'crashed' || phase === 'replaying' || phase === 'recovered'
+            ? durable
+            : OPS.slice(0, cursor);
 
     const highlight =
-        phase === 'replaying' ? cursor - 1 : phase === 'writing' ? cursor - 1 : -1;
+        phase === 'replaying'
+            ? cursor - 1
+            : phase === 'writing'
+              ? cursor - 1
+              : -1;
 
     return (
         <Figure
@@ -137,16 +142,21 @@ export const CrashReplay = () => {
                 <div>
                     <p
                         className="mb-2 text-[11px] uppercase tracking-[0.14em]"
-                        style={{ color: 'var(--paper-faint)', fontFamily: 'var(--font-mono)' }}
+                        style={{
+                            color: 'var(--paper-faint)',
+                            fontFamily: 'var(--font-mono)',
+                        }}
                     >
                         wal segment (on disk)
                     </p>
                     <div className="space-y-1">
                         {OPS.map((op, idx) => {
-                            const written = visibleLog.some(v => v.lsn === op.lsn);
-                            const lost =
-                                op.unflushed && phase !== 'writing';
-                            const isCurrent = idx === highlight && phase === 'replaying';
+                            const written = visibleLog.some(
+                                v => v.lsn === op.lsn,
+                            );
+                            const lost = op.unflushed && phase !== 'writing';
+                            const isCurrent =
+                                idx === highlight && phase === 'replaying';
 
                             return (
                                 <div
@@ -164,7 +174,9 @@ export const CrashReplay = () => {
                                         background: isCurrent
                                             ? 'color-mix(in oklab, var(--term-green) 14%, transparent)'
                                             : 'transparent',
-                                        textDecoration: lost ? 'line-through' : 'none',
+                                        textDecoration: lost
+                                            ? 'line-through'
+                                            : 'none',
                                         color: lost
                                             ? 'var(--term-red)'
                                             : written
@@ -172,15 +184,20 @@ export const CrashReplay = () => {
                                               : 'var(--paper-faint)',
                                     }}
                                 >
-                                    <span style={{ color: 'var(--paper-faint)' }}>
-                                        lsn={String(op.lsn).padStart(2, '0')}{' '}
+                                    <span
+                                        style={{ color: 'var(--paper-faint)' }}
+                                    >
+                                        lsn=
+                                        {String(op.lsn).padStart(2, '0')}{' '}
                                     </span>
                                     {op.op} {op.key}
                                     {op.value && ` = "${op.value}"`}
                                     {op.unflushed && (
                                         <span
                                             className="ml-2"
-                                            style={{ color: 'var(--term-amber)' }}
+                                            style={{
+                                                color: 'var(--term-amber)',
+                                            }}
                                         >
                                             (buffered, not fsynced)
                                         </span>
@@ -194,7 +211,10 @@ export const CrashReplay = () => {
                 <div>
                     <p
                         className="mb-2 text-[11px] uppercase tracking-[0.14em]"
-                        style={{ color: 'var(--paper-faint)', fontFamily: 'var(--font-mono)' }}
+                        style={{
+                            color: 'var(--paper-faint)',
+                            fontFamily: 'var(--font-mono)',
+                        }}
                     >
                         memtable (in memory)
                     </p>
@@ -215,11 +235,21 @@ export const CrashReplay = () => {
                                 — power lost, memory gone —
                             </span>
                         ) : Object.keys(memory).length === 0 ? (
-                            <span style={{ color: 'var(--paper-faint)' }}>empty</span>
+                            <span style={{ color: 'var(--paper-faint)' }}>
+                                empty
+                            </span>
                         ) : (
                             Object.entries(memory).map(([key, value]) => (
-                                <div key={key} style={{ color: 'var(--paper-ink)' }}>
-                                    {key} <span style={{ color: 'var(--paper-faint)' }}>=</span>{' '}
+                                <div
+                                    key={key}
+                                    style={{ color: 'var(--paper-ink)' }}
+                                >
+                                    {key}{' '}
+                                    <span
+                                        style={{ color: 'var(--paper-faint)' }}
+                                    >
+                                        =
+                                    </span>{' '}
                                     <span style={{ color: 'var(--term-blue)' }}>
                                         &quot;{value}&quot;
                                     </span>

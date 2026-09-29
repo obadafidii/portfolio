@@ -63,11 +63,17 @@ export const RecordLayout = () => {
                                 active === idx
                                     ? `color-mix(in oklab, ${field.color} 22%, transparent)`
                                     : `color-mix(in oklab, ${field.color} 8%, transparent)`,
-                            color: active === idx ? 'var(--paper-bright)' : 'var(--paper-muted)',
+                            color:
+                                active === idx
+                                    ? 'var(--paper-bright)'
+                                    : 'var(--paper-muted)',
                         }}
                     >
                         <span className="block truncate">{field.name}</span>
-                        <span className="block" style={{ color: 'var(--paper-faint)' }}>
+                        <span
+                            className="block"
+                            style={{ color: 'var(--paper-faint)' }}
+                        >
                             {field.bytes}b
                         </span>
                     </button>
@@ -76,7 +82,10 @@ export const RecordLayout = () => {
 
             <div
                 className="mt-3 flex items-baseline justify-between text-[11px]"
-                style={{ fontFamily: 'var(--font-mono)', color: 'var(--paper-faint)' }}
+                style={{
+                    fontFamily: 'var(--font-mono)',
+                    color: 'var(--paper-faint)',
+                }}
             >
                 <span>offset 0</span>
                 <span>header = 17 bytes</span>

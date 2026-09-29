@@ -2,14 +2,24 @@ node_modules/
 .next/
 out/
 public/
+local-images/
 
 .env*
 .idea/
 .vscode/
 
-prettier.config.js
 postcss.config.mjs
 tailwind.config.js
 
 coverage/
 *.log
+
+# Generated files are formatted by their generators.
+meta/blog.generated.ts
+components/ui/blog/PostContent.generated.tsx
+next-env.d.ts
+package-lock.json
+skills-lock.json
+.agents/
+.codex/
+.vercel/

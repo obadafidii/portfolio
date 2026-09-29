@@ -20,7 +20,11 @@ export const ThemeSwitcher = () => {
     return (
         <button
             type="button"
-            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            aria-label={
+                theme === 'dark'
+                    ? 'Switch to light theme'
+                    : 'Switch to dark theme'
+            }
             className="grid h-7 w-7 cursor-pointer place-items-center rounded-[4px] text-[var(--paper-muted)] transition-colors duration-200 hover:bg-[var(--paper-accent-soft)] hover:text-[var(--paper-bright)]"
             onClick={toggleTheme}
         >

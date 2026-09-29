@@ -7,10 +7,7 @@ interface AProps extends HTMLAttributes<HTMLAnchorElement> {
 
 const A = ({ children, className = '', ...props }: AProps) => {
     return (
-        <a
-            {...props}
-            className={cn('cursor-pointer', className)}
-        >
+        <a {...props} className={cn('cursor-pointer', className)}>
             {children}
         </a>
     );

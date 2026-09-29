@@ -16,7 +16,11 @@ const slugify = (value: string) =>
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
 
-export function TableOfContents({ contentRef }: { contentRef: RefObject<HTMLDivElement | null> }) {
+export function TableOfContents({
+    contentRef,
+}: {
+    contentRef: RefObject<HTMLDivElement | null>;
+}) {
     const [headings, setHeadings] = useState<Heading[]>([]);
     const [activeId, setActiveId] = useState('');
 
@@ -28,9 +32,14 @@ export function TableOfContents({ contentRef }: { contentRef: RefObject<HTMLDivE
 
         const collectHeadings = () => {
             const usedIds = new Set<string>();
-            const elements = Array.from(content.querySelectorAll<HTMLHeadingElement>('h2, h3'));
+            const elements = Array.from(
+                content.querySelectorAll<HTMLHeadingElement>('h2, h3'),
+            );
             const nextHeadings = elements.map((heading, index) => {
-                const baseId = heading.id || slugify(heading.textContent || '') || `section-${index + 1}`;
+                const baseId =
+                    heading.id ||
+                    slugify(heading.textContent || '') ||
+                    `section-${index + 1}`;
                 let id = baseId;
                 let suffix = 2;
 
@@ -43,7 +52,8 @@ export function TableOfContents({ contentRef }: { contentRef: RefObject<HTMLDivE
                 heading.id = id;
                 return {
                     id,
-                    label: heading.textContent?.trim() || `Section ${index + 1}`,
+                    label:
+                        heading.textContent?.trim() || `Section ${index + 1}`,
                     level: heading.tagName === 'H3' ? 3 : 2,
                 } as Heading;
             });
@@ -77,8 +87,13 @@ export function TableOfContents({ contentRef }: { contentRef: RefObject<HTMLDivE
     const jumpTo = (id: string) => {
         const heading = document.getElementById(id);
         if (!heading) return;
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        heading.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        const reduceMotion = window.matchMedia(
+            '(prefers-reduced-motion: reduce)',
+        ).matches;
+        heading.scrollIntoView({
+            behavior: reduceMotion ? 'auto' : 'smooth',
+            block: 'start',
+        });
         window.history.replaceState(null, '', `#${id}`);
         setActiveId(id);
     };
@@ -111,8 +126,13 @@ export function TableOfContents({ contentRef }: { contentRef: RefObject<HTMLDivE
                             <span className="blog-toc__index">
                                 {String(index + 1).padStart(2, '0')}
                             </span>
-                            <span className="blog-toc__label">./{slugify(heading.label)}</span>
-                            <span className="blog-toc__arrow" aria-hidden="true">
+                            <span className="blog-toc__label">
+                                ./{slugify(heading.label)}
+                            </span>
+                            <span
+                                className="blog-toc__arrow"
+                                aria-hidden="true"
+                            >
                                 {active ? '▸' : '›'}
                             </span>
                         </a>

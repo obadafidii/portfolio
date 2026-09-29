@@ -1,6 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    type ReactNode,
+} from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 
 import {
@@ -13,7 +20,11 @@ import {
 const DEFAULT_PATHS = ['/works', '/resume', '/contact', '/'] as const;
 const DEFAULT_THEMES: PaneTheme[] = ['dark', 'blue', 'paper', 'transparent'];
 
-export const SplitWorkspaceProvider = ({ children }: { children: ReactNode }) => {
+export const SplitWorkspaceProvider = ({
+    children,
+}: {
+    children: ReactNode;
+}) => {
     const pathname = usePathname();
     const router = useRouter();
     const nextPaneId = useRef(1);
@@ -28,7 +39,8 @@ export const SplitWorkspaceProvider = ({ children }: { children: ReactNode }) =>
 
     useEffect(() => {
         setPanes(current => {
-            if (current.length !== 1 || current[0].path === pathname) return current;
+            if (current.length !== 1 || current[0].path === pathname)
+                return current;
             return [{ ...current[0], path: pathname }];
         });
     }, [pathname]);
@@ -37,7 +49,8 @@ export const SplitWorkspaceProvider = ({ children }: { children: ReactNode }) =>
         if (panes.length >= MAX_PANES) return;
 
         const usedPaths = new Set(panes.map(pane => pane.path));
-        const path = DEFAULT_PATHS.find(candidate => !usedPaths.has(candidate)) ?? '/';
+        const path =
+            DEFAULT_PATHS.find(candidate => !usedPaths.has(candidate)) ?? '/';
         const pane: PaneState = {
             id: nextPaneId.current++,
             path,
@@ -54,7 +67,8 @@ export const SplitWorkspaceProvider = ({ children }: { children: ReactNode }) =>
 
             const index = panes.findIndex(pane => pane.id === paneId);
             const next = panes.filter(pane => pane.id !== paneId);
-            const nextActive = next[Math.min(Math.max(index, 0), next.length - 1)];
+            const nextActive =
+                next[Math.min(Math.max(index, 0), next.length - 1)];
 
             setPanes(next);
             if (activePane === paneId) setActivePane(nextActive.id);
@@ -65,13 +79,17 @@ export const SplitWorkspaceProvider = ({ children }: { children: ReactNode }) =>
 
     const setPanePath = useCallback((paneId: number, path: string) => {
         setPanes(current =>
-            current.map(pane => (pane.id === paneId ? { ...pane, path } : pane)),
+            current.map(pane =>
+                pane.id === paneId ? { ...pane, path } : pane,
+            ),
         );
     }, []);
 
     const setPaneTheme = useCallback((paneId: number, theme: PaneTheme) => {
         setPanes(current =>
-            current.map(pane => (pane.id === paneId ? { ...pane, theme } : pane)),
+            current.map(pane =>
+                pane.id === paneId ? { ...pane, theme } : pane,
+            ),
         );
     }, []);
 
@@ -116,6 +134,8 @@ export const SplitWorkspaceProvider = ({ children }: { children: ReactNode }) =>
     );
 
     return (
-        <SplitWorkspaceContext.Provider value={value}>{children}</SplitWorkspaceContext.Provider>
+        <SplitWorkspaceContext.Provider value={value}>
+            {children}
+        </SplitWorkspaceContext.Provider>
     );
 };

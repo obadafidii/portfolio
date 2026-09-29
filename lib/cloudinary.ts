@@ -11,19 +11,25 @@ type ImageTransform = {
 };
 
 const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-const cloudinaryFolder = process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || DEFAULT_CLOUDINARY_FOLDER;
+const cloudinaryFolder =
+    process.env.NEXT_PUBLIC_CLOUDINARY_FOLDER || DEFAULT_CLOUDINARY_FOLDER;
 
-const encodePath = (value: string) => value.split('/').map(encodeURIComponent).join('/');
+const encodePath = (value: string) =>
+    value.split('/').map(encodeURIComponent).join('/');
 
-export const isLocalBlogImage = (src: string) => src.startsWith(LOCAL_IMAGE_PREFIX);
+export const isLocalBlogImage = (src: string) =>
+    src.startsWith(LOCAL_IMAGE_PREFIX);
 
 export const blogImagePublicId = (src: string) => {
-    const relativePath = src.slice(LOCAL_IMAGE_PREFIX.length).replace(/^\/+/, '');
+    const relativePath = src
+        .slice(LOCAL_IMAGE_PREFIX.length)
+        .replace(/^\/+/, '');
     const withoutExtension = relativePath.replace(/\.[a-z0-9]+$/i, '');
     return `${cloudinaryFolder}/${withoutExtension}`;
 };
 
-export const isCloudinaryImage = (src: string) => src.startsWith('https://res.cloudinary.com/');
+export const isCloudinaryImage = (src: string) =>
+    src.startsWith('https://res.cloudinary.com/');
 
 const addTransformations = (src: string, operations: string) => {
     const marker = '/image/upload/';
@@ -35,9 +41,13 @@ const addTransformations = (src: string, operations: string) => {
 
 /**
  * Resolve an author-friendly /image path to Cloudinary when configured.
- * Keeping local paths in MDX gives local development and migration a safe fallback.
+ * Legacy paths need Cloudinary configuration; new articles use versioned URLs.
+ * Original images are kept outside public and are not served locally.
  */
-export const resolveBlogImage = (src: string, transform: ImageTransform = {}) => {
+export const resolveBlogImage = (
+    src: string,
+    transform: ImageTransform = {},
+) => {
     const operations = [
         `f_${transform.format ?? 'auto'}`,
         `q_${transform.quality ?? 'auto'}`,
@@ -45,7 +55,9 @@ export const resolveBlogImage = (src: string, transform: ImageTransform = {}) =>
         transform.background ? `b_${transform.background}` : undefined,
         transform.width ? `w_${transform.width}` : undefined,
         transform.height ? `h_${transform.height}` : undefined,
-    ].filter(Boolean).join(',');
+    ]
+        .filter(Boolean)
+        .join(',');
 
     if (isCloudinaryImage(src)) return addTransformations(src, operations);
     if (!cloudName || !isLocalBlogImage(src)) return src;

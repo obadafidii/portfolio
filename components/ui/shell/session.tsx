@@ -34,7 +34,11 @@ interface ShellSessionValue {
 
 const ShellSessionContext = createContext<ShellSessionValue | null>(null);
 
-export const PaneShellSessionProvider = ({ children }: { children: ReactNode }) => {
+export const PaneShellSessionProvider = ({
+    children,
+}: {
+    children: ReactNode;
+}) => {
     const [blocks, setBlocks] = useState<ShellBlock[]>([]);
     const [input, setInput] = useState('');
     const [history, setHistory] = useState<string[]>([]);
