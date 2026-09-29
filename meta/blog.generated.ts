@@ -91,7 +91,11 @@ export const blogMetadata: Record<string, BlogMetadata> = {
             "libc",
             "open-source"
         ],
-        "status": "done"
+        "status": "done",
+        "coverImage": {
+            "src": "https://res.cloudinary.com/cloudlord/image/upload/v1790719806/portfolio/blog/llvm-logo.png",
+            "alt": "The LLVM wyvern logo"
+        }
     },
     "log/part-1-introduction": {
         "title": "Understanding Log: Introduction",
