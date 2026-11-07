@@ -255,6 +255,38 @@ const isSectionHeading = (text: string) => {
 
 const isTableLine = (line: string) => line.trim().startsWith('|');
 
+/** A line that starts its own block rather than continuing the one above. */
+const startsBlock = (line: string) =>
+    /^(#|\||>|<!--|\*\*|([-*+]|\d+[.)])\s)/.test(line) ||
+    /^(\*[^*]+\*|_[^_]+_)$/.test(line) ||
+    /^([-*_])\1{2,}$/.test(line.replace(/\s/g, ''));
+
+/**
+ * Formatters such as Prettier hard-wrap markdown at 80 columns. Join those
+ * soft breaks back into one line, so a paragraph or bullet stays one block
+ * instead of rendering as a ragged stack of short lines.
+ */
+export const unwrapSoftBreaks = (markdown: string): string => {
+    const out: string[] = [];
+
+    for (const raw of markdown.replace(/\r\n/g, '\n').split('\n')) {
+        const line = raw.trim();
+        const previous = out[out.length - 1]?.trim();
+
+        const continues =
+            line &&
+            previous &&
+            !startsBlock(line) &&
+            !/^(#|\||<!--)/.test(previous) &&
+            !/^\*\*.+\*\*$/.test(previous);
+
+        if (continues) out[out.length - 1] = `${out[out.length - 1]} ${line}`;
+        else out.push(raw);
+    }
+
+    return out.join('\n');
+};
+
 /**
  * Google Docs exports resumes as bold paragraphs and layout tables rather than
  * markdown headings. This rewrites the export into the heading structure the
@@ -329,10 +361,10 @@ export const adaptGoogleDoc = (markdown: string): string => {
                 }
 
                 const email = rest.match(
-                    /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/,
+                    /<?([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})>?/,
                 );
                 if (email) {
-                    contact.push(`- email: ${email[0]}`);
+                    contact.push(`- email: ${email[1]}`);
                     rest = rest.replace(email[0], ' ');
                 }
 
@@ -430,7 +462,9 @@ export const adaptGoogleDoc = (markdown: string): string => {
 
 export const parseResume = (input: string): Resume => {
     const syncedOn = input.match(SYNCED)?.[1];
-    const markdown = adaptGoogleDoc(input.replace(SYNCED, ''));
+    const markdown = adaptGoogleDoc(
+        unwrapSoftBreaks(input.replace(SYNCED, '')),
+    );
     const lines = markdown.split('\n');
 
     const resume: Resume = { name: '', tagline: [], sections: [], syncedOn };

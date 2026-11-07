@@ -6,6 +6,8 @@ import { ThemeProvider } from 'next-themes';
 import ogImageUrl from '@/misc/og';
 import { Analytics } from '@vercel/analytics/next';
 import { SplitWorkspaceProvider } from '@/components/layout/SplitWorkspaceProvider';
+import { MusicProvider } from '@/components/ui/music/MusicProvider';
+import { getTracks } from '@/lib/music';
 
 const sans = Manrope({
     variable: '--font-sans',
@@ -27,30 +29,35 @@ const code = Fira_Code({
 });
 
 export const metadata: Metadata = {
-    title: 'David Dada',
-    description: 'Computer Scientist and Experienced Backend Engineer.',
+    title: {
+        default: `${info.name} · ${info.role}`,
+        template: `%s · ${info.name}`,
+    },
+    description: info.description,
+    authors: [{ name: info.name, url: info.url }],
     icons: {
         shortcut: info.shortcutIcon,
     },
     openGraph: {
+        type: 'website',
         locale: 'en_US',
-        title: 'David Dada',
-        siteName: 'David Dada',
-        description: 'Computer Scientist and Experienced Backend Engineer.',
+        title: `${info.name} · ${info.role}`,
+        siteName: info.name,
+        description: info.description,
         url: info.url,
         images: [
             {
-                url: '/api/og',
+                url: ogImageUrl.toString(),
                 width: 1200,
                 height: 630,
-                alt: 'David Dada',
+                alt: `${info.name}, ${info.role.toLowerCase()}`,
             },
         ],
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'David Dada',
-        description: 'Computer Scientist and Experienced Backend Engineer.',
+        title: `${info.name} · ${info.role}`,
+        description: info.description,
         images: [ogImageUrl.toString()],
     },
     metadataBase: new URL(info.url),
@@ -73,7 +80,11 @@ export default function RootLayout({
                     defaultTheme="dark"
                     enableSystem={false}
                 >
-                    <SplitWorkspaceProvider>{children}</SplitWorkspaceProvider>
+                    <MusicProvider tracks={getTracks()}>
+                        <SplitWorkspaceProvider>
+                            {children}
+                        </SplitWorkspaceProvider>
+                    </MusicProvider>
                 </ThemeProvider>
                 <Analytics />
             </body>

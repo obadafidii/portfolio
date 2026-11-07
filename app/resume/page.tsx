@@ -9,32 +9,32 @@ const resume = getResume();
 
 const description =
     inlineToText(resume.tagline) ||
-    'Backend and infrastructure engineer. Experience, projects and skills.';
+    'Backend and systems engineer. Experience, projects and skills.';
 
 export const metadata: Metadata = {
-    title: `Resume — ${resume.name}`,
+    title: 'Resume',
     description,
     alternates: {
         canonical: `${info.url}/resume`,
     },
     openGraph: {
-        title: `Resume — ${resume.name}`,
+        title: `Resume · ${info.name}`,
         description,
         url: `${info.url}/resume`,
-        siteName: resume.name,
+        siteName: info.name,
         type: 'profile',
         images: [
             {
                 url: '/api/og',
                 width: 1200,
                 height: 630,
-                alt: `Resume — ${resume.name}`,
+                alt: `Resume · ${info.name}`,
             },
         ],
     },
     twitter: {
         card: 'summary_large_image',
-        title: `Resume — ${resume.name}`,
+        title: `Resume · ${info.name}`,
         description,
         images: ['/api/og'],
     },

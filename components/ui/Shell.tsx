@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+
+import info from '@/misc/info';
 
 import { CommandLine, Prompt } from '@/components/ui/shell/CommandLine';
 import { ROUTES } from '@/components/ui/shell/registry';
@@ -13,18 +15,112 @@ const Listing = () => (
     <div className="mt-1 space-y-0.5">
         {ROUTES.map(route => (
             <Link key={route.href} href={route.href} className="term-row group">
-                <span className="ink-faint w-[11ch] shrink-0">drwxr-xr-x</span>
+                <span className="ink-faint hidden w-[11ch] shrink-0 sm:inline">
+                    drwxr-xr-x
+                </span>
                 <span
-                    className="group-hover:underline"
+                    className="w-[14ch] shrink-0 group-hover:underline"
                     style={{ color: 'var(--term-blue)' }}
                 >
                     {route.name}/
                 </span>
-                <span className="ink-muted ml-auto text-[11px]">
+                <span className="ink-muted min-w-0 flex-1 text-[11px]">
                     {route.note}
                 </span>
             </Link>
         ))}
+    </div>
+);
+
+/**
+ * The first screen a visitor sees. Every line here should be a fact they can
+ * check on the resume or the blog, so keep it in sync with content/resume.md.
+ */
+const FACTS: { key: string; value: ReactNode }[] = [
+    {
+        key: 'now',
+        value: (
+            <>
+                Senior Golang Engineer at Satsio, building exchange and
+                matching-engine tooling
+            </>
+        ),
+    },
+    {
+        key: 'shipped',
+        value: (
+            <>
+                cut end-to-end processing latency 70% on Terrace&apos;s Solana
+                trading pipeline
+            </>
+        ),
+    },
+    {
+        key: 'built',
+        value: (
+            <>
+                <a
+                    href="https://github.com/obadafidii/minired"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="term-link"
+                >
+                    minired
+                </a>
+                , a Redis-compatible cache server in Go, and a sharded key-value
+                store with a WAL
+            </>
+        ),
+    },
+    {
+        key: 'upstream',
+        value: (
+            <>
+                merged into LLVM libc,{' '}
+                <Link
+                    href="/blog/llvm-first-contribution"
+                    className="term-link"
+                >
+                    read how it went
+                </Link>
+            </>
+        ),
+    },
+    { key: 'open to', value: <>remote backend and systems roles</> },
+];
+
+const Whoami = () => (
+    <div className="mt-1">
+        <div className="text-[15px]" style={{ color: 'var(--paper-bright)' }}>
+            David Dada
+        </div>
+        <p className="ink-muted max-w-[68ch]">
+            Backend and systems engineer. I build compilers and distributed
+            systems (databases and caches) in Go and Zig.
+        </p>
+
+        <dl className="mt-3 space-y-1">
+            {FACTS.map(fact => (
+                <div key={fact.key} className="flex gap-x-4">
+                    <dt className="ink-faint w-[9ch] shrink-0">{fact.key}</dt>
+                    <dd
+                        className="min-w-0 flex-1"
+                        style={{ color: 'var(--paper-ink)' }}
+                    >
+                        {fact.value}
+                    </dd>
+                </div>
+            ))}
+        </dl>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+            <Link href="/resume" className="term-action term-action-primary">
+                man david <span aria-hidden>→</span> resume
+            </Link>
+            <a href={`mailto:${info.email}`} className="term-action">
+                mail david <span aria-hidden>→</span> email
+            </a>
+        </div>
     </div>
 );
 
@@ -69,10 +165,8 @@ export const Shell = () => {
 
             {booted && (
                 <>
-                    <div style={{ color: 'var(--paper-ink)' }}>
-                        David Dada — backend + infrastructure engineer
-                    </div>
-                    <div className="ink-faint mt-3">
+                    <Whoami />
+                    <div className="ink-faint mt-5">
                         type{' '}
                         <span style={{ color: 'var(--term-blue)' }}>help</span>{' '}
                         for commands, or click a directory below.

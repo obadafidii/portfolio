@@ -37,10 +37,11 @@ const Row = ({ post }: { post: BlogMetadata }) => {
     const status = STATUS_MARK[post.status];
     const readable = isReadable(post);
 
+    /* Unpublished dates are placeholders, so the queue shows status instead. */
     const content = (
         <>
             <span className="ink-faint w-[11ch] shrink-0">
-                {formatDate(post.publishedOn)}
+                {readable ? formatDate(post.publishedOn) : status.label}
             </span>
             <span
                 className="w-[2ch] shrink-0"
@@ -159,13 +160,31 @@ const BlogsPage = () => {
 
     const byYear = useMemo(() => {
         const grouped: Record<string, BlogMetadata[]> = {};
-        filtered.forEach(post => {
+        filtered.filter(isReadable).forEach(post => {
             (grouped[post.year] ??= []).push(post);
         });
         return Object.entries(grouped).sort(
             (a, b) => Number(b[0]) - Number(a[0]),
         );
     }, [filtered]);
+
+    /* Unfinished posts sit below the published ones, in-progress first. */
+    const queued = useMemo(
+        () =>
+            filtered
+                .filter(post => !isReadable(post))
+                .sort(
+                    (a, b) =>
+                        Number(b.status === 'in-progress') -
+                        Number(a.status === 'in-progress'),
+                ),
+        [filtered],
+    );
+
+    const publishedCount = useMemo(
+        () => posts.filter(isReadable).length,
+        [posts],
+    );
 
     const flags = [
         tag ? `--tag=${tag}` : '',
@@ -180,7 +199,8 @@ const BlogsPage = () => {
             path="~/writing"
             status={
                 <span>
-                    {filtered.length} of {posts.length} entries
+                    {publishedCount} published · {posts.length - publishedCount}{' '}
+                    in the queue
                 </span>
             }
         >
@@ -231,6 +251,22 @@ const BlogsPage = () => {
                                 </div>
                             </section>
                         ))}
+
+                        {queued.length > 0 && (
+                            <section>
+                                <p className="ink-faint mb-1 text-[11px]">
+                                    # in the queue · not published yet
+                                </p>
+                                <div className="space-y-0.5">
+                                    {queued.map(post => (
+                                        <Row
+                                            key={post.slug || post.title}
+                                            post={post}
+                                        />
+                                    ))}
+                                </div>
+                            </section>
+                        )}
 
                         {filtered.length === 0 && (
                             <p className="term-err">ls: no entries matched</p>

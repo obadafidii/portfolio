@@ -13,6 +13,11 @@ export interface ShellContext {
     cwd: Cwd;
     navigate: (href: string) => void;
     clear: () => void;
+    music: {
+        play: () => void;
+        pause: () => void;
+        next: () => void;
+    };
 }
 
 export type CommandResult = ReactNode | null;
@@ -118,6 +123,9 @@ export const COMMAND_NAMES = [
     'cat',
     'man',
     'open',
+    'play',
+    'pause',
+    'next',
     'whoami',
     'pwd',
     'clear',
@@ -138,6 +146,9 @@ const HELP_ROWS: { name: string; args?: string; help: string }[] = [
     { name: 'cat', args: '<name>', help: 'read an entry here' },
     { name: 'man', args: 'david', help: 'the resume, as a manual page' },
     { name: 'open', args: '<name>', help: 'open a project, post or profile' },
+    { name: 'play', help: 'play the music' },
+    { name: 'pause', help: 'pause the music' },
+    { name: 'next', help: 'skip to the next track' },
     { name: 'whoami', help: 'the short version' },
     { name: 'pwd', help: 'where you are' },
     { name: 'clear', help: 'wipe the screen' },
@@ -147,7 +158,7 @@ const Help = () => (
     <div className="mt-1 space-y-0.5">
         {HELP_ROWS.map(row => (
             <div
-                key={row.name}
+                key={`${row.name}:${row.args ?? ''}`}
                 className="flex flex-wrap items-baseline gap-x-3"
             >
                 <span className="w-[22ch] shrink-0">
@@ -270,6 +281,10 @@ export const suggestionsFor = (value: string, cwd: Cwd): string[] => {
         pool = COMMAND_NAMES;
     } else {
         switch (verb) {
+            case 'play':
+            case 'pause':
+            case 'next':
+                return [];
             case 'ls':
             case 'll':
                 pool =
@@ -460,6 +475,28 @@ export const runCommand = (
         case 'help':
             return <Help />;
 
+        case 'play':
+            if (rest.length > 0)
+                return <Err>play: takes no arguments. Usage: play</Err>;
+            ctx.music.play();
+            return <div className="ink-muted mt-1">starting the music…</div>;
+
+        case 'pause':
+            if (rest.length > 0)
+                return <Err>pause: takes no arguments. Usage: pause</Err>;
+            ctx.music.pause();
+            return <div className="ink-muted mt-1">music paused</div>;
+
+        case 'next':
+            if (rest.length > 0)
+                return <Err>next: takes no arguments. Usage: next</Err>;
+            ctx.music.next();
+            return (
+                <div className="ink-muted mt-1">
+                    skipping to the next track…
+                </div>
+            );
+
         case 'man': {
             const page = arg?.replace(/\(\d\)$/, '');
             if (!page || page === 'david' || page === 'resume') {
@@ -489,7 +526,7 @@ export const runCommand = (
         case 'whoami':
             return (
                 <div className="mt-1" style={{ color: 'var(--paper-ink)' }}>
-                    David Dada — backend + infrastructure engineer
+                    David Dada — backend + systems engineer
                 </div>
             );
 

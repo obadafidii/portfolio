@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'Open Source Contributions | David Dada',
+    title: 'Open source',
     description:
-        'Public open source pull requests and notes on what changed and why.',
+        'Pull requests merged into other projects, including LLVM, with notes on what changed and why.',
 };
 
 export default function OpenSourceLayout({

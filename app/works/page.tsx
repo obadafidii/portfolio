@@ -20,16 +20,24 @@ const Row = ({ work, perm }: { work: Work; perm: string }) => (
         rel="noopener noreferrer"
         className="term-row group"
     >
-        <span className="ink-faint w-[11ch] shrink-0">{perm}</span>
+        <span className="ink-faint hidden w-[11ch] shrink-0 sm:inline">
+            {perm}
+        </span>
         <span
-            className="w-[16ch] shrink-0 group-hover:underline"
+            className="w-full shrink-0 group-hover:underline sm:w-[16ch]"
             style={{ color: 'var(--term-blue)' }}
         >
             {work.file}
             {work.kind === 'product' ? '/' : ''}
         </span>
-        <span className="ink-muted min-w-0 flex-1 text-[12px]">
-            {work.description}
+        <span className="w-full min-w-0 pl-[2ch] text-[12px] sm:w-auto sm:flex-1 sm:pl-0">
+            <span className="ink-muted block">{work.description}</span>
+            {work.impact && (
+                <span className="block" style={{ color: 'var(--term-green)' }}>
+                    <span aria-hidden>↳ </span>
+                    {work.impact}
+                </span>
+            )}
         </span>
     </a>
 );

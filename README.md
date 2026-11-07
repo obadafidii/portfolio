@@ -1,5 +1,29 @@
 ## David Dada's Website
 
+### Music
+
+The status bar's music button and the terminal commands `play`, `pause` and
+`next` control an audio-only player. There is no visible player or video.
+Playback continues across client-side navigation and split panes, and nothing
+downloads until a visitor presses play.
+
+Drop audio files (mp3, ogg, m4a, wav, opus) into `public/music/`. Every file
+becomes a track, played in filename order and looped. Prefix names with numbers
+to set the order, for example `01-desert-mystic.mp3`; the title shown in the
+status bar comes from the filename. The files are served from this site, so
+only use tracks you have the rights to publish (CC0 or similar).
+
+While music plays, a faint carved frieze drifts along the bottom of the window
+and walks through history as the track plays. Each era gets an equal share of
+the song: ancient Egypt, classical Greece, Rome, Tang China, the Mali Empire,
+the industrial age, today (a booster landing on a drone ship) and the future
+in space. As each era's time runs out, the next civilization walks in from
+the right and pushes it off to the left. The frieze fades out when the music stops and stays still
+for visitors who prefer reduced motion.
+
+The frieze lives in `components/ui/music/Frieze.tsx`, with one file per era in
+`components/ui/music/frieze/` and the order in `frieze/eras.ts`.
+
 ### GitHub comments
 
 Published blog posts render a Giscus comment thread after the reaction buttons.

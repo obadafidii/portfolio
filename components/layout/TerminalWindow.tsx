@@ -13,6 +13,8 @@ import info from '@/misc/info';
 import { NavLink } from '@/components/ui/NavLink';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
 import { MobileNavBar } from '@/components/ui/MobileNavBar';
+import { MusicControls } from '@/components/ui/music/MusicProvider';
+import { Frieze } from '@/components/ui/music/Frieze';
 import { PaneShellSessionProvider } from '@/components/ui/shell/session';
 import type { NavLinkType } from '@/types/types.navigation';
 import {
@@ -390,11 +392,13 @@ export const TerminalWindow = ({
             )}
 
             <footer className="term-statusbar">
+                <Frieze />
                 <span className="truncate">
                     {workspace.splitOpen ? pathLabel(activePane.path) : path}
                 </span>
                 <span className="hidden sm:inline">zsh</span>
                 <span className="hidden sm:inline">utf-8</span>
+                <MusicControls />
                 {workspace.splitOpen && (
                     <span className="hidden md:inline">
                         pane {activePaneIndex + 1} of {workspace.panes.length} ·{' '}

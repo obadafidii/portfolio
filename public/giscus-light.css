@@ -7,13 +7,13 @@ main {
     --terminal-inset: #fbfaf8;
     --terminal-line: #cfcfcb;
     --terminal-ink: #1c2128;
-    --terminal-muted: #626c7a;
+    --terminal-muted: #4d5663;
     --terminal-blue: #0550ae;
     --terminal-green: #1a7f37;
 
     --color-fg-default: var(--terminal-ink);
     --color-fg-muted: var(--terminal-muted);
-    --color-fg-subtle: #8b95a3;
+    --color-fg-subtle: #656f7c;
     --color-canvas-default: transparent;
     --color-canvas-subtle: var(--terminal-panel);
     --color-canvas-inset: var(--terminal-inset);

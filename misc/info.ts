@@ -1,5 +1,9 @@
 const info = {
     me: 'òbàdàfídì',
+    name: 'David Dada',
+    role: 'Backend & systems engineer',
+    description:
+        'Backend and systems engineer. I build compilers and distributed systems (databases and caches) in Go and Zig.',
     url: 'https://obadafidi.me',
     shortcutIcon: 'icon.svg',
     github: 'https://github.com/obadafidii',
@@ -23,6 +27,7 @@ const info = {
             kind: 'product' as const,
             url: 'https://app.terrace.fi/i',
             description: 'CEX and DEX pool aggregator',
+            impact: 'cut end-to-end processing latency 70% at 99.9% accuracy',
             tags: [
                 'go',
                 'solana',
@@ -38,6 +43,7 @@ const info = {
             kind: 'product' as const,
             url: 'https://www.curaboard.com/',
             description: 'A single home for all your shopping finds',
+            impact: 'zero-downtime domain migration, full access back in 24h',
             tags: ['nodejs', 'postgres', 'aws', 'dns', 'tls'],
         },
         {

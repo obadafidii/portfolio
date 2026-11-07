@@ -8,8 +8,8 @@
     --paper-raised: #161b23;
     --paper-ink: #d5dde8;
     --paper-bright: #f2f6fa;
-    --paper-muted: #7b8798;
-    --paper-faint: #5a6472;
+    --paper-muted: #98a3b3;
+    --paper-faint: #7a8492;
     --paper-line: #1e242e;
     --paper-line-strong: #2b333f;
     --paper-accent: #d5dde8;
@@ -34,8 +34,8 @@
     --paper-raised: #ffffff;
     --paper-ink: #1c2128;
     --paper-bright: #05080c;
-    --paper-muted: #626c7a;
-    --paper-faint: #8b95a3;
+    --paper-muted: #4d5663;
+    --paper-faint: #656f7c;
     --paper-line: #e2e2df;
     --paper-line-strong: #cfcfcb;
     --paper-accent: #1c2128;
@@ -385,20 +385,8 @@ a {
 .blog-post-layout .pager-prose > ul,
 .blog-post-layout .pager-prose > ol,
 .blog-post-layout .pager-prose > blockquote {
-    text-align: justify;
-    text-justify: inter-word;
-    hyphens: auto;
-}
-
-@media (max-width: 760px) {
-    .blog-post-layout .pager-prose > p,
-    .blog-post-layout .pager-prose > ul,
-    .blog-post-layout .pager-prose > ol,
-    .blog-post-layout .pager-prose > blockquote {
-        text-align: left;
-        text-justify: auto;
-        hyphens: manual;
-    }
+    text-align: left;
+    hyphens: manual;
 }
 
 .blog-post-layout .mdx-image-frame {
@@ -1536,8 +1524,8 @@ a {
     --paper-raised: #161b23;
     --paper-ink: #d5dde8;
     --paper-bright: #f2f6fa;
-    --paper-muted: #7b8798;
-    --paper-faint: #5a6472;
+    --paper-muted: #98a3b3;
+    --paper-faint: #7a8492;
     --paper-line: #1e242e;
     --paper-line-strong: #2b333f;
     --paper-accent: #d5dde8;
@@ -1665,6 +1653,55 @@ a {
     margin: 0 -6px;
     border-radius: 3px;
     text-decoration: none;
+}
+
+.term-link {
+    color: var(--term-blue);
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+}
+
+.term-link:hover {
+    text-decoration-style: solid;
+}
+
+.term-link:focus-visible,
+.term-action:focus-visible {
+    outline: 1px solid var(--term-blue);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+.term-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6ch;
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--paper-line-strong);
+    border-radius: 4px;
+    background: var(--paper-raised);
+    color: var(--paper-ink);
+    font-size: 12px;
+    text-decoration: none;
+    transition:
+        border-color 120ms ease,
+        background-color 120ms ease;
+}
+
+.term-action:hover {
+    border-color: var(--paper-muted);
+}
+
+.term-action-primary {
+    border-color: color-mix(in srgb, var(--term-green) 55%, transparent);
+    color: var(--term-green);
+}
+
+.term-action-primary:hover {
+    border-color: var(--term-green);
+    background: color-mix(in srgb, var(--term-green) 10%, var(--paper-raised));
 }
 
 a.term-row:hover,
@@ -1895,4 +1932,15 @@ a.term-row:focus-visible {
     background-color: var(--paper-soft);
     color: var(--paper-muted);
     font-weight: 400;
+}
+
+/* Leave room so the last lines can scroll clear of the music frieze. */
+.term-page:has([data-frieze='on']) .term-content {
+    padding-bottom: 92px;
+}
+
+@media (max-width: 639px) {
+    .term-page:has([data-frieze='on']) .term-content {
+        padding-bottom: 78px;
+    }
 }

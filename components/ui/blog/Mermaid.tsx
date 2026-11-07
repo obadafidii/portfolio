@@ -42,7 +42,7 @@ export default function Mermaid({ chart }: { chart: string }) {
         if (!container || !nearViewport) return;
 
         const ink = readVar('--paper-ink', '#d5dde8');
-        const muted = readVar('--paper-muted', '#7b8798');
+        const muted = readVar('--paper-muted', '#98a3b3');
         const line = readVar('--paper-line-strong', '#2b333f');
         const surface = readVar('--paper-soft', '#10141b');
 

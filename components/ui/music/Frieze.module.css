@@ -1,0 +1,264 @@
+/*
+ * Carved-wall band that sits just above the status bar while music plays.
+ * Each era has its own ink, kept faint so it reads as texture on the wall
+ * rather than content: sandstone for Egypt, terracotta for Greece, and so on
+ * up to a cool glow for the future.
+ */
+
+.frieze {
+    --frieze-h: 60px;
+
+    position: absolute;
+    right: 0;
+    bottom: 100%;
+    left: 0;
+    height: var(--frieze-h);
+    overflow: hidden;
+    pointer-events: none;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        var(--paper-raised) 5px
+    );
+    opacity: 0;
+    transition: opacity 900ms ease;
+}
+
+.frieze[data-frieze='on'] {
+    opacity: 1;
+}
+
+/* ------------------------------------------------------------- eras */
+
+/* Each era's ink, shared by its wall and its label. */
+.tinted {
+    --frieze-ink: #d9b77e;
+    --frieze-strength: 0.42;
+}
+
+/*
+ * Handover: the next civilization walks in from the right and pushes the
+ * current one off to the left, both still drifting as they go.
+ */
+.layer {
+    position: absolute;
+    inset: 0;
+}
+
+.layer[data-arriving] {
+    animation: arrive 9s cubic-bezier(0.45, 0, 0.55, 1) both;
+}
+
+.layer[data-leaving] {
+    animation: depart 9s cubic-bezier(0.45, 0, 0.55, 1) both;
+}
+
+@keyframes arrive {
+    from {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes depart {
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+/* Reduced motion: no sliding, a plain crossfade instead. */
+.frieze[data-motion='off'] .layer[data-arriving] {
+    animation: fade-in 1.2s ease both;
+}
+
+.frieze[data-motion='off'] .layer[data-leaving] {
+    animation: fade-out 1.2s ease both;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes fade-out {
+    to {
+        opacity: 0;
+    }
+}
+
+.tinted[data-era='greece'] {
+    --frieze-ink: #e0987a;
+}
+.tinted[data-era='rome'] {
+    --frieze-ink: #d2c6ae;
+}
+.tinted[data-era='china'] {
+    --frieze-ink: #e08c80;
+}
+.tinted[data-era='mali'] {
+    --frieze-ink: #d6a46a;
+}
+.tinted[data-era='industry'] {
+    --frieze-ink: #aeb7c0;
+}
+.tinted[data-era='today'] {
+    --frieze-ink: #c3d2e0;
+}
+.tinted[data-era='future'] {
+    --frieze-ink: #86d8ea;
+    --frieze-strength: 0.48;
+}
+
+:global([data-theme='light']) .tinted {
+    --frieze-ink: #7a5a2c;
+    --frieze-strength: 0.4;
+}
+:global([data-theme='light']) .tinted[data-era='greece'] {
+    --frieze-ink: #94442a;
+}
+:global([data-theme='light']) .tinted[data-era='rome'] {
+    --frieze-ink: #625743;
+}
+:global([data-theme='light']) .tinted[data-era='china'] {
+    --frieze-ink: #9b3427;
+}
+:global([data-theme='light']) .tinted[data-era='mali'] {
+    --frieze-ink: #85531f;
+}
+:global([data-theme='light']) .tinted[data-era='industry'] {
+    --frieze-ink: #48525c;
+}
+:global([data-theme='light']) .tinted[data-era='today'] {
+    --frieze-ink: #3d5166;
+}
+:global([data-theme='light']) .tinted[data-era='future'] {
+    --frieze-ink: #1d6a7b;
+}
+
+.label {
+    position: absolute;
+    top: 4px;
+    left: 0;
+    z-index: 1;
+    padding: 2px 14px 3px 12px;
+    font-size: 9.5px;
+    line-height: 1;
+    white-space: nowrap;
+    color: color-mix(in srgb, var(--frieze-ink) 60%, transparent);
+    background: linear-gradient(to right, var(--paper-raised) 80%, transparent);
+}
+
+/* ------------------------------------------------------------- wall */
+
+.strip {
+    height: 100%;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent,
+        #000 7%,
+        #000 93%,
+        transparent
+    );
+    mask-image: linear-gradient(
+        to right,
+        transparent,
+        #000 7%,
+        #000 93%,
+        transparent
+    );
+}
+
+.wall {
+    display: flex;
+    width: max-content;
+    height: 100%;
+    padding-top: 4px;
+    color: var(--frieze-ink);
+    opacity: var(--frieze-strength);
+}
+
+/* The procession drifts left; one tile per cycle so the loop is seamless. */
+.frieze[data-motion='on'] .wall {
+    animation: drift 60s linear infinite;
+}
+
+@keyframes drift {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-33.3333%);
+    }
+}
+
+.tile {
+    display: block;
+    flex: none;
+    height: 100%;
+    width: auto;
+    aspect-ratio: 960 / 64;
+    overflow: visible;
+}
+
+.ink {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Filled areas read as the raised surface of the relief. */
+.solid {
+    fill: currentColor;
+    fill-opacity: 0.55;
+}
+
+/* Cloth and glass: lighter than the carved figures. */
+.sail {
+    fill: currentColor;
+    fill-opacity: 0.18;
+}
+
+/* Fine incised detail: pleats, strings, water, windows. */
+.cut {
+    stroke-width: 0.7;
+    opacity: 0.8;
+}
+
+/* Smoke, steam and exhaust. */
+.smoke {
+    fill: currentColor;
+    fill-opacity: 0.35;
+    stroke: none;
+}
+
+/* Engine fire and starlight: filled, no outline. */
+.glow {
+    fill: currentColor;
+    fill-opacity: 0.8;
+    stroke: none;
+}
+
+.glyphs {
+    opacity: 0.75;
+}
+
+.ground {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 0.8;
+}
+
+@media (max-width: 639px) {
+    .frieze {
+        --frieze-h: 46px;
+    }
+
+    .label {
+        top: 4px;
+        left: 10px;
+        font-size: 8.5px;
+    }
+}

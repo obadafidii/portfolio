@@ -81,7 +81,7 @@ export const buildPostMetadata = (
     const canonicalUrl = `/blog/${key}`;
 
     return {
-        title: `${blog.title} | ${site.me}`,
+        title: blog.title,
         description: blog.summary,
         alternates: { canonical: canonicalUrl },
         authors: [{ name: site.me }],

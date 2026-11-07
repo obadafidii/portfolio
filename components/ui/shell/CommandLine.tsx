@@ -1,7 +1,14 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useId, useRef, useState, type ReactNode } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useId,
+    useRef,
+    useState,
+    type ReactNode,
+} from 'react';
 
 import {
     runCommand,
@@ -9,6 +16,7 @@ import {
     type Cwd,
 } from '@/components/ui/shell/registry';
 import { usePaneNavigation } from '@/components/layout/split-state';
+import { useMusic } from '@/components/ui/music/MusicProvider';
 import { usePaneShellSession, type ShellBlock } from './session';
 
 interface CommandLineProps {
@@ -33,6 +41,7 @@ export const CommandLine = ({
     const router = useRouter();
     const paneNavigate = usePaneNavigation();
     const paneSession = usePaneShellSession();
+    const { play, pause, next } = useMusic();
     const [localBlocks, setLocalBlocks] = useState<ShellBlock[]>([]);
     const [localInput, setLocalInput] = useState('');
     const [localHistory, setLocalHistory] = useState<string[]>([]);
@@ -66,6 +75,7 @@ export const CommandLine = ({
                 navigate: href =>
                     paneNavigate ? paneNavigate(href) : router.push(href),
                 clear: () => setBlocks([]),
+                music: { play, pause, next },
             });
 
             if (output === 'CLEARED') return;
@@ -82,8 +92,18 @@ export const CommandLine = ({
                 }),
             );
         },
-        [cwd, nextId, paneNavigate, router, setBlocks],
+        [cwd, next, nextId, paneNavigate, pause, play, router, setBlocks],
     );
+
+    /*
+     * Focus the prompt on load without scrolling to it, and skip touch
+     * screens entirely so the keyboard does not cover the page on arrival.
+     */
+    useEffect(() => {
+        if (!autoFocus) return;
+        if (window.matchMedia('(pointer: coarse)').matches) return;
+        inputRef.current?.focus({ preventScroll: true });
+    }, [autoFocus]);
 
     const onSubmit = (event: React.FormEvent) => {
         event.preventDefault();
@@ -139,7 +159,16 @@ export const CommandLine = ({
                 return;
             }
         }
-        if (event.key === 'Tab') {
+        /*
+         * Tab completes only while there is something to complete. On an
+         * empty prompt it moves focus as usual, so keyboard users can leave.
+         */
+        if (
+            event.key === 'Tab' &&
+            !event.shiftKey &&
+            input.trim() !== '' &&
+            suggestions.length > 0
+        ) {
             event.preventDefault();
             complete();
             return;
@@ -227,7 +256,6 @@ export const CommandLine = ({
                         autoCorrect="off"
                         autoCapitalize="off"
                         spellCheck={false}
-                        autoFocus={autoFocus}
                         role="combobox"
                         aria-label="Terminal command"
                         aria-autocomplete="list"

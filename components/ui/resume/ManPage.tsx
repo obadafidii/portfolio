@@ -196,7 +196,7 @@ const BlockView = ({
         case 'row':
             return (
                 <div className="indent flex flex-wrap gap-x-3">
-                    <span className="ink-faint w-[13ch] shrink-0">
+                    <span className="ink-faint w-[13ch] shrink-0 sm:w-[17ch]">
                         {block.key}
                     </span>
                     <span style={{ color: 'var(--paper-ink)' }}>
