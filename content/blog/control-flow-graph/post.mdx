@@ -1,0 +1,561 @@
+import Img from '@/components/mdx/elements/Img';
+import { CfgBuilder } from '@/components/ui/blog/cfg/CfgBuilder';
+
+export const post = {
+    title: 'Program visualization; control-flow-graphs & basic block',
+    summary:
+        'Understanding basic blocks and building control flow graphs',
+    publishedOn: '2026-11-24T09:00:00.000Z',
+    tags: ['basic-blocks', 'control-flow-graphs', 'mojo', 'graphs'],
+    status: 'done',
+    coverImage: {
+        src: 'https://res.cloudinary.com/cloudlord/image/upload/v1795536527/portfolio/blog/control-flow-graph-cover.png',
+        alt: 'Hand-drawn control flow graph of basic blocks connected by arrows, including a loop back edge',
+    },
+};
+
+<Img
+    src="https://res.cloudinary.com/cloudlord/image/upload/v1795536527/portfolio/blog/control-flow-graph-cover.png"
+    alt="The LLVM wyvern logo"
+    width={700}
+    height={439}
+    caption=""
+/>
+
+<p style={{ textAlign: 'center' }}>
+    <a
+        href="https://res.cloudinary.com/cloudlord/image/upload/v1795536527/portfolio/blog/control-flow-graph-cover.png"
+        style={{ color: 'var(--paper-faint)' }}
+    >
+        {'Control flow graph'}
+    </a>
+</p>
+
+
+# Beyond parsing
+Most compiler courses just explore the basics of lexing and parsing, but understanding compilers and the infrastructure that surrounds them pushes one to dig deeper than these surface areas. I am currently taking the [Advanced compilers course](https://www.cs.cornell.edu/courses/cs6120/2020fa/self-guided/) and I just finished module 2: program representation. I am dropping my thoughts on what I learnt.
+
+## Programs
+There are several ways to represent a program; the raw syntax, intermediate representation and control-flow graphs. The raw syntax is basically the source code and that is fine but compilers don't necessarily work with this representation. This representation is meant for us mere mortals and not machines.
+
+## Intermediate Representation
+This is a well-defined structure that the compiler lowers the Abstract Syntax Tree (AST) into allowing for several *computation*, *transformation* and *analysis* to be carried out. There are 2 major categories of IR:
+
+1. Linear IR
+2. Graphical IR
+
+## Linear IR
+This represents a program as a flattened structure of instructions, examples in this category are:
+
+1. Three-address-code (TAC)
+2. Polish representation
+3. Stack-based representation
+
+## Three-Address-Code
+TAC represents a program as linear instructions made up of at most 3 operands per instruction. Consider this program:
+
+```mojo
+var a = 10 * 15 + 2
+var b = 2 * a
+```
+The TAC representation of this program becomes
+
+```
+t1 = 10 * 15
+t2 = t1 + 2
+t3 = 2 * t2
+```
+Each instruction contains _at most 3 operands_. This mode of representation is really useful especially when we get to SSA (Static Single Assignment) construction.
+
+## Graphical IR
+This represents programs as nodes interacting with each other to form a graph.  Examples in this area are:
+
+1. Control flow graphs (CFG)
+2. Sea of nodes
+3. Abstract Syntax Tree (AST)
+
+## Control Flow Graphs
+This is a kind of representation that models how control is passed in a program. It is also used to model data-flow analysis; how variables/values are passed from one *region* of code to another. 
+
+A CFG is made of nodes called _BasicBlocks_; and a BasicBlock is a group of instructions that can be executed sequentially. The CFG maps out how these blocks interact within a program and if one integrates a graph visualizing tool like [Graphviz](https://graphviz.org/) you will be able to see a pictorial representation of any program.
+
+## BasicBlocks?
+Like previously explained, these are instructions grouped together. A BasicBlock has several rules it must follow:
+
+1. There must be only one entry into a block and one exit out of the block. "_Single entry Single exit_"
+2. Every control-passing instruction (_jump, branch and return instructions_) must be either at the beginning or end of a block.
+3. The incoming and outgoing nodes of a basic block must follow
+    - count(incoming) > 0 and count(outgoing) == 1
+
+With this brief theoretical foundation, let's dive into building basic blocks and control-flow-graphs. I will be using [Mojo](https://www.mojolang.org) for this but you can use any language of your choice.
+
+## Problem and goals
+>Given a set of instructions build a control flow graph & basic blocks from these instructions respecting the rules that guides its construction.
+
+So our input is a set of instructions and we are to return a graph 🤔
+
+```mojo
+def main():
+  var instructions = []
+  cfg = build(instructions)
+```
+[BRIL](https://capra.cs.cornell.edu/bril/tools/interp.html) is the intermediate representation we are going to use for this program and we will define our graph & block as mojo structs
+
+**Block**
+```mojo
+struct BasicBlock(Copyable, Movable, Writable):
+  var label: String
+  var instructions: Optional[List[Code]]
+  
+  var destination_block_label: Optional[List[String]]
+
+  def __init__(out self,
+        name: String,
+        instructions: List[Code],
+        dest: Optional[List[String]] = None
+    ):
+      self.label = name
+      self.instructions = instructions.copy()
+      self.destination_block_label = dest.copy()
+```
+
+**Graph**
+```mojo
+struct Graph(Movable, Writable):
+  var graph: Dict[String, List[BasicBlock]]
+
+  def __init__(out self):
+      self.graph = Dict[String, List[BasicBlock]]()
+```
+
+This is the program we are going to use in BRIL representation
+
+```js title="log"
+@main {
+  v0: int = const 1;
+  v1: int = const 2;
+  br  cond .label .label2;
+.label:
+  v2: int = add v0 v1;
+  print v2;
+  jmp .label2;
+.label2:
+  print v3;
+}
+```
+We are going to read this program in its json representation, I used [emberJSON](https://github.com/bgreni/EmberJson) library to handle the json parsing and I literally offloaded the parsing logic from JSON to Mojo structs to Claude. You can do it yourself if you want to, you're going to learn about parsing but that was not my focus.
+
+Each node in the graph is represented by a label (_String_) and maps to the block it holds (_List[BasicBlock]_). Now that we have our basic structure setup, let us build our control-flow-graph.
+
+## Builder 👷
+First, we have to figure out all _labels_ in the program, think of a label as a tagged portion of a code that a program can go to. We iterate over all codes provided and see if the *code* is an instruction or a label. If it is a label we just create the node for it
+
+```mojo
+for code in instructions:
+  if code.is_label():
+    g.add_node(code.label().name())
+```
+*code* is a [`Variant`](https://mojolang.org/docs/std/utils/variant/Variant/) of _Instructions and Labels_
+```mojo
+from std.utils import Variant
+var code = Variant[Instruction, Label]
+```
+
+To test our logic, let's run the code; we get this formatted output
+
+```js title="log"
+Graph {
+  "main": [
+  ],
+  "label": [
+  ],
+  "label2": [
+  ],
+}
+```
+Awesome! we have our nodes constructed successfully. We need to construct our basic blocks and for this we are going to have another iteration outside of our first iteration. In this iteration we are going to
+
+1. Group all instructions encountered
+2. Check if the current instruction is a control passing instruction; these are instructions that pass program control to another block e.g "jmp", "br", "cbr", "call". 
+    - If the instruction passes control 
+      - create a new block and add all previously grouped instructions, 
+      - then insert this block in the current label. 
+      - clear the previous group
+    - If not, then continue iterating and grouping these instructions
+
+```mojo
+for instruction in instructions:
+  group.append(instruction.copy())
+
+  if is_control_passing(instruction.op):
+    var bb = BasicBlock(
+      name = "blk-{}".format(block_count),
+      instructions = group^,
+      dest = instruction.labels.copy(),
+    )
+    g.add(label, bb^)
+    block_count += 1
+    group = []
+```
+There is an issue in this flow, can you spot the issue? Yeah exactly, since we are iterating over list of instructions it is possible we encounter a label again and we don't want to add labels to our set of instructions. For this we check the kind of *code*. If the code is not an instruction, it means we are entering a new region in the program and this calls for a new basic block, what we need to do is 
+
+1. update the label
+2. Clear all previously grouped instructions, we don't want them to be present in this new block
+
+```mojo
+for instruction in instructions:
+  if code.is_instr():
+    # handle instruction
+    # grouping and basic block creation
+  else:
+    # handle label encountered
+    group = []
+    label = code.label().name()
+```
+Now we have been able to construct the control flow graph, but the last block has not been added; we need to add the last block outside the `for..loop`
+
+```mojo
+var bb = BasicBlock(
+  name = "blk-{}".format(block_count),
+  instructions = group^,
+  dest = instruction.labels.copy(),
+)
+g.add(label, bb^)
+```
+The final code for building the control flow graph will now look like this
+
+```mojo
+def build(instructions: List[Code]) raises -> Graph:
+  var label = "main"
+  var block_count = 0
+  var g = Graph()
+  var group: List[Code] = []
+
+  g.add_node(label)
+
+  # build graph nodes.
+  for code in instructions:
+    if code.is_label():
+      g.add_node(code.label().name())
+
+  # map instructions to nodes.
+  for code in instructions:
+    # instructions
+    if code.is_instr():
+      var instruction = code.instr().copy()
+      group.append(instruction.copy())
+
+      if is_control_passing(instruction.op):
+        # create block
+        var bb = BasicBlock(
+          name = "blk-{}".format(block_count),
+          instructions = group^,
+          dest = instruction.labels.copy(),
+        )
+        # add block to graph
+        g.add(label, bb^)
+        block_count += 1
+        # clear instructions to avoid them spilling into the next block
+        group = []
+        
+    # labels
+    else:
+      # clear instructions to avoid them spilling into the next block
+      group = []
+      label = code.label().name()
+
+  # insert last block
+  var bb = BasicBlock(
+    name = "blk-{}".format(block_count),
+    instructions = group^,
+  )
+  g.add(label, bb^)
+  return g^
+```
+and the output will be
+
+```js title="log"
+Graph {
+  "main": [
+    BasicBlock {
+      name: "blk-1",
+      instructions: [
+        Instruction {
+          op: "const",
+          dest: Some("v0"),
+          type: Some(BrilType { base: "int", wrappers: [] }),
+          value: Some(Literal.Int(1)),
+          pos: Some(Position { row: 2, col: 3 }),
+        },
+        Instruction {
+          op: "const",
+          dest: Some("v1"),
+          type: Some(BrilType { base: "int", wrappers: [] }),
+          value: Some(Literal.Int(2)),
+          pos: Some(Position { row: 3, col: 3 }),
+        },
+        Instruction {
+          op: "br",
+          args: ["cond"],
+          labels: ["label", "label2"],
+          pos: Some(Position { row: 4, col: 3 }),
+        },
+      ],
+      dest_block_label: [label, label2],
+    },
+  ],
+  "label": [
+    BasicBlock {
+      name: "blk-2",
+      instructions: [
+        Instruction {
+          op: "add",
+          dest: Some("v2"),
+          type: Some(BrilType { base: "int", wrappers: [] }),
+          args: ["v0", "v1"],
+          pos: Some(Position { row: 6, col: 3 }),
+        },
+        Instruction {
+          op: "print",
+          args: ["v2"],
+          pos: Some(Position { row: 7, col: 3 }),
+        },
+        Instruction {
+          op: "jmp",
+          labels: ["label2"],
+          pos: Some(Position { row: 8, col: 3 }),
+        },
+      ],
+      dest_block_label: [label2],
+    },
+  ],
+  "label2": [
+    BasicBlock {
+      name: "blk-3",
+      instructions: [
+        Instruction {
+          op: "print",
+          args: ["v3"],
+          pos: Some(Position { row: 10, col: 3 }),
+        },
+      ],
+      dest_block_label: None,
+    },
+  ],
+}
+```
+
+Here is the whole run, one decision at a time. Press play, or step through it.
+
+<CfgBuilder />
+
+## Silent bug 🐞
+While this code builds the control-flow graph well, there is a silent bug and that is an unhandled case. If you notice the last instructions in every block of the bril program are control-passing instructions, what happens when a block does not end with a control-passing instruction? This is what I call "fallthrough bug" 
+
+```js title="program.bril"
+@main {
+  v0: int = const 1;
+  v1: int = const 2;
+  br  cond .label .label2; <-- # control passing instruction
+.label:
+  v2: int = add v0 v1;
+  print v2;
+  jmp .label2; <-- # control passing instruction
+.label2:
+  print v3;
+}
+```
+Modifying our program to expose this bug we have:
+
+```js title="program.bril"
+@main {
+  v0: int = const 1;
+  v1: int = const 2;
+  br  cond .label 
+.label:
+  v2: int = add v0 v1;
+  print v2; <-- # not passing control
+.label2:
+  print v3;
+}
+```
+If we run the json version of this program against our current algorithm and get the output as
+
+```js title="log"
+Graph {
+  "main": [
+    BasicBlock {
+      name: "blk-0",
+      instructions: [
+        Instruction {
+          op: "const",
+          dest: Some("v0"),
+          type: Some(BrilType { base: "int", wrappers: [] }),
+          value: Some(Literal.Int(1)),
+          pos: Some(Position { row: 3, col: 3 }),
+        },
+        Instruction {
+          op: "const",
+          dest: Some("v1"),
+          type: Some(BrilType { base: "int", wrappers: [] }),
+          value: Some(Literal.Int(2)),
+          pos: Some(Position { row: 4, col: 3 }),
+        },
+        Instruction {
+          op: "br",
+          args: ["cond"],
+          labels: ["label"],
+          pos: Some(Position { row: 5, col: 3 }),
+        },
+      ],
+      dest_block_label: [label],
+    },
+  ],
+  "label": [
+  ] // empty node,
+  "label2": [
+    BasicBlock {
+      name: "blk-1",
+      instructions: [
+        Instruction {
+          op: "print",
+          args: ["v3"],
+          pos: Some(Position { row: 10, col: 3 }),
+        },
+      ],
+      dest_block_label: None,
+    },
+  ],
+}
+```
+
+because the "label" block does not end with a control-passing instruction the algorithm does not track its blocks when the next label ("label2") is seen. Step through it below and watch what happens to the instructions under `.label` when the cursor reaches `.label2`.
+
+<CfgBuilder scenario="fallthrough" />
+
+How do we mitigate this error?
+
+We have go into our `else` block, where labels are handled, before clearning the previous group and updating to the new label we should check if we have some grouped instructions 
+
+- if we do - we create a basic block. This is because the group instructions were not cleared by `group = []` in the `is_control_passing():` block because the last instruction in that label's block ("label") was not control passing.
+- if we don't we do the normal cleanup and label update
+
+```mojo
+else:
+  # handles fallthrough scenarios where a block does not
+  # terminate with a control passing instructions
+  # so execution just moves to next label
+  if len(group) != 0:
+    var fallthrough_label: List[String] = [code.label().name()]
+    g.add(
+      label,
+      BasicBlock(
+        name = "blk-{}".format(block_count),
+        instructions = group^,
+        dest = fallthrough_label.copy()
+      )
+    )
+    block_count += 1
+  group = []
+  label = code.label().name()
+```
+Implementing this fix handles the subtle `fallthrough` bug. If we run our previous BRIL program against our new algorithm we are going to have
+
+```js title="log"
+Graph {
+  "main": [
+    BasicBlock {
+      name: "blk-1",
+      instructions: [
+        Instruction {
+          op: "const",
+          dest: Some("v0"),
+          type: Some(BrilType { base: "int", wrappers: [] }),
+          value: Some(Literal.Int(1)),
+          pos: Some(Position { row: 2, col: 3 }),
+        },
+        Instruction {
+          op: "const",
+          dest: Some("v1"),
+          type: Some(BrilType { base: "int", wrappers: [] }),
+          value: Some(Literal.Int(2)),
+          pos: Some(Position { row: 3, col: 3 }),
+        },
+        Instruction {
+          op: "br",
+          dest: None,
+          type: None,
+          args: ["cond"],
+          labels: ["label"],
+          pos: Some(Position { row: 4, col: 3 }),
+        },
+      ],
+      dest_block_label: [label],
+    },
+  ],
+  # now populated with the basic block
+  "label": [
+    BasicBlock {
+      name: "blk-2",
+      instructions: [
+        Instruction {
+          op: "add",
+          dest: Some("v2"),
+          type: Some(BrilType { base: "int", wrappers: [] }),
+          args: ["v0", "v1"],
+          pos: Some(Position { row: 6, col: 3 }),
+        },
+        Instruction {
+          op: "print",
+          args: ["v2"],
+          pos: Some(Position { row: 7, col: 3 }),
+        },
+      ],
+      dest_block_label: [label2],
+    },
+  ],
+  "label2": [
+    BasicBlock {
+      name: "blk-3",
+      instructions: [
+        Instruction {
+          op: "print",
+          args: ["v3"],
+          pos: Some(Position { row: 9, col: 3 }),
+        },
+      ],
+      dest_block_label: None,
+    },
+  ],
+}
+```
+With this we've been able to construct a basic block and build a control flow graph for a BRIL program.
+
+## Challenge
+While studying this module I told `GPT` to generate a set of challenges for me to practically understand this, I didn't use GPT's IR anymore when I saw BRIL but if you want to practically understand beyond just reading I will challenge you to build a CFG builder for [GPT's simple IR](https://github.com/obadafidii/cge/tree/main/02-control-flow-graph). You can tell claude, codex or any AI you use to handle the parsing of text so that you can 
+focus on implementing the control-flow-graph. If you attempt the challenge, feel free to share online and tag me on [X](https://x.com) as [@obadafidii](https://x.com/obadafidiii) or on Linkedin as [David Dada](https://www.linkedin.com/in/obadafidi).
+
+```text
+label entry
+cond = gt x 10
+cbr cond yes no
+label yes
+y = mul x 2
+br end
+label no
+y = add x 1
+br end
+label end
+ret y
+```
+
+## Conclusion
+This understanding is really fundamental to many compiler concepts like `def-use` and compiler optimizations. Speaking of compiler optimizations, I will be studying & implementing compiler optimizations next and digging into [`Modular's Mojo optimizations`](https://github.com/modular/modular/tree/main/Mojo/lib/Transforms). Till next time 気をつけてね (take care)🚀
+
+
+## Resources
+1. [Advanced Compiler Course](https://www.cs.cornell.edu/courses/cs6120/2020fa/self-guided/)
+2. [Intermediate Representation](https://en.wikipedia.org/wiki/Intermediate_representation)
+3. [BasicBlock](https://en.wikipedia.org/wiki/Basic_block)
+4. [Control Flow Graph](https://en.wikipedia.org/wiki/Control-flow_graph)
+5. [LLVM BasicBlock class](https://llvm.org/doxygen/group__LLVMCCoreValueBasicBlock.html)

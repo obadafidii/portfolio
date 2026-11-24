@@ -33,6 +33,24 @@ export const blogMetadata: Record<string, BlogMetadata> = {
         ],
         "status": "draft"
     },
+    "control-flow-graph": {
+        "title": "Program visualization; control-flow-graphs & basic block",
+        "summary": "Understanding basic blocks and building control flow graphs",
+        "publishedOn": "2026-11-24T09:00:00.000Z",
+        "year": "2026",
+        "slug": "control-flow-graph",
+        "tags": [
+            "basic-blocks",
+            "control-flow-graphs",
+            "mojo",
+            "graphs"
+        ],
+        "status": "done",
+        "coverImage": {
+            "src": "https://res.cloudinary.com/cloudlord/image/upload/v1795536527/portfolio/blog/control-flow-graph-cover.png",
+            "alt": "Hand-drawn control flow graph of basic blocks connected by arrows, including a loop back edge"
+        }
+    },
     "cpu-pipelining": {
         "title": "CPU Pipelining, Explained with Robots",
         "summary": "A visual explanation of how a CPU overlaps fetch, decode, and execute so that one instruction can finish on almost every clock tick.",

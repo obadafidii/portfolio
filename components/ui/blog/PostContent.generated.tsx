@@ -6,6 +6,7 @@ import type { ComponentType } from 'react';
 
 const content: Record<string, ComponentType> = {
     "busy-waiting": dynamic(() => import("@/content/blog/busy-waiting/post.mdx")),
+    "control-flow-graph": dynamic(() => import("@/content/blog/control-flow-graph/post.mdx")),
     "cpu-pipelining": dynamic(() => import("@/content/blog/cpu-pipelining/post.mdx")),
     "llvm-first-contribution": dynamic(() => import("@/content/blog/llvm-first-contribution/post.mdx")),
     "log/part-1-introduction": dynamic(() => import("@/content/blog/log/part-1-introduction.mdx")),
