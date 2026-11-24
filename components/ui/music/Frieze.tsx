@@ -20,6 +20,17 @@ const FADE_MS = 900;
 const SWAP_MS = 9000;
 /** Start each handover early so it is halfway done at the era boundary. */
 const LEAD_S = SWAP_MS / 2000;
+/** One drift cycle of the wall, matching the drift keyframes. */
+const DRIFT_S = 60;
+
+/** Where the track is now, so a freshly mounted wall picks up mid-song. */
+const now = (audio: HTMLAudioElement | null) =>
+    audio
+        ? {
+              era: eraAt(audio.currentTime + LEAD_S, audio.duration),
+              time: audio.currentTime,
+          }
+        : { era: 0, time: 0 };
 
 /** One era's wall: three copies of its tile drifting left. */
 export function EraWall({
@@ -27,11 +38,14 @@ export function EraWall({
     motion,
     arriving = false,
     leaving = false,
+    time = 0,
 }: {
     era: number;
     motion: boolean;
     arriving?: boolean;
     leaving?: boolean;
+    /** Track time when this wall appeared; sets how far it has drifted. */
+    time?: number;
 }) {
     const { id, Scene } = ERAS[era];
     return (
@@ -42,7 +56,12 @@ export function EraWall({
             data-leaving={leaving ? '' : undefined}
         >
             <div className={styles.strip}>
-                <div className={styles.wall}>
+                <div
+                    className={styles.wall}
+                    style={{
+                        animationDelay: `-${(time % DRIFT_S).toFixed(2)}s`,
+                    }}
+                >
                     {[0, 1, 2].map(copy => (
                         <svg
                             key={copy}
@@ -65,11 +84,19 @@ export function EraWall({
 export function Frieze() {
     const { status, audio } = useMusic();
     const playing = status === 'playing';
-    const [mounted, setMounted] = useState(false);
-    const [visible, setVisible] = useState(false);
+    /*
+     * The status bar is rebuilt on every page, so this mounts again on each
+     * navigation. Start from wherever the song is, already visible, so the
+     * wall carries on instead of restarting from Egypt.
+     */
+    const [mounted, setMounted] = useState(playing);
+    const [visible, setVisible] = useState(playing);
     const [motion, setMotion] = useState(true);
-    const [era, setEra] = useState(0);
-    const [layers, setLayers] = useState([{ era: 0, key: 0, arriving: false }]);
+    const [start] = useState(() => now(audio.current));
+    const [era, setEra] = useState(start.era);
+    const [layers, setLayers] = useState([
+        { era: start.era, key: 0, arriving: false, time: start.time },
+    ]);
 
     useEffect(() => {
         const query = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -122,20 +149,29 @@ export function Frieze() {
             if (top.era === era) return current;
             return [
                 { ...top, arriving: false },
-                { era, key: top.key + 1, arriving: true },
+                {
+                    era,
+                    key: top.key + 1,
+                    arriving: true,
+                    time: audio.current?.currentTime ?? 0,
+                },
             ];
         });
-    }, [era]);
+    }, [audio, era]);
 
     /* The era's name changes halfway through, when the new wall leads. */
-    const [labelEra, setLabelEra] = useState(0);
+    const [labelEra, setLabelEra] = useState(start.era);
+    const [labelChanged, setLabelChanged] = useState(false);
     useEffect(() => {
         const next = layers[layers.length - 1].era;
         if (layers.length < 2) {
             setLabelEra(next);
             return;
         }
-        const half = window.setTimeout(() => setLabelEra(next), SWAP_MS / 2);
+        const half = window.setTimeout(() => {
+            setLabelEra(next);
+            setLabelChanged(true);
+        }, SWAP_MS / 2);
         return () => window.clearTimeout(half);
     }, [layers]);
 
@@ -167,12 +203,14 @@ export function Frieze() {
                     motion={motion}
                     arriving={layer.arriving}
                     leaving={idx < layers.length - 1}
+                    time={layer.time}
                 />
             ))}
             <span
                 key={labelEra}
                 className={`${styles.label} ${styles.tinted}`}
                 data-era={ERAS[labelEra].id}
+                data-changed={labelChanged ? '' : undefined}
             >
                 {ERAS[labelEra].label}
             </span>

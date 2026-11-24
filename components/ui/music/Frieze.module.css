@@ -148,6 +148,11 @@
     background: linear-gradient(to right, var(--paper-raised) 80%, transparent);
 }
 
+/* A new era name fades in; on page changes the name just stays. */
+.label[data-changed] {
+    animation: fade-in 1.2s ease both;
+}
+
 /* ------------------------------------------------------------- wall */
 
 .strip {
