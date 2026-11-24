@@ -29,12 +29,33 @@ export function TableOfContents({
         if (!content) return;
 
         let headingObserver: IntersectionObserver | undefined;
+        let observed: HTMLHeadingElement[] = [];
+        let signature = '';
+        let frame = 0;
 
         const collectHeadings = () => {
-            const usedIds = new Set<string>();
+            frame = 0;
             const elements = Array.from(
                 content.querySelectorAll<HTMLHeadingElement>('h2, h3'),
             );
+            /*
+             * The interactive figures in a post change the DOM many times a
+             * second. Only rebuild the outline when the headings themselves
+             * changed, instead of on every one of those mutations.
+             */
+            const nextSignature = elements
+                .map(heading => `${heading.tagName}:${heading.textContent}`)
+                .join('\n');
+            if (
+                nextSignature === signature &&
+                elements.length === observed.length &&
+                elements.every((heading, index) => heading === observed[index])
+            )
+                return;
+            signature = nextSignature;
+            observed = elements;
+
+            const usedIds = new Set<string>();
             const nextHeadings = elements.map((heading, index) => {
                 const baseId =
                     heading.id ||
@@ -73,11 +94,15 @@ export function TableOfContents({
         };
 
         collectHeadings();
-        const contentObserver = new MutationObserver(collectHeadings);
+        // Coalesce bursts of mutations into one check per frame.
+        const contentObserver = new MutationObserver(() => {
+            if (!frame) frame = requestAnimationFrame(collectHeadings);
+        });
         contentObserver.observe(content, { childList: true, subtree: true });
 
         return () => {
             contentObserver.disconnect();
+            if (frame) cancelAnimationFrame(frame);
             headingObserver?.disconnect();
         };
     }, [contentRef]);

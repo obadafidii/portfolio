@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import { savedContributions, type Contribution } from '@/content/contributions';
 
+/*
+ * Serve a cached copy and refresh it in the background at most once an hour,
+ * matching the GitHub fetch below, instead of running the function on every
+ * request the CDN has not cached yet.
+ */
+export const revalidate = 3600;
+
 const USERNAME = 'obadafidii';
 const CACHE_HEADERS = {
     'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',

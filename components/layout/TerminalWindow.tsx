@@ -14,7 +14,7 @@ import { NavLink } from '@/components/ui/NavLink';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
 import { MobileNavBar } from '@/components/ui/MobileNavBar';
 import { MusicControls } from '@/components/ui/music/MusicProvider';
-import { Frieze } from '@/components/ui/music/Frieze';
+import { LazyFrieze } from '@/components/ui/music/LazyFrieze';
 import { PaneShellSessionProvider } from '@/components/ui/shell/session';
 import type { NavLinkType } from '@/types/types.navigation';
 import {
@@ -392,7 +392,7 @@ export const TerminalWindow = ({
             )}
 
             <footer className="term-statusbar">
-                <Frieze />
+                <LazyFrieze />
                 <span className="truncate">
                     {workspace.splitOpen ? pathLabel(activePane.path) : path}
                 </span>

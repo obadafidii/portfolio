@@ -274,6 +274,9 @@ def build(instructions: List[Code]) raises -> Graph:
 ```
 and the output will be
 
+<details style={{ margin: '1.6rem 0', border: '1px solid var(--code-border)', borderRadius: 4, background: 'var(--code-header-bg)' }}>
+<summary style={{ cursor: 'pointer', padding: '6px 10px', color: 'var(--code-muted)', fontFamily: "var(--font-code), 'Fira Code', monospace", fontSize: 12 }}>log: the built Graph (click to expand)</summary>
+
 ```js title="log"
 Graph {
   "main": [
@@ -345,6 +348,8 @@ Graph {
 }
 ```
 
+</details>
+
 Here is the whole run, one decision at a time. Press play, or step through it.
 
 <CfgBuilder />
@@ -380,6 +385,9 @@ Modifying our program to expose this bug we have:
 }
 ```
 If we run the json version of this program against our current algorithm and get the output as
+
+<details style={{ margin: '1.6rem 0', border: '1px solid var(--code-border)', borderRadius: 4, background: 'var(--code-header-bg)' }}>
+<summary style={{ cursor: 'pointer', padding: '6px 10px', color: 'var(--code-muted)', fontFamily: "var(--font-code), 'Fira Code', monospace", fontSize: 12 }}>log: Graph with the fallthrough bug (click to expand)</summary>
 
 ```js title="log"
 Graph {
@@ -429,6 +437,8 @@ Graph {
 }
 ```
 
+</details>
+
 because the "label" block does not end with a control-passing instruction the algorithm does not track its blocks when the next label ("label2") is seen. Step through it below and watch what happens to the instructions under `.label` when the cursor reaches `.label2`.
 
 <CfgBuilder scenario="fallthrough" />
@@ -460,6 +470,9 @@ else:
   label = code.label().name()
 ```
 Implementing this fix handles the subtle `fallthrough` bug. If we run our previous BRIL program against our new algorithm we are going to have
+
+<details style={{ margin: '1.6rem 0', border: '1px solid var(--code-border)', borderRadius: 4, background: 'var(--code-header-bg)' }}>
+<summary style={{ cursor: 'pointer', padding: '6px 10px', color: 'var(--code-muted)', fontFamily: "var(--font-code), 'Fira Code', monospace", fontSize: 12 }}>log: Graph after the fix (click to expand)</summary>
 
 ```js title="log"
 Graph {
@@ -529,6 +542,8 @@ Graph {
   ],
 }
 ```
+
+</details>
 With this we've been able to construct a basic block and build a control flow graph for a BRIL program.
 
 ## Challenge

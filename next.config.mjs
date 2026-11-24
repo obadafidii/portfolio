@@ -32,10 +32,23 @@ const nextConfig = {
         ],
     },
     async headers() {
-        return ['dark', 'light'].map(theme => ({
-            source: `/giscus-${theme}.css`,
-            headers: [{ key: 'Access-Control-Allow-Origin', value: '*' }],
-        }));
+        return [
+            ...['dark', 'light'].map(theme => ({
+                source: `/giscus-${theme}.css`,
+                headers: [{ key: 'Access-Control-Allow-Origin', value: '*' }],
+            })),
+            {
+                // Tracks rarely change; let browsers reuse them for a week
+                // instead of revalidating the whole file on every play.
+                source: '/music/:file*',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=604800, stale-while-revalidate=86400',
+                    },
+                ],
+            },
+        ];
     },
     pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
     webpack(config) {
